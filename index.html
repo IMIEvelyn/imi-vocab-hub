@@ -81,37 +81,33 @@ body {
   .marquee-item { margin: 0 30px; font-weight: bold; color: #666; font-size: 26px; letter-spacing: 2px; }
   .marquee-item span { color: #4CAF50; font-size: 20px; margin-left: 8px; }
 
-  /* 大星星回饋層 */
+ /* 大星星回饋層與固定尺寸 */
   #bigStarFeedback { 
-    position: fixed; top: 50%; left: 50%; 
+    position: fixed; top: 50%; left: 50%;
+    width: 250px; height: 250px; /* 💡新增固定尺寸，讓外框包住整顆星星 */
     transform: translate(-50%, -50%) scale(0); 
-    z-index: 10005; pointer-events: none; opacity: 0; 
+    z-index: 10005; opacity: 0; pointer-events: none; 
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
   }
- #bigStarFeedback.show { transform: translate(-50%, -50%) scale(1); opacity: 1; pointer-events: auto; cursor: pointer; }
+  #bigStarFeedback.show { transform: translate(-50%, -50%) scale(1); opacity: 1; pointer-events: auto; cursor: pointer; }
   
-  /* 🔊 再聽一次按鈕專屬樣式 (極簡圓形小衛星) */
+  /* 🔊 再聽一次按鈕專屬樣式 (緊貼星星正下方) */
   .replay-audio-btn {
     position: absolute;
     left: 50%;
-    top: 50%;
-    transform: translate(-50%, 135px); /* 將按鈕往下推，懸浮在星星外圍正下方 */
+    bottom: -10px; /* 💡利用 bottom 像圖釘一樣釘在星星框架的最底邊緣 */
+    transform: translateX(-50%); 
     background: #ffffff;
-    border-radius: 50%; /* 設定為純圓形 */
-    width: 60px;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 30px;
-    cursor: pointer;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2); /* 加上立體陰影 */
-    transition: all 0.2s;
-    z-index: 10;
+    border-radius: 50%; 
+    width: 60px; height: 60px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 30px; cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2); 
+    transition: all 0.2s; z-index: 10;
   }
-  .replay-audio-btn:hover { transform: translate(-50%, 135px) scale(1.1); }
-  .replay-audio-btn:active { transform: translate(-50%, 135px) scale(0.9); }
+  .replay-audio-btn:hover { transform: translateX(-50%) scale(1.1); }
+  .replay-audio-btn:active { transform: translateX(-50%) scale(0.9); }
   
   .star-bg { font-size: 220px; filter: drop-shadow(0 0 40px rgba(255, 202, 40, 0.8)); position: absolute; z-index: 1; }
   .star-text-box { z-index: 2; text-align: center; }
@@ -477,8 +473,7 @@ body {
     </div>
     <div class="top-bar">
       <div class="scaffold-controls"><button class="toggle-btn" id="btnPy" onclick="togglePinyin()">👁️ 拼音 Pinyin</button><button class="toggle-btn" id="btnZy" onclick="toggleZhuyin()">👁️ 注音ㄅㄆㄇ</button></div>
-     <div class="star-status-group">
-        <button class="toggle-btn" id="btnVoiceToggle" onclick="toggleVoiceGender()" style="padding: 8px 15px; font-size: 24px; margin-right: 10px;">👩🔊</button>
+    <div class="star-status-group">
         <div class="star-panel" id="starBtn" onclick="useStar()">
             <svg class="finger-guide" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
               <path d="M70,45 C70,42 68,40 65,40 C64,40 63,41 62,42 C61,39 59,37 56,37 C54,37 52,38 51,40 C50,38 48,36 45,36 C42,36 40,38 40,41 L40,25 C40,20 36,16 31,16 C26,16 22,20 22,25 L22,60 C22,63 19,65 17,65 C14,65 12,67 12,70 C12,77 18,84 25,84 L60,84 C65,84 70,79 70,74 L70,45 Z" fill="#FFCA28" stroke="#555" stroke-width="3" stroke-linejoin="round" />
@@ -570,18 +565,6 @@ body {
       msg.text = text;
       msg.lang = 'zh-TW';
       msg.rate = 0.85; 
-      
-      let voices = window.speechSynthesis.getVoices().filter(v => v.lang.includes('zh'));
-      if (voices.length > 0) {
-        let targetVoice = voices.find(v => {
-          let n = v.name.toLowerCase();
-          return currentVoiceGender === 'male' 
-            ? (n.includes('male') || n.includes('boy') || n.includes('zhiwei'))
-            : (n.includes('female') || n.includes('girl') || n.includes('meijia') || n.includes('xiaoxiao'));
-        });
-        msg.voice = targetVoice || voices[0]; // 若找不到指定性別，就用預設中文聲音保底
-      }
-      
       window.speechSynthesis.speak(msg);
     }
   }
@@ -698,19 +681,6 @@ body {
   let hintUsedThisTurn = false; // 🎯 防弊機制：這回合是否用過提示
   const HEX_W = 170; const HEX_H = 196; const GAP = 5;
   let pinyinVisible = true; let zhuyinVisible = true;
-  let currentVoiceGender = 'female'; // 預設女聲狀態
-
-  // 控制男女聲圖示切換的函式
-  function toggleVoiceGender() {
-    const btn = document.getElementById('btnVoiceToggle');
-    if (currentVoiceGender === 'female') {
-      currentVoiceGender = 'male';
-      btn.innerText = '👨🔊';
-    } else {
-      currentVoiceGender = 'female';
-      btn.innerText = '👩🔊';
-    }
-  }
   
   function togglePinyin() { pinyinVisible = !pinyinVisible; const btn = document.getElementById('btnPy'); if(pinyinVisible) { document.body.classList.remove('hide-pinyin'); btn.classList.remove('off'); btn.innerText = "👁️ 拼音 Pinyin"; } else { document.body.classList.add('hide-pinyin'); btn.classList.add('off'); btn.innerText = "🙈 拼音 Pinyin"; } }
   function toggleZhuyin() { zhuyinVisible = !zhuyinVisible; const btn = document.getElementById('btnZy'); if(zhuyinVisible) { document.body.classList.remove('hide-zhuyin'); btn.classList.remove('off'); btn.innerText = "👁️ 注音ㄅㄆㄇ"; } else { document.body.classList.add('hide-zhuyin'); btn.classList.add('off'); btn.innerText = "🙈 注音ㄅㄆㄇ"; } }
