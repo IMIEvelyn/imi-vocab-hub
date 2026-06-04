@@ -89,7 +89,24 @@ body {
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
   }
-  #bigStarFeedback.show { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+ #bigStarFeedback.show { transform: translate(-50%, -50%) scale(1); opacity: 1; pointer-events: auto; cursor: pointer; }
+  
+  /* 🔊 再聽一次按鈕專屬樣式 */
+  .replay-audio-btn {
+    margin-top: 15px;
+    background: rgba(255, 255, 255, 0.25);
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    border-radius: 15px;
+    padding: 8px 30px;
+    font-size: 28px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    display: inline-block;
+    text-align: center;
+  }
+  .replay-audio-btn:hover { background: rgba(255, 255, 255, 0.45); transform: scale(1.05); }
+  .replay-audio-btn:active { transform: scale(0.95); }
   
   .star-bg { font-size: 220px; filter: drop-shadow(0 0 40px rgba(255, 202, 40, 0.8)); position: absolute; z-index: 1; }
   .star-text-box { z-index: 2; text-align: center; }
@@ -780,14 +797,35 @@ body {
   function showBigStar(matchObj) {
     const starContainer = document.getElementById('bigStarFeedback');
     const textBox = document.getElementById('bigStarText');
+    
+    // 1. 建立內容，加入 🔊 按鈕
     let htmlContent = `<div class="star-text-zh">${matchObj.str}</div>`;
     if (matchObj.native) { htmlContent += `<div class="star-text-en">${matchObj.native}</div>`; }
+    htmlContent += `<div class="replay-audio-btn" id="replayAudioBtn">🔊</div>`;
+    
     textBox.innerHTML = htmlContent;
     starContainer.classList.add('show');
     
+    // 2. 首次播放音效 (維持原本 0.85 語速)
     playAudio(matchObj.str);
     
-    setTimeout(() => { starContainer.classList.remove('show'); }, 1200);
+    // 3. 綁定「🔊 再聽一次」按鈕事件（防護罩，避免點擊冒泡）
+    document.getElementById('replayAudioBtn').addEventListener('click', function(event) {
+      event.stopPropagation(); // 阻止事件向上層的大星星傳遞，保護星星不被關閉
+      playAudio(matchObj.str);
+    });
+
+    // 4. 綁定「點擊大星星關閉」事件
+    starContainer.onclick = function() {
+      clearTimeout(starContainer.closeTimeout);
+      starContainer.classList.remove('show');
+    };
+
+    // 5. 自動消失時間改為 8 秒 (8000 毫秒)
+    clearTimeout(starContainer.closeTimeout);
+    starContainer.closeTimeout = setTimeout(() => {
+      starContainer.classList.remove('show');
+    }, 8000);
   }
 
   function refillBoard() { let emptySlots = SLOTS.filter(s => s.tileData === null).sort(() => Math.random() - 0.5); while (tileQueue.length > 0 && emptySlots.length > 0) { let nextTile = tileQueue.shift(); let slot = emptySlots.pop(); slot.tileData = nextTile; renderTileInSlot(slot); } setTimeout(checkDeadlock, 700); }
