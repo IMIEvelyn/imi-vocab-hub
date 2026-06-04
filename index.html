@@ -570,6 +570,18 @@ body {
       msg.text = text;
       msg.lang = 'zh-TW';
       msg.rate = 0.85; 
+      
+      let voices = window.speechSynthesis.getVoices().filter(v => v.lang.includes('zh'));
+      if (voices.length > 0) {
+        let targetVoice = voices.find(v => {
+          let n = v.name.toLowerCase();
+          return currentVoiceGender === 'male' 
+            ? (n.includes('male') || n.includes('boy') || n.includes('zhiwei'))
+            : (n.includes('female') || n.includes('girl') || n.includes('meijia') || n.includes('xiaoxiao'));
+        });
+        msg.voice = targetVoice || voices[0]; // 若找不到指定性別，就用預設中文聲音保底
+      }
+      
       window.speechSynthesis.speak(msg);
     }
   }
