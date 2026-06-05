@@ -235,7 +235,31 @@ body {
   .hide-pinyin .greet-py { opacity: 0 !important; } 
   .hide-zhuyin .greet-zhuyin-box { opacity: 0 !important; }
   body.hide-translation .marquee-item span { display: none !important; } /* 💡 讓跑馬燈裡的翻譯消失並縮緊空間 */
-
+    
+/* 🌐 高質感自訂語種下拉選單 */
+  .custom-dropdown {
+    display: none; /* 預設先藏起來 */
+    position: absolute;
+    top: 100%; left: 0; width: 100%;
+    background: #ffffff;
+    border-radius: 12px; /* 柔和的大圓角 */
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15); /* 絕美的懸浮立體陰影 */
+    z-index: 1000;
+    margin-top: 8px;
+    overflow: hidden; /* 確保選項不會超出版面破壞圓角 */
+    border: 1px solid #e2e8f0;
+  }
+  .custom-dropdown.show { display: block; } /* 觸發顯示的開關 */
+  
+  .custom-dropdown div {
+    padding: 12px 16px; font-size: 16px;
+    color: #4a5568; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .custom-dropdown div:hover {
+    background: #ebf8ff; /* 漂亮清爽的微藍色反饋 */
+    color: #2b6cb0; font-weight: bold;
+  }
   /* =======================================================================
      🎯 電腦版：歡迎詞專屬縮小一號設定
      ======================================================================= */
@@ -433,15 +457,20 @@ body {
       <div class="input-box"><label>👩‍🏫 老師姓名</label><input type="text" id="inputTeacherName" value="Evelyn 老師"></div>
       <div class="input-box"><label>🎓 學生 / 班級</label><input type="text" id="inputClassName" value=""></div>
       <div class="input-box"><label>🗓️ 日期</label><input type="date" id="inputDate"></div>
-      <div class="input-box">
+      <div class="input-box" style="position: relative;">
         <label>🌐 國別化語種</label>
-       <input list="langOptions" id="inputLanguage" placeholder="可選擇或輸入">
-        <datalist id="langOptions">
-          <option value="英文"></option><option value="日文"></option><option value="韓文"></option>
-          <option value="越南文"></option><option value="法文"></option><option value="捷克文"></option><option value="印尼文"></option>
-        </datalist>
+        <input type="text" id="inputLanguage" placeholder="可選擇或輸入" autocomplete="off" onclick="toggleCustomDropdown()">
+        
+        <div id="customLangDropdown" class="custom-dropdown">
+          <div onclick="selectCustomLang('英文')">英文</div>
+          <div onclick="selectCustomLang('日文')">日文</div>
+          <div onclick="selectCustomLang('韓文')">韓文</div>
+          <div onclick="selectCustomLang('越南文')">越南文</div>
+          <div onclick="selectCustomLang('法文')">法文</div>
+          <div onclick="selectCustomLang('捷克文')">捷克文</div>
+          <div onclick="selectCustomLang('印尼文')">印尼文</div>
+        </div>
       </div>
-    </div>
     
     <div style="display: flex; justify-content: space-between; align-items: flex-end; width: 100%;">
       <label style="font-size: 16px; font-weight: bold; color: #555; margin-left: 5px; margin-bottom: 8px;">📥 匯入單字資料</label>
