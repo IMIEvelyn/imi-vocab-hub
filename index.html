@@ -260,13 +260,14 @@ body {
     background: #ebf8ff; /* 漂亮清爽的微藍色反饋 */
     color: #2b6cb0; font-weight: bold;
   }
-    /* 替國別化語種加上專屬下拉箭頭 */
+   /* 替國別化語種加上專屬下拉箭頭 */
   #inputLanguage {
-    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%24%2024%22%20fill%3D%22%23666%22%3E%3Cpath%20d%3D%22M7%2010l5%205%205-5z%22%2F%3E%3C%2Fsvg%3E');
+    /* 💡 稍微優化了箭頭的向量圖比例，讓它本身就豐滿一點 */
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22%23666%22%3E%3Cpath%20d%3D%22M5%209l7%207%207-7z%22%2F%3E%3C%2Fsvg%3E');
     background-repeat: no-repeat;
-    background-position: right 15px center; /* 讓箭頭靠右對齊 */
-    background-size: 28px;
-    padding-right: 40px; /* 預留空間，避免文字太長疊到箭頭 */
+    background-position: right 12px center; /* 靠右對齊，調整適當邊距 */
+    background-size: 40px; /* 💡 尺寸從 28px 大幅放大到 40px */
+    padding-right: 45px; /* 💡 防沾黏空間也對應加大 */
     cursor: pointer;
   }
   /* =======================================================================
