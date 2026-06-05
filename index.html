@@ -736,7 +736,26 @@ body {
   const HEX_W = 170; const HEX_H = 196; const GAP = 5;
   let pinyinVisible = true; let zhuyinVisible = true;
  let transVisible = true; let currentLang = '外語'; 
-
+function toggleCustomDropdown() {
+  document.getElementById('customLangDropdown').classList.toggle('show');
+}
+function selectCustomLang(lang) {
+  document.getElementById('inputLanguage').value = lang;
+  document.getElementById('customLangDropdown').classList.remove('show');
+}
+// 💡 貼心設計：點擊外部任何空白處時，自動收合選單
+document.addEventListener('click', (e) => {
+  const input = document.getElementById('inputLanguage');
+  const dropdown = document.getElementById('customLangDropdown');
+  if (input && dropdown && !input.contains(e.target) && !dropdown.contains(e.target)) {
+    dropdown.classList.remove('show');
+  }
+});
+// 💡 貼心設計：當滑鼠移出選單範圍時，立刻自動收合
+document.getElementById('customLangDropdown').addEventListener('mouseleave', () => {
+  document.getElementById('customLangDropdown').classList.remove('show');
+});
+    
 function toggleTranslation() { 
   transVisible = !transVisible; const btn = document.getElementById('btnTrans');
   if (transVisible) { 
