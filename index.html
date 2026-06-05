@@ -234,6 +234,7 @@ body {
 
   .hide-pinyin .greet-py { opacity: 0 !important; } 
   .hide-zhuyin .greet-zhuyin-box { opacity: 0 !important; }
+  body.hide-translation .marquee-item span { display: none !important; } /* 💡 讓跑馬燈裡的翻譯消失並縮緊空間 */
 
   /* =======================================================================
      🎯 電腦版：歡迎詞專屬縮小一號設定
@@ -432,6 +433,14 @@ body {
       <div class="input-box"><label>👩‍🏫 老師姓名</label><input type="text" id="inputTeacherName" value="Evelyn 老師"></div>
       <div class="input-box"><label>🎓 學生 / 班級</label><input type="text" id="inputClassName" value=""></div>
       <div class="input-box"><label>🗓️ 日期</label><input type="date" id="inputDate"></div>
+      <div class="input-box">
+        <label>🌐 國別化語種</label>
+        <input list="langOptions" id="inputLanguage" placeholder="可選擇或輸入" value="外語">
+        <datalist id="langOptions">
+          <option value="英文"></option><option value="日文"></option><option value="韓文"></option>
+          <option value="越南文"></option><option value="法文"></option><option value="捷克文"></option><option value="印尼文"></option>
+        </datalist>
+      </div>
     </div>
     
     <div style="display: flex; justify-content: space-between; align-items: flex-end; width: 100%;">
@@ -472,7 +481,11 @@ body {
       <div class="course-info" id="displayInfoTags"></div>
     </div>
     <div class="top-bar">
-      <div class="scaffold-controls"><button class="toggle-btn" id="btnPy" onclick="togglePinyin()">👁️ 拼音 Pinyin</button><button class="toggle-btn" id="btnZy" onclick="toggleZhuyin()">👁️ 注音ㄅㄆㄇ</button></div>
+     <div class="scaffold-controls">
+        <button class="toggle-btn" id="btnTrans" onclick="toggleTranslation()">👁️ 外語</button>
+        <button class="toggle-btn" id="btnPy" onclick="togglePinyin()">👁️ 拼音 Pinyin</button>
+        <button class="toggle-btn" id="btnZy" onclick="toggleZhuyin()">👁️ 注音ㄅㄆㄇ</button>
+      </div>
     <div class="star-status-group">
         <div class="star-panel" id="starBtn" onclick="useStar()">
             <svg class="finger-guide" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
@@ -506,8 +519,14 @@ body {
       document.getElementById('teacherPanel').style.display = 'none';
       document.getElementById('gameContainer').style.display = 'flex'; 
       try {
-        const decodedString = decodeURIComponent(escape(atob(URL_DATA)));
+       const decodedString = decodeURIComponent(escape(atob(URL_DATA)));
         const dataObj = JSON.parse(decodedString);
+        
+        // 💡 讀取語種設定，如果舊網址沒有就保底顯示 '外語'
+        currentLang = dataObj.lang || '外語';
+        const transBtn = document.getElementById('btnTrans');
+        if (transBtn) transBtn.innerText = `👁️ ${currentLang}`;
+        
         document.getElementById('displayMaterialName').innerText = dataObj.mName;
         
         let tagsHtml = `<span class="info-tag">👩‍🏫 ${dataObj.tName}</span>`;
@@ -545,7 +564,14 @@ body {
   function generateLink() {
     const vText = document.getElementById('vocabInput').value;
     if (!vText.trim()) { alert("(請貼上 專屬Gem 生成的Json資料喔！)"); return; }
-    const gameData = { mName: document.getElementById('inputMaterialName').value || 'IMI_詞彙消消樂', tName: document.getElementById('inputTeacherName').value || 'Evelyn 老師', cName: document.getElementById('inputClassName').value || '', dStr: document.getElementById('inputDate').value || '', vText: vText };
+ const gameData = { 
+      mName: document.getElementById('inputMaterialName').value || 'IMI_詞彙消消樂', 
+      tName: document.getElementById('inputTeacherName').value || 'Evelyn 老師', 
+      cName: document.getElementById('inputClassName').value || '', 
+      dStr: document.getElementById('inputDate').value || '', 
+      lang: document.getElementById('inputLanguage').value || '外語', // 💡 新增這行：抓取語種
+      vText: vText 
+    };
     const jsonString = JSON.stringify(gameData);
     const safeBase64 = btoa(unescape(encodeURIComponent(jsonString)));
     const finalUrl = SCRIPT_URL + "?data=" + encodeURIComponent(safeBase64);
@@ -681,7 +707,16 @@ body {
   let hintUsedThisTurn = false; // 🎯 防弊機制：這回合是否用過提示
   const HEX_W = 170; const HEX_H = 196; const GAP = 5;
   let pinyinVisible = true; let zhuyinVisible = true;
-  
+  let transVisible = true; let currentLang = '外語'; 
+
+function toggleTranslation() { 
+  transVisible = !transVisible; const btn = document.getElementById('btnTrans');
+  if (transVisible) { 
+    document.body.classList.remove('hide-translation'); btn.classList.remove('off'); btn.innerText = `👁️ ${currentLang}`; 
+  } else { 
+    document.body.classList.add('hide-translation'); btn.classList.add('off'); btn.innerText = `🙈 ${currentLang}`; 
+  } 
+}
   function togglePinyin() { pinyinVisible = !pinyinVisible; const btn = document.getElementById('btnPy'); if(pinyinVisible) { document.body.classList.remove('hide-pinyin'); btn.classList.remove('off'); btn.innerText = "👁️ 拼音 Pinyin"; } else { document.body.classList.add('hide-pinyin'); btn.classList.add('off'); btn.innerText = "🙈 拼音 Pinyin"; } }
   function toggleZhuyin() { zhuyinVisible = !zhuyinVisible; const btn = document.getElementById('btnZy'); if(zhuyinVisible) { document.body.classList.remove('hide-zhuyin'); btn.classList.remove('off'); btn.innerText = "👁️ 注音ㄅㄆㄇ"; } else { document.body.classList.add('hide-zhuyin'); btn.classList.add('off'); btn.innerText = "🙈 注音ㄅㄆㄇ"; } }
   function initSlots() { SLOTS = []; const layout = [3, 4, 3]; for (let row = 0; row < layout.length; row++) { let cols = layout[row]; let offsetX = (cols === 3) ? ((HEX_W + GAP) / 2) : 0; for (let col = 0; col < cols; col++) { const x = col * (HEX_W + GAP) + offsetX + 20; const y = row * (HEX_H * 0.75 + GAP) + 20; SLOTS.push({ id: `R${row}C${col}`, x, y, tileData: null, el: null }); } } }
