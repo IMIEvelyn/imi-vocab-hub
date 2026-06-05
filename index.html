@@ -260,6 +260,15 @@ body {
     background: #ebf8ff; /* 漂亮清爽的微藍色反饋 */
     color: #2b6cb0; font-weight: bold;
   }
+    /* 替國別化語種加上專屬下拉箭頭 */
+  #inputLanguage {
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%24%2024%22%20fill%3D%22%23666%22%3E%3Cpath%20d%3D%22M7%2010l5%205%205-5z%22%2F%3E%3C%2Fsvg%3E');
+    background-repeat: no-repeat;
+    background-position: right 15px center; /* 讓箭頭靠右對齊 */
+    background-size: 28px;
+    padding-right: 40px; /* 預留空間，避免文字太長疊到箭頭 */
+    cursor: pointer;
+  }
   /* =======================================================================
      🎯 電腦版：歡迎詞專屬縮小一號設定
      ======================================================================= */
@@ -460,7 +469,7 @@ body {
       
       <div class="input-box"><label>🎓 學生 / 班級</label><input type="text" id="inputClassName" value=""></div>
       <div class="input-box" style="position: relative;">
-        <label>🌐 國別化語種</label>
+        <label>🌐 國別化輔助語種</label>
         <input type="text" id="inputLanguage" placeholder="可選擇或輸入" autocomplete="off" onclick="toggleCustomDropdown()">
         <div id="customLangDropdown" class="custom-dropdown">
           <div onclick="selectCustomLang('英文')">英文</div><div onclick="selectCustomLang('日文')">日文</div>
