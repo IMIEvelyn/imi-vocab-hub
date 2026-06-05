@@ -260,15 +260,19 @@ body {
     background: #ebf8ff; /* 漂亮清爽的微藍色反饋 */
     color: #2b6cb0; font-weight: bold;
   }
-   /* 替國別化語種加上專屬下拉箭頭 */
+  /* 替國別化語種加上專屬下拉箭頭 */
   #inputLanguage {
-    /* 💡 稍微優化了箭頭的向量圖比例，讓它本身就豐滿一點 */
     background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22%23666%22%3E%3Cpath%20d%3D%22M5%209l7%207%207-7z%22%2F%3E%3C%2Fsvg%3E');
     background-repeat: no-repeat;
-    background-position: right 12px center; /* 靠右對齊，調整適當邊距 */
-    background-size: 40px; /* 💡 尺寸從 28px 大幅放大到 40px */
-    padding-right: 45px; /* 💡 防沾黏空間也對應加大 */
+    background-position: right 12px center;
+    background-size: 38px; /* 💡 從 40px 縮小約 5% 變成 38px */
+    padding-right: 45px;
     cursor: pointer;
+  }
+    /* 💡 針對原生的日期選擇器小圖示，進行 5% 的等比例放大 */
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    transform: scale(1.05); 
+    cursor: pointer; /* 順便加上手指游標，讓點擊體驗更好 */
   }
   /* =======================================================================
      🎯 電腦版：歡迎詞專屬縮小一號設定
