@@ -452,7 +452,7 @@ body {
         <p class="brand-more-info">更多資訊 - <a href="https://imiteacherevelyn.wixsite.com/mandarin-hub" target="_blank">IMI華語教學網站</a></p>
       </div>
     </div>
-   <div class="input-grid">
+  <div class="input-grid">
       <div class="input-box" style="grid-column: span 2;"><label>📚 教材名稱</label><input type="text" id="inputMaterialName" value="IMI_詞彙消消樂"></div>
       
       <div class="input-box"><label>👩‍🏫 老師姓名</label><input type="text" id="inputTeacherName" value="Evelyn 老師"></div>
@@ -468,9 +468,11 @@ body {
           <div onclick="selectCustomLang('法文')">法文</div><div onclick="selectCustomLang('捷克文')">捷克文</div>
           <div onclick="selectCustomLang('印尼文')">印尼文</div>
         </div>
+      </div>
     </div>
-    </div> <div style="display: flex; justify-content: space-between; align-items: flex-end; width: 100%;">
-      <label style="font-size: 16px; font-weight: bold; color: #555; margin-left: 5px; margin-bottom: 8px;">📥 匯入詞彙資料</label>
+
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; width: 100%; margin-top: 15px;">
+      <label style="font-size: 16px; font-weight: bold; color: #555; margin-left: 5px; margin-bottom: 8px;">📥 匯入單字資料</label>
       <button class="clear-btn" onclick="clearVocab()">🗑️ 清除資料</button>
     </div>
     <textarea id="vocabInput" placeholder="請在此貼上 專屬Gem 的Json資料..."></textarea>
