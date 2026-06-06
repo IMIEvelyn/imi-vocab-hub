@@ -450,6 +450,48 @@ body {
     .film-countdown::before, .film-countdown::after { height: 3px; width: 3px; }
     .film-number { font-size: 90px; padding: 0 15px; }
   }
+    /* =========================================
+     全新 2x3 極致緊湊網格排版系統
+  ========================================= */
+  .settings-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 切分為左右兩個等寬欄位 */
+    gap: 20px 24px; /* 上下間距 20px，左右間距 24px */
+    margin-bottom: 24px; /* 與下方的「匯入單字區塊」保持舒適的呼吸空間 */
+  }
+
+  .setting-item {
+    display: flex;
+    flex-direction: column;
+  }
+    /* 標題文字美化 */
+  .setting-item label {
+    font-size: 16px; font-weight: bold;
+    color: #4a5568; margin-bottom: 8px;
+  }
+
+  /* 統一所有輸入框與下拉選單的樣式 */
+  .setting-item input, .styled-select {
+    width: 100%; box-sizing: border-box;
+    padding: 12px 16px; font-size: 18px;
+    color: #2d3748; border: 2px solid #e2e8f0;
+    border-radius: 12px; background-color: white;
+    transition: all 0.2s ease;
+  }
+
+  /* 點擊聚焦時的專屬綠色光暈回饋 */
+  .setting-item input:focus, .styled-select:focus {
+    border-color: #4CAF50; outline: none;
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+  }
+
+  /* 專為口音選單加上客製化下拉箭頭 */
+  .styled-select {
+    appearance: none; -webkit-appearance: none; /* 隱藏原生箭頭 */
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22%23666%22%3E%3Cpath%20d%3D%22M5%209l7%207%207-7z%22%2F%3E%3C%2Fsvg%3E');
+    background-repeat: no-repeat; background-position: right 12px center;
+    background-size: 38px; padding-right: 45px; cursor: pointer;
+  }
 </style>
 </head>
 
@@ -466,24 +508,49 @@ body {
         <p class="brand-more-info">更多資訊 - <a href="https://imiteacherevelyn.wixsite.com/mandarin-hub" target="_blank">IMI華語教學網站</a></p>
       </div>
     </div>
-  <div class="input-grid">
-      <div class="input-box" style="grid-column: span 2;"><label>📚 教材名稱</label><input type="text" id="inputMaterialName" value="IMI_詞彙消消樂"></div>
-      
-      <div class="input-box"><label>👩‍🏫 老師姓名</label><input type="text" id="inputTeacherName" value="Evelyn 老師"></div>
-      <div class="input-box"><label>🗓️ 日期</label><input type="date" id="inputDate"></div>
-      
-      <div class="input-box"><label>🎓 學生 / 班級</label><input type="text" id="inputClassName" value=""></div>
-      <div class="input-box" style="position: relative;">
-        <label>🌐 國別化輔助語種</label>
-        <input type="text" id="inputLanguage" placeholder="可選擇或輸入" autocomplete="off" onclick="toggleCustomDropdown()">
-        <div id="customLangDropdown" class="custom-dropdown">
-          <div onclick="selectCustomLang('英文')">英文</div><div onclick="selectCustomLang('日文')">日文</div>
-          <div onclick="selectCustomLang('韓文')">韓文</div><div onclick="selectCustomLang('越南文')">越南文</div>
-          <div onclick="selectCustomLang('法文')">法文</div><div onclick="selectCustomLang('捷克文')">捷克文</div>
-          <div onclick="selectCustomLang('印尼文')">印尼文</div>
-        </div>
+ <div class="settings-grid">
+  
+  <div class="setting-item">
+    <label>📚 教材名稱</label>
+    <input type="text" id="inputMaterialName" value="IMI_詞彙消消樂">
+  </div>
+  <div class="setting-item">
+    <label>🎓 學生 / 班級</label>
+    <input type="text" id="inputClassName" value="">
+  </div>
+
+  <div class="setting-item">
+    <label>👩‍🏫 老師姓名</label>
+    <input type="text" id="inputTeacherName" value="Evelyn 老師">
+  </div>
+  <div class="setting-item">
+    <label>🗓️ 日期</label>
+    <input type="date" id="inputDate">
+  </div>
+     <div class="setting-item">
+    <label>🌐 國別化輔助語種</label>
+    <div class="custom-dropdown-container" style="position: relative;">
+      <input type="text" id="inputLanguage" placeholder="可選擇或輸入" autocomplete="off" readonly onclick="toggleCustomDropdown()">
+      <div id="customLangDropdown" class="custom-dropdown">
+        <div onclick="selectCustomLang('英文')">英文</div>
+        <div onclick="selectCustomLang('日文')">日文</div>
+        <div onclick="selectCustomLang('韓文')">韓文</div>
+        <div onclick="selectCustomLang('越南文')">越南文</div>
+        <div onclick="selectCustomLang('法文')">法文</div>
+        <div onclick="selectCustomLang('捷克文')">捷克文</div>
+        <div onclick="selectCustomLang('印尼文')">印尼文</div>
       </div>
     </div>
+  </div>
+  <div class="setting-item">
+    <label>🗣️ 口音類別 (學生端隱藏)</label>
+    <select id="inputAccent" class="styled-select">
+      <option value="zh-TW">🇹🇼臺灣口音 (zh-TW)</option>
+      <option value="zh-CN">🇨🇳中國口音 (zh-CN)</option>
+    </select>
+  </div>
+
+</div>
 
     <div style="display: flex; justify-content: space-between; align-items: flex-end; width: 100%; margin-top: 15px;">
       <label style="font-size: 16px; font-weight: bold; color: #555; margin-left: 5px; margin-bottom: 8px;">📥 匯入單字資料</label>
