@@ -887,16 +887,20 @@ function toggleTranslation() {
       let parts = line.split(','); if (parts.length < 3) continue; 
       const wordId = parts[0].trim(); const toneCode = parts[1].trim(); const zh = parts[2].trim();
       const py = parts[3] ? parts[3].trim() : ""; const zy = parts[4] ? parts[4].trim().split('') : [];
-      const tone = parts[5] ? parts[5].trim() : ""; const nativeTranslation = parts[6] ? parts[6].trim() : "";
+     const tone = parts[5] ? parts[5].trim() : ""; const nativeTranslation = parts[6] ? parts[6].trim() : "";
+      // 🎯 攔截器核心：抓取第 8 欄位 (index 7)，若無則預設使用原本漢字
+      const ttsOverride = parts[7] ? parts[7] : zh; 
       if (py) hasPy = true; if (zy.length > 0) hasZy = true;
-      if (!tempMap[wordId]) tempMap[wordId] = { fullStr: '', native: nativeTranslation, tiles: [] };
+      // 🎯 在字典物件中新增 ttsStr 用來儲存語音專用字串
+      if (!tempMap[wordId]) tempMap[wordId] = { fullStr: '', ttsStr: '', native: nativeTranslation, tiles: [] };
       let tData = { wordId, toneCode, zh, py, zy, tone, native: tempMap[wordId].native };
       tempMap[wordId].fullStr += zh; 
+      tempMap[wordId].ttsStr += ttsOverride; // 🎯 組合隱形提詞機的字串
       tempMap[wordId].tiles.push(tData);
-      tileQueue.push(tData);
     }
     document.getElementById('btnPy').style.display = hasPy ? 'flex' : 'none'; document.getElementById('btnZy').style.display = hasZy ? 'flex' : 'none';
-    validWords = Object.values(tempMap).map(w => ({ str: w.fullStr, native: w.native, tiles: w.tiles })); 
+    // 🎯 將組合好的 ttsStr 一併打包進最終詞庫
+    validWords = Object.values(tempMap).map(w => ({ str: w.fullStr, ttsStr: w.ttsStr, native: w.native, tiles: w.tiles }));
     
     initGame(); 
   }
@@ -1000,13 +1004,13 @@ function toggleTranslation() {
     textBox.innerHTML = htmlContent;
     starContainer.classList.add('show');
     
-    // 2. 首次播放音效 (維持原本 0.85 語速)
-    playAudio(matchObj.str);
+   // 2. 首次播放音效 (🎯 優先使用發音攔截字串 ttsStr)
+    playAudio(matchObj.ttsStr || matchObj.str);
     
-    // 3. 綁定「🔊 再聽一次」按鈕事件（防護罩，避免點擊冒泡）
+    // 3. 綁定「🔊 再聽一次」按鈕事件
     document.getElementById('replayAudioBtn').addEventListener('click', function(event) {
-      event.stopPropagation(); // 阻止事件向上層的大星星傳遞，保護星星不被關閉
-      playAudio(matchObj.str);
+      event.stopPropagation(); 
+      playAudio(matchObj.ttsStr || matchObj.str);
     });
 
     // 4. 綁定「點擊大星星關閉」事件
