@@ -492,6 +492,62 @@ body {
     background-repeat: no-repeat; background-position: right 12px center;
     background-size: 38px; padding-right: 45px; cursor: pointer;
   }
+    /* =========================================
+     🛡️ 智慧審查儀表板 UI (第一部分)
+     ========================================= */
+  #auditDashboard {
+    display: none; flex-direction: column; gap: 12px;
+    background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 20px;
+    padding: 20px; margin-top: 15px; margin-bottom: 5px; box-sizing: border-box;
+  }
+  .audit-header {
+    font-size: 18px; font-weight: bold; color: #334155; margin-bottom: 5px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .audit-item {
+    display: flex; align-items: center; justify-content: space-between;
+    background: #fff; padding: 12px 18px; border-radius: 15px;
+    border-left: 6px solid #ef4444; box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+    flex-wrap: wrap; gap: 10px; transition: all 0.3s;
+  }
+  .audit-item.resolved { 
+    border-left-color: #22c55e; opacity: 0.6; pointer-events: none; 
+  }
+    .audit-item-info { 
+    display: flex; align-items: center; gap: 10px; 
+    font-size: 20px; font-weight: bold; color: #1e293b; 
+  }
+  .audit-item-info span.pinyin { 
+    font-size: 16px; color: #64748b; font-weight: normal; 
+  }
+  .audit-actions { display: flex; gap: 10px; align-items: center; }
+  .audit-btn {
+    padding: 8px 16px; border: none; border-radius: 10px; cursor: pointer;
+    font-size: 16px; font-weight: bold; transition: all 0.2s;
+  }
+  .audit-btn-play { background: #e0f2fe; color: #0284c7; }
+  .audit-btn-play:hover { background: #bae6fd; transform: scale(0.95); }
+  .audit-btn-ok { background: #dcfce7; color: #16a34a; }
+  .audit-btn-ok:hover { background: #bbf7d0; transform: scale(0.95); }
+  .audit-btn-tweak { 
+    background: transparent; color: #cbd5e1; padding: 5px; 
+    font-size: 20px; cursor: pointer; border: none; transition: all 0.2s; 
+  }
+  .audit-btn-tweak:hover { color: #64748b; transform: rotate(90deg); }
+    .audit-tweak-box {
+    width: 100%; display: none; padding-top: 12px; margin-top: 5px; 
+    border-top: 1px dashed #e2e8f0;
+  }
+  .audit-tweak-box.show { display: block; }
+  .audit-tweak-desc { 
+    font-size: 14px; color: #ef4444; margin-bottom: 8px; font-weight: bold; 
+  }
+  .audit-tweak-input-group { display: flex; gap: 10px; }
+  .audit-tweak-input-group input {
+    flex: 1; padding: 10px 15px; border: 2px solid #e2e8f0; 
+    border-radius: 10px; font-size: 16px; outline: none; transition: border-color 0.2s;
+  }
+  .audit-tweak-input-group input:focus { border-color: #0284c7; }
 </style>
 </head>
 
@@ -557,7 +613,7 @@ body {
       <button class="clear-btn" onclick="clearVocab()">🗑️ 清除資料</button>
     </div>
     <textarea id="vocabInput" placeholder="請在此貼上 專屬Gem 的Json資料..."></textarea>
-    
+   <div id="auditDashboard"></div> 
     <button class="start-btn" onclick="generateLink()">🔗 生成學生專屬連結</button>
     <div id="linkResult">
       <p style="margin: 0 0 10px 0; font-weight: bold; color: #2e7d32;">✅ 連結已生成！請點擊複製</p>
@@ -674,9 +730,31 @@ body {
     document.getElementById('generatedUrl').value = '';
   }
 
-  function generateLink() {
-    const vText = document.getElementById('vocabInput').value;
+function generateLink() {
+    let vText = document.getElementById('vocabInput').value;
     if (!vText.trim()) { alert("(請貼上 專屬Gem 生成的Json資料喔！)"); return; }
+
+    // 🔒 安全鎖檢查：確保所有紅燈都已解決
+    const unresolved = pendingAudits.filter(item => {
+      const el = document.getElementById(item.id);
+      return el && !el.classList.contains('resolved');
+    });
+    
+    if (unresolved.length > 0) {
+      alert("⚠️ 請先試聽並確認「發音安全審查區」中的所有紅燈詞彙！");
+      return; // 擋下打包程序
+    }
+
+    // 📝 資料寫回：將確認好的隱藏發音字串，重新組合回文本中
+    let lines = vText.split('\n');
+    pendingAudits.forEach(item => {
+      let parts = lines[item.lineIndex].split(',');
+      // 將最終確認的發音 (finalTts) 寫入第 8 欄 (index 7)
+      parts[7] = item.finalTts;
+      lines[item.lineIndex] = parts.join(',');
+    });
+    vText = lines.join('\n'); // 更新 vText，準備打包
+    
 // 💡 第一批次：將老師設定的口音一併打包
     const gameData = { 
       mName: document.getElementById('inputMaterialName').value || 'IMI_詞彙消消樂', 
@@ -836,7 +914,110 @@ body {
       }, 1000);
     }, 4000); 
   }
+// 💡 智慧作弊字典：雙軌辨識 (拼音 / 注音) -> 對應隱藏發音字串
+  const cheatDictionary = {
+    "髮型": { "fà xíng": "法 型", "ㄈㄚˋ ㄒㄧㄥˊ": "法 型" },
+    "垃圾": { "lè sè": "勒 色", "ㄌㄜˋ ㄙㄜˋ": "勒 色" },
+    "轉盤": { "zhuǎn pán": "轉 盤", "ㄓㄨㄢˇ ㄆㄢˊ": "轉 盤" },
+    "銀行": { "yín háng": "銀 航", "ㄧㄣˊ ㄏㄤˊ": "銀 航" },
+    "重": { "zhòng": "眾", "ㄓㄨㄥˋ": "眾" }
+  };
+  
+  // 紀錄目前被儀表板抓出的待審查物件清單
+  let pendingAudits = [];
+    // 💡 監聽輸入框：當老師貼上資料時，自動觸發掃描
+  document.getElementById('vocabInput').addEventListener('input', function() {
+    clearTimeout(this.scanTimeout);
+    this.scanTimeout = setTimeout(scanVocabForAudit, 500);
+  });
 
+  // 💡 核心掃描與生成儀表板邏輯 (上半部)
+  function scanVocabForAudit() {
+    const rawText = document.getElementById('vocabInput').value;
+    const dashboard = document.getElementById('auditDashboard');
+    pendingAudits = [];
+    dashboard.innerHTML = ''; 
+    
+    if (!rawText.trim()) {
+      dashboard.style.display = 'none';
+      return;
+    }
+    
+    let hasRisk = false;
+    let dashboardHtml = `<div class="audit-header">🔍 發音安全審查 (請確認紅燈詞彙)</div>`;
+      const lines = rawText.split('\n');
+    lines.forEach((line, index) => {
+      const parts = line.split(',');
+      if (parts.length < 3) return;
+      
+      const zh = parts[2].trim();
+      const py = parts[3] ? parts[3].trim() : "";
+      const zy = parts[4] ? parts[4].trim() : "";
+      const tone = parts[5] ? parts[5].trim() : "";
+      const fullZy = zy + tone; // 組合注音與聲調
+      
+      // 檢查字典中是否有這個漢字
+      if (cheatDictionary[zh]) {
+        // 雙軌比對：如果拼音吻合，或注音吻合
+        let targetOverride = cheatDictionary[zh][py] || cheatDictionary[zh][fullZy];
+        
+        if (targetOverride) {
+          hasRisk = true;
+          const auditId = `audit_${index}`;
+          pendingAudits.push({ id: auditId, lineIndex: index, zh: zh, py: py || fullZy, originalLine: line, targetTts: targetOverride });
+          dashboardHtml += createAuditItemHtml(auditId, zh, py || fullZy, targetOverride);
+        }
+      }
+    });
+      // 如果有危險字，顯示儀表板
+    if (hasRisk) {
+      dashboard.innerHTML = dashboardHtml;
+      dashboard.style.display = 'flex';
+    } else {
+      dashboard.style.display = 'none';
+    }
+  }
+
+  // 💡 建立單個審查項目的 HTML 樣板
+  function createAuditItemHtml(id, zh, py, targetTts) {
+    return `
+      <div class="audit-item" id="${id}">
+        <div class="audit-item-info">🔴 ${zh} <span class="pinyin">[${py}]</span></div>
+        <div class="audit-actions">
+          <button class="audit-btn audit-btn-play" onclick="playAudio('${targetTts}')">🔊 試聽發音</button>
+          <button class="audit-btn audit-btn-ok" onclick="resolveAudit('${id}')">✅ 沒問題</button>
+          <button class="audit-btn-tweak" onclick="toggleTweak('${id}')">⚙️</button>
+        </div>
+        <div class="audit-tweak-box" id="tweak_${id}">
+          <div class="audit-tweak-desc">如果自動發音有誤，請手動輸入拼音或加空白強制導正：</div>
+          <div class="audit-tweak-input-group">
+            <input type="text" id="input_${id}" value="${targetTts}">
+            <button class="audit-btn audit-btn-play" onclick="playAudio(document.getElementById('input_${id}').value)">🔊 測試</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+    // 💡 互動功能：老師點擊「✅ 沒問題」解除警報
+  function resolveAudit(id) {
+    const itemEl = document.getElementById(id);
+    const inputEl = document.getElementById(`input_${id}`);
+    
+    // 將老師最終確認的發音字串，更新到待審查清單中
+    let auditObj = pendingAudits.find(item => item.id === id);
+    if (auditObj) {
+      auditObj.finalTts = inputEl.value; // 如果有手動修改，以修改後的為準
+    }
+    
+    // 視覺回饋：變為綠燈
+    itemEl.classList.add('resolved');
+    itemEl.querySelector('.audit-item-info').innerHTML = itemEl.querySelector('.audit-item-info').innerHTML.replace('🔴', '🟢');
+  }
+
+  // 💡 互動功能：展開/收合進階微調框
+  function toggleTweak(id) {
+    document.getElementById(`tweak_${id}`).classList.toggle('show');
+  }
   let validWords = []; let remainingWords = []; let tileQueue = []; let SLOTS = []; let currentSelection = []; 
   let stars = 0; let idleTimer = null; let toastTimer = null; 
   let isShuffling = false; 
