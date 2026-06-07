@@ -631,8 +631,12 @@ body {
        const decodedString = decodeURIComponent(escape(atob(URL_DATA)));
         const dataObj = JSON.parse(decodedString);
         
-        // 💡 讀取語種設定，如果舊網址沒有就保底顯示 '外語'
+      // 💡 讀取語種設定，如果舊網址沒有就保底顯示 '外語'
         currentLang = dataObj.lang || '外語';
+        
+        // 🎯 第二批次：解開口音暗號，並存入全域變數備用 (舊網址保底為臺灣腔)
+        window.currentAccent = dataObj.accent || 'zh-TW'; 
+
         const transBtn = document.getElementById('btnTrans');
         if (transBtn) transBtn.innerText = `👁️ ${currentLang}`;
         
@@ -673,12 +677,14 @@ body {
   function generateLink() {
     const vText = document.getElementById('vocabInput').value;
     if (!vText.trim()) { alert("(請貼上 專屬Gem 生成的Json資料喔！)"); return; }
- const gameData = { 
+// 💡 第一批次：將老師設定的口音一併打包
+    const gameData = { 
       mName: document.getElementById('inputMaterialName').value || 'IMI_詞彙消消樂', 
       tName: document.getElementById('inputTeacherName').value || 'Evelyn 老師', 
       cName: document.getElementById('inputClassName').value || '', 
       dStr: document.getElementById('inputDate').value || '', 
-      lang: document.getElementById('inputLanguage').value || '外語', // 💡 新增這行：抓取語種
+      lang: document.getElementById('inputLanguage').value || '外語',
+      accent: document.getElementById('inputAccent').value || 'zh-TW', // 🎯 新增：抓取發音口音
       vText: vText 
     };
     const jsonString = JSON.stringify(gameData);
@@ -694,11 +700,13 @@ body {
     document.execCommand("copy"); alert("學生專屬連結已複製！");
   }
 
+  // 💡 第三批次：讓語音引擎根據老師設定的口音發音
   function playAudio(text) {
     if ('speechSynthesis' in window) {
       let msg = new SpeechSynthesisUtterance();
       msg.text = text;
-      msg.lang = 'zh-TW';
+      // 🎯 核心神經接通：讀取全域變數中的口音，如果沒讀到則保底使用臺灣腔
+      msg.lang = window.currentAccent || 'zh-TW';
       msg.rate = 0.85; 
       window.speechSynthesis.speak(msg);
     }
