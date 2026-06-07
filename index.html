@@ -978,11 +978,11 @@ function generateLink() {
     }
   }
 
-  // 💡 建立單個審查項目的 HTML 樣板
-  function createAuditItemHtml(id, zh, py, targetTts) {
+  // 💡 建立單個審查項目的 HTML 樣板 (支援動態紅藍燈號)
+  function createAuditItemHtml(id, zh, py, targetTts, icon) {
     return `
       <div class="audit-item" id="${id}">
-        <div class="audit-item-info">🔴 ${zh} <span class="pinyin">[${py}]</span></div>
+        <div class="audit-item-info">${icon} ${zh} <span class="pinyin">[${py}]</span></div>
         <div class="audit-actions">
           <button class="audit-btn audit-btn-play" onclick="playAudio('${targetTts}')">🔊 試聽發音</button>
           <button class="audit-btn audit-btn-ok" onclick="resolveAudit('${id}')">✅ 沒問題</button>
@@ -998,7 +998,8 @@ function generateLink() {
       </div>
     `;
   }
-    // 💡 互動功能：老師點擊「✅ 沒問題」解除警報
+    
+  // 💡 互動功能：老師點擊「✅ 沒問題」確認發音
   function resolveAudit(id) {
     const itemEl = document.getElementById(id);
     const inputEl = document.getElementById(`input_${id}`);
@@ -1006,12 +1007,13 @@ function generateLink() {
     // 將老師最終確認的發音字串，更新到待審查清單中
     let auditObj = pendingAudits.find(item => item.id === id);
     if (auditObj) {
-      auditObj.finalTts = inputEl.value; // 如果有手動修改，以修改後的為準
+      auditObj.finalTts = inputEl.value; 
     }
     
-    // 視覺回饋：變為綠燈
+    // 視覺回饋：變為綠燈 (將紅燈 🔴 或藍燈 🔵 替換為綠燈 🟢)
     itemEl.classList.add('resolved');
-    itemEl.querySelector('.audit-item-info').innerHTML = itemEl.querySelector('.audit-item-info').innerHTML.replace('🔴', '🟢');
+    let infoDiv = itemEl.querySelector('.audit-item-info');
+    infoDiv.innerHTML = infoDiv.innerHTML.replace('🔴', '🟢').replace('🔵', '🟢');
   }
 
   // 💡 互動功能：展開/收合進階微調框
