@@ -1078,6 +1078,7 @@ function toggleTranslation() {
       tempMap[wordId].fullStr += zh; 
       tempMap[wordId].ttsStr += ttsOverride; // 🎯 組合隱形提詞機的字串
       tempMap[wordId].tiles.push(tData);
+      tileQueue.push(tData);
     }
     document.getElementById('btnPy').style.display = hasPy ? 'flex' : 'none'; document.getElementById('btnZy').style.display = hasZy ? 'flex' : 'none';
     // 🎯 將組合好的 ttsStr 一併打包進最終詞庫
