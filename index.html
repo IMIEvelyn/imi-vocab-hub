@@ -699,7 +699,15 @@ body {
     copyText.select(); copyText.setSelectionRange(0, 99999); 
     document.execCommand("copy"); alert("學生專屬連結已複製！");
   }
-
+// 💡 預先喚醒機制：解決首次點擊變成男聲或亂碼的「暖機遲到」問題
+  if ('speechSynthesis' in window) {
+    // 1. 網頁一載入，就先偷偷戳一下系統，叫它去拿配音員名單
+    window.speechSynthesis.getVoices();
+    // 2. 綁定監聽：當系統把名單整理好回傳時，確保瀏覽器立刻更新記憶體
+    window.speechSynthesis.onvoiceschanged = function() {
+      window.speechSynthesis.getVoices();
+    };
+  }
   // 💡 升級版：強制篩選優質女聲配音員
   function playAudio(text) {
     if ('speechSynthesis' in window) {
