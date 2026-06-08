@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IMI 華語老師的教材坊 - 詞彙消消樂</title>
+<title>IMI 華語老師的教材坊 - 詞序配對練習</title>
 
 <style id="gameStyles">
 body {
@@ -81,38 +81,32 @@ body {
   .marquee-item { margin: 0 30px; font-weight: bold; color: #666; font-size: 26px; letter-spacing: 2px; }
   .marquee-item span { color: #4CAF50; font-size: 20px; margin-left: 8px; }
 
- /* 大星星回饋層與固定尺寸 */
+ /* 🌟 電腦版大星星回饋層 (全面放大 1.5 倍) */
   #bigStarFeedback { 
     position: fixed; top: 50%; left: 50%;
-    width: 250px; height: 250px; /* 💡新增固定尺寸，讓外框包住整顆星星 */
+    width: 380px; height: 380px; /* 💡 包裹框放大 */
     transform: translate(-50%, -50%) scale(0); 
     z-index: 10005; opacity: 0; pointer-events: none; 
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
   #bigStarFeedback.show { transform: translate(-50%, -50%) scale(1); opacity: 1; pointer-events: auto; cursor: pointer; }
   
-  /* 🔊 再聽一次按鈕專屬樣式 (緊貼星星正下方) */
+  /* 🔊 再聽一次按鈕 (配合比例同步放大) */
   .replay-audio-btn {
-    position: absolute;
-    left: 50%;
-    bottom: -10px; /* 💡利用 bottom 像圖釘一樣釘在星星框架的最底邊緣 */
-    transform: translateX(-50%); 
-    background: #ffffff;
-    border-radius: 50%; 
-    width: 60px; height: 60px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 30px; cursor: pointer;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2); 
-    transition: all 0.2s; z-index: 10;
+    position: absolute; left: 50%; bottom: 0px; transform: translateX(-50%); 
+    background: #ffffff; border-radius: 50%; 
+    width: 80px; height: 80px; display: flex; align-items: center; justify-content: center;
+    font-size: 40px; cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2); transition: all 0.2s; z-index: 10;
   }
   .replay-audio-btn:hover { transform: translateX(-50%) scale(1.1); }
   .replay-audio-btn:active { transform: translateX(-50%) scale(0.9); }
   
-  .star-bg { font-size: 220px; filter: drop-shadow(0 0 40px rgba(255, 202, 40, 0.8)); position: absolute; z-index: 1; }
+  .star-bg { font-size: 340px; filter: drop-shadow(0 0 40px rgba(255, 202, 40, 0.8)); position: absolute; z-index: 1; } /* 💡 星星本體巨大化 */
   .star-text-box { z-index: 2; text-align: center; }
-  .star-text-zh { font-size: 45px; font-weight: bold; color: #FFF; text-shadow: 0 3px 10px rgba(0,0,0,0.6), 0 0 5px rgba(0,0,0,0.8); letter-spacing: 2px; line-height: 1.2; }
-  .star-text-en { font-size: 22px; font-weight: bold; color: #FFFDE7; text-shadow: 0 2px 8px rgba(0,0,0,0.8); margin-top: 5px; }
+  .star-text-zh { font-size: 70px; font-weight: bold; color: #FFF; text-shadow: 0 3px 10px rgba(0,0,0,0.6), 0 0 5px rgba(0,0,0,0.8); letter-spacing: 2px; line-height: 1.2; } /* 💡 漢字放大 */
+  .star-text-en { font-size: 30px; font-weight: bold; color: #FFFDE7; text-shadow: 0 2px 8px rgba(0,0,0,0.8); margin-top: 5px; } /* 💡 外語放大 */
 
   /* 系統提示框樣式 */
   .system-toast { 
@@ -389,7 +383,13 @@ body {
     .final-stars { gap: 5px; }
     .final-star-item { font-size: 35px; }
     .final-star-text { font-size: 22px; margin: 0 0 20px 0;}
-    #restartBtn { font-size: 18px; padding: 12px 20px; border-radius: 15px; }
+      
+    /* 🛡️ 星星系統手機版專屬防護罩 (鎖死原始尺寸，拒絕干擾) */
+    #bigStarFeedback { width: 250px; height: 250px; }
+    .star-bg { font-size: 180px; }
+    .star-text-zh { font-size: 45px; }
+    .star-text-en { font-size: 22px; }
+    .replay-audio-btn { width: 60px; height: 60px; font-size: 30px; bottom: -10px; }
     
     .star-bg { font-size: 180px; }
 
@@ -568,7 +568,7 @@ body {
   
   <div class="setting-item">
     <label>📚 教材名稱</label>
-    <input type="text" id="inputMaterialName" value="IMI_詞彙消消樂">
+    <input type="text" id="inputMaterialName" value="IMI_詞序配對練習">
   </div>
   <div class="setting-item">
     <label>🎓 學生 / 班級</label>
