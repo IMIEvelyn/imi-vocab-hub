@@ -1094,6 +1094,57 @@ function generateLink() {
     document.getElementById('editorSaveBtn').disabled = false;
     document.getElementById('editorModalOverlay').classList.add('show');
   }
+    // 💡 互動功能：即時防呆檢查 (監聽字數是否對齊)
+  function validateEditor() {
+    let zh = document.getElementById('editorZh').value.trim();
+    let py = document.getElementById('editorPy').value.trim().split(/\s+/).filter(Boolean);
+    let tone = document.getElementById('editorTone').value.trim().split(/\s+/).filter(Boolean);
+    let btn = document.getElementById('editorSaveBtn');
+    let fb = document.getElementById('editorFeedback');
+
+    if (!zh) { fb.innerText = ""; btn.disabled = true; return; }
+    if (zh.length !== py.length || zh.length !== tone.length) {
+      fb.innerText = `⚠️ 數量不一致：漢字 ${zh.length} 字，拼音 ${py.length} 組，聲調 ${tone.length} 組`;
+      btn.disabled = true;
+    } else {
+      fb.innerText = ""; btn.disabled = false;
+    }
+  }
+
+  // 綁定鍵盤輸入監聽器，只要打字就會瞬間檢查
+  ['editorZh', 'editorPy', 'editorTone'].forEach(id => {
+    let el = document.getElementById(id);
+    if(el) el.addEventListener('input', validateEditor);
+  });
+    // 💡 互動功能：儲存編輯並逆向同步資料庫
+  function saveEditorModal() {
+    let id = document.getElementById('editorId').value;
+    let zh = document.getElementById('editorZh').value.trim();
+    let py = document.getElementById('editorPy').value.trim().split(/\s+/);
+    let zy = document.getElementById('editorZy').value.trim().split(/\s+/);
+    let tone = document.getElementById('editorTone').value.trim().split(/\s+/);
+    let native = document.getElementById('editorNative').value.trim();
+    let tts = document.getElementById('editorTts').value.trim().split(/\s+/);
+
+    let auditObj = pendingAudits.find(item => item.id === id);
+    let lines = document.getElementById('vocabInput').value.split('\n');
+    let wordId = lines[auditObj.lines[0]].split(',')[0].trim(); // 保留原始單字ID
+
+    auditObj.lines.forEach(idx => lines[idx] = null); // 徹底清空舊資料
+
+    let newLines = [];
+    for (let i = 0; i < zh.length; i++) {
+      let charTts = tts[i] || zh[i]; // 若無特別輸入咒語，則預設回歸漢字
+      // 將資料精準切碎，重組回系統標準格式
+      newLines.push(`${wordId}, ${tone[i]||'1'}, ${zh[i]}, ${py[i]||''}, ${zy[i]||''}, , ${native}, ${charTts}`);
+    }
+
+    lines[auditObj.lines[0]] = newLines.join('\n'); // 將新資料塞回第一行的位置
+    document.getElementById('vocabInput').value = lines.filter(l => l !== null).join('\n');
+
+    closeEditorModal(); // 關閉視窗
+    scanVocabForAudit(); // 瞬間重新掃描並重繪儀表板
+  }
   let validWords = []; let remainingWords = []; let tileQueue = []; let SLOTS = []; let currentSelection = []; 
   let stars = 0; let idleTimer = null; let toastTimer = null; 
   let isShuffling = false; 
