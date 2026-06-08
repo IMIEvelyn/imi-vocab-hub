@@ -794,15 +794,22 @@ function generateLink() {
     };
   }
     
-// 💡 升級版：正確抓取全局口音變數 ＋ 支援跨平台口音格式 ＋ 篩選優質女聲
+// 💡 升級版：雙軌偵測口音 (教師端即時抓取選單，學生端讀取全域變數) ＋ 篩選優質女聲
   function playAudio(text) {
     if (!text || text.trim() === "") return;
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel(); // 停止目前播放
       let msg = new SpeechSynthesisUtterance(text);
 
-      // 🎯 核心修正：回歸您的正統變數，並處理 Mac/Windows 的格式差異 (如 zh-CN 與 zh_CN)
-      const targetLang = window.currentAccent || 'zh-TW'; 
+      // 🎯 雙軌偵測核心邏輯：判斷全域常數 URL_DATA 是否有值
+      let targetLang = 'zh-TW';
+      if (URL_DATA) {
+          targetLang = window.currentAccent || 'zh-TW'; // 🎓 學生端：讀取解碼後的大腦變數
+      } else {
+          const accentSelect = document.getElementById('inputAccent');
+          targetLang = accentSelect ? accentSelect.value : 'zh-TW'; // 👩‍🏫 教師端：即時抓取介面下拉選單
+      }
+
       const fallbackLang = targetLang.replace('-', '_'); 
       msg.lang = targetLang;
       msg.rate = 0.85;
@@ -810,7 +817,6 @@ function generateLink() {
       let voices = window.speechSynthesis.getVoices();
       let premiumFemales = ['Ting-Ting', 'Xiaoxiao', '曉曉', 'Huihui', 'Mei-Jia', '美佳', 'Hanhan', 'Google'];
       
-      // 💡 尋找聲音時，同時比對 targetLang 與 fallbackLang
       let bestVoice = voices.find(v => (v.lang.includes(targetLang) || v.lang.includes(fallbackLang)) && premiumFemales.some(name => v.name.includes(name)));
       if (!bestVoice) bestVoice = voices.find(v => v.lang.includes(targetLang) || v.lang.includes(fallbackLang));
 
