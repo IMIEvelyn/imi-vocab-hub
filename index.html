@@ -954,29 +954,36 @@ function generateLink() {
       groups[wId].zh += p[2].trim();
       if(p[3]) groups[wId].py.push(p[3].trim());
     });
-      let redHtml = `<div class="audit-header">🚨 待確認風險區 (請試聽並親手點擊確認)</div>`;
-    let greenHtml = `<div class="audit-header" style="margin-top:20px; color:#16a34a;">🛡️ 一般安全詞彙區 (已自動通關，無需動作)</div>`;
+ let redHtml = `<div class="audit-header">🚨 待確認風險區 (須手動試聽確認)</div>`;
+    let greenHtml = `<div class="audit-header" style="margin-top:20px; color:#16a34a; display:flex; justify-content:space-between; align-items:center;">
+        <span>🛡️ 一般安全詞彙區</span>
+        <button class="audit-btn audit-btn-ok" onclick="resolveAllGreen()">✅ 綠燈一鍵確認</button>
+      </div>`;
     let hasRed = false, hasGreen = false;
-    const riskChars = ['轉', '重', '行', '髮', '教', '長', '樂', '假', '覺', '差']; // 🚨 高頻破音字警戒名單
+    const riskChars = ['轉', '重', '行', '髮', '教', '長', '樂', '假', '覺', '差']; 
 
-    // 🎯 第二步：逐一審查完整詞彙，並分流到紅綠燈區
+    // 🎯 第二步：分流紅綠燈 (綠燈徹底解鎖，初始為 false)
     Object.values(groups).forEach((g, i) => {
       let pyStr = g.py.join(' '); let target = g.zh;
       let isRisk = riskChars.some(c => g.zh.includes(c)) || cheatDictionary[g.zh];
-
-      if (cheatDictionary[g.zh] && cheatDictionary[g.zh][pyStr]) {
-        target = cheatDictionary[g.zh][pyStr]; // 命中作弊字典，自動套用替身咒語
-      }
+      if (cheatDictionary[g.zh] && cheatDictionary[g.zh][pyStr]) target = cheatDictionary[g.zh][pyStr];
 
       let aId = `audit_${i}`;
-      pendingAudits.push({ id: aId, lines: g.lines, finalTts: target });
+      pendingAudits.push({ id: aId, lines: g.lines, finalTts: target, isGreen: !isRisk }); // 💡 標記是否為綠燈
 
       if (isRisk) { hasRed = true; redHtml += createAuditItemHtml(aId, g.zh, pyStr, target, '🔴', false); }
-      else { hasGreen = true; greenHtml += createAuditItemHtml(aId, g.zh, pyStr, target, '🟢', true); }
+      else { hasGreen = true; greenHtml += createAuditItemHtml(aId, g.zh, pyStr, target, '🟢', false); } // 🟢 徹底解鎖
     });
 
     dashboard.innerHTML = (hasRed ? redHtml : '') + (hasGreen ? greenHtml : '');
     dashboard.style.display = 'flex';
+  }
+
+  // 💡 互動功能：專屬綠燈區的「一鍵確認」
+  function resolveAllGreen() {
+    pendingAudits.forEach(item => {
+      if (item.isGreen) resolveAudit(item.id);
+    });
   }
     
  // 💡 建立單個審查項目的 HTML 樣板 (支援預設綠燈通關)
@@ -991,7 +998,7 @@ function generateLink() {
           <button class="audit-btn-tweak" onclick="toggleTweak('${id}')">⚙️</button>
         </div>
         <div class="audit-tweak-box" id="tweak_${id}">
-          <div class="audit-tweak-desc">如果自動發音有誤，請手動輸入拼音或加空白強制導正：</div>
+          <div class="audit-tweak-desc">如果自動發音有誤，請輸入同音異字來校正，如轉盤＝>囀盤：</div>
           <div class="audit-tweak-input-group">
             <input type="text" id="input_${id}" value="${targetTts}">
             <button class="audit-btn audit-btn-play" onclick="playAudio(document.getElementById('input_${id}').value)">🔊 測試</button>
