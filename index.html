@@ -1063,6 +1063,37 @@ function generateLink() {
     document.getElementById('vocabInput').value = lines.filter(l => l !== null).join('\n');
     scanVocabForAudit(); // 瞬間重繪儀表板
   }
+    // 💡 互動功能：開啟彈出式編輯器並萃取資料
+  function openEditorModal(id) {
+    let auditObj = pendingAudits.find(item => item.id === id);
+    if (!auditObj) return;
+
+    let lines = document.getElementById('vocabInput').value.split('\n');
+    let zh = "", py = [], zy = [], tone = [], native = "";
+
+    // 🎯 精準萃取：從多行資料中組合出完整的詞彙屬性
+    auditObj.lines.forEach((lineIdx, i) => {
+      let p = lines[lineIdx].split(',');
+      zh += p[2] ? p[2].trim() : "";
+      if (p[3]) py.push(p[3].trim());
+      if (p[4]) zy.push(p[4].trim());
+      if (p[5]) tone.push(p[5].trim());
+      if (i === 0) native = p[6] ? p[6].trim() : "";
+    });
+
+    document.getElementById('editorId').value = id;
+    document.getElementById('editorIsNew').value = "false";
+    document.getElementById('editorZh').value = zh;
+    document.getElementById('editorPy').value = py.join(' ');
+    document.getElementById('editorZy').value = zy.join(' ');
+    document.getElementById('editorTone').value = tone.join(' ');
+    document.getElementById('editorNative').value = native;
+    document.getElementById('editorTts').value = (auditObj.finalTts === zh) ? "" : auditObj.finalTts;
+    
+    document.getElementById('editorFeedback').innerText = "";
+    document.getElementById('editorSaveBtn').disabled = false;
+    document.getElementById('editorModalOverlay').classList.add('show');
+  }
   let validWords = []; let remainingWords = []; let tileQueue = []; let SLOTS = []; let currentSelection = []; 
   let stars = 0; let idleTimer = null; let toastTimer = null; 
   let isShuffling = false; 
