@@ -529,25 +529,17 @@ body {
   .audit-btn-play:hover { background: #bae6fd; transform: scale(0.95); }
   .audit-btn-ok { background: #dcfce7; color: #16a34a; }
   .audit-btn-ok:hover { background: #bbf7d0; transform: scale(0.95); }
-  .audit-btn-tweak { 
-    background: transparent; color: #cbd5e1; padding: 5px; 
-    font-size: 20px; cursor: pointer; border: none; transition: all 0.2s; 
-  }
-  .audit-btn-tweak:hover { color: #64748b; transform: rotate(90deg); }
-    .audit-tweak-box {
-    width: 100%; display: none; padding-top: 12px; margin-top: 5px; 
-    border-top: 1px dashed #e2e8f0;
-  }
-  .audit-tweak-box.show { display: block; }
-  .audit-tweak-desc { 
-    font-size: 14px; color: #ef4444; margin-bottom: 8px; font-weight: bold; 
-  }
-  .audit-tweak-input-group { display: flex; gap: 10px; }
-  .audit-tweak-input-group input {
-    flex: 1; padding: 10px 15px; border: 2px solid #e2e8f0; 
-    border-radius: 10px; font-size: 16px; outline: none; transition: border-color 0.2s;
-  }
-  .audit-tweak-input-group input:focus { border-color: #0284c7; }
+.audit-btn-edit { background: #f3f4f6; color: #4b5563; }
+  .audit-btn-edit:hover { background: #e5e7eb; transform: scale(0.95); }
+  .audit-btn-del { background: #fee2e2; color: #ef4444; }
+  .audit-btn-del:hover { background: #fecaca; transform: scale(0.95); }
+  
+  /* 🌟 彈出式編輯器 (Modal) 基本樣式 */
+  .editor-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 11000; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
+  .editor-modal-overlay.show { display: flex; opacity: 1; }
+  .editor-modal { background: #fff; padding: 30px; border-radius: 20px; width: 90%; max-width: 500px; box-shadow: 0 20px 50px rgba(0,0,0,0.2); transform: translateY(20px); transition: transform 0.3s; max-height: 90vh; overflow-y: auto; }
+  .editor-modal-overlay.show .editor-modal { transform: translateY(0); }
+  .editor-modal h2 { margin: 0 0 20px 0; color: #1e293b; font-size: 24px; text-align: center; border-bottom: 2px dashed #e2e8f0; padding-bottom: 15px; }
 </style>
 </head>
 
@@ -622,7 +614,28 @@ body {
     </div>
   </div>
 
-
+<div id="editorModalOverlay" class="editor-modal-overlay">
+    <div class="editor-modal">
+      <h2 id="editorModalTitle">✏️ 編輯詞彙</h2>
+      <input type="hidden" id="editorId">
+      <input type="hidden" id="editorIsNew">
+      
+      <div class="editor-group"><label>漢字</label><input type="text" id="editorZh" placeholder="例：靠窗"></div>
+      <div class="editor-group"><label>拼音</label><input type="text" id="editorPy" placeholder="例：kào chuāng"><div class="editor-hint">各字拼音請用空白鍵隔開</div></div>
+      <div class="editor-group"><label>注音 (選填)</label><input type="text" id="editorZy" placeholder="例：ㄎㄠˋ ㄔㄨㄤ"><div class="editor-hint">無則留白，各字用空白鍵隔開</div></div>
+      <div class="editor-group"><label>聲調密碼</label><input type="text" id="editorTone" placeholder="例：4 1"><div class="editor-hint">輸入 1~5，各字用空白鍵隔開</div></div>
+      <div class="editor-group"><label>外語翻譯</label><input type="text" id="editorNative" placeholder="例：window seat"></div>
+      <div class="editor-group"><label>發音咒語 (選填)</label><input type="text" id="editorTts" placeholder="例：靠 窗"><div class="editor-hint">輸入同音字強制導正發音</div></div>
+      
+      <div id="editorFeedback" class="editor-feedback"></div>
+      
+      <div class="editor-actions">
+        <button class="editor-btn editor-btn-cancel" onclick="closeEditorModal()">取消</button>
+        <button class="editor-btn editor-btn-save" id="editorSaveBtn" onclick="saveEditorModal()" disabled>💾 儲存並同步</button>
+      </div>
+    </div>
+  </div>
+    
   <div id="winModal" class="win-overlay" style="display: none;">
     <div class="win-content">
       <h1>🎉 🎉 🎉 太棒了！</h1>
@@ -991,7 +1004,7 @@ function generateLink() {
     dashboard.style.display = 'flex';
   }
     
-// 💡 建立單個審查項目的 HTML 樣板 (支援雙重後悔藥機制)
+// 💡 建立單個審查項目的 HTML 樣板 (升級版：接軌彈出式編輯器)
   function createAuditItemHtml(id, zh, py, targetTts, icon, isResolved) {
     return `
       <div class="audit-item" id="${id}" data-icon="${icon}">
@@ -999,14 +1012,8 @@ function generateLink() {
         <div class="audit-actions">
           <button class="audit-btn audit-btn-play" onclick="playAudio('${targetTts}')">🔊 試聽發音</button>
           <button class="audit-btn audit-btn-ok" id="btn_${id}" onclick="toggleResolve('${id}')">✅ 沒問題</button>
-          <button class="audit-btn-tweak" onclick="toggleTweak('${id}')">⚙️</button>
-        </div>
-        <div class="audit-tweak-box" id="tweak_${id}">
-          <div class="audit-tweak-desc">手動輸入拼音或加空白強制導正：</div>
-          <div class="audit-tweak-input-group">
-            <input type="text" id="input_${id}" value="${targetTts}">
-            <button class="audit-btn audit-btn-play" onclick="playAudio(document.getElementById('input_${id}').value)">🔊 測試</button>
-          </div>
+          <button class="audit-btn audit-btn-edit" onclick="openEditorModal('${id}')">✏️ 編輯</button>
+          <button class="audit-btn audit-btn-del" onclick="deleteVocab('${id}')">🗑️ 刪除</button>
         </div>
       </div>
     `;
@@ -1039,9 +1046,22 @@ function generateLink() {
   function resolveAllGreen() { pendingAudits.forEach(item => { if (item.isGreen && !item.isResolved) toggleResolve(item.id); }); }
   function unresolveAllGreen() { pendingAudits.forEach(item => { if (item.isGreen && item.isResolved) toggleResolve(item.id); }); }
 
-  // 💡 互動功能：展開/收合進階微調框
-  function toggleTweak(id) {
-    document.getElementById(`tweak_${id}`).classList.toggle('show');
+ // 💡 互動功能：關閉彈出式編輯器
+  function closeEditorModal() {
+    document.getElementById('editorModalOverlay').classList.remove('show');
+  }
+
+  // 💡 互動功能：刪除單一詞彙並逆向同步
+  function deleteVocab(id) {
+    if (!confirm("確定要刪除這個詞彙嗎？")) return;
+    let auditObj = pendingAudits.find(item => item.id === id);
+    if (!auditObj) return;
+
+    let lines = document.getElementById('vocabInput').value.split('\n');
+    auditObj.lines.forEach(lineIdx => { lines[lineIdx] = null; }); // 標記為空
+    
+    document.getElementById('vocabInput').value = lines.filter(l => l !== null).join('\n');
+    scanVocabForAudit(); // 瞬間重繪儀表板
   }
   let validWords = []; let remainingWords = []; let tileQueue = []; let SLOTS = []; let currentSelection = []; 
   let stars = 0; let idleTimer = null; let toastTimer = null; 
