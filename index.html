@@ -957,7 +957,10 @@ function generateLink() {
  let redHtml = `<div class="audit-header">🚨 待確認風險區 (須手動試聽確認)</div>`;
     let greenHtml = `<div class="audit-header" style="margin-top:20px; color:#16a34a; display:flex; justify-content:space-between; align-items:center;">
         <span>🛡️ 一般安全詞彙區</span>
-        <button class="audit-btn audit-btn-ok" onclick="resolveAllGreen()">✅ 綠燈一鍵確認</button>
+        <div>
+          <button class="audit-btn audit-btn-play" onclick="unresolveAllGreen()" style="margin-right:10px;">🔓 全部解鎖</button>
+          <button class="audit-btn audit-btn-ok" onclick="resolveAllGreen()">✅ 綠燈一鍵確認</button>
+        </div>
       </div>`;
     let hasRed = false, hasGreen = false;
     const riskChars = ['轉', '重', '行', '髮', '教', '長', '樂', '假', '覺', '差']; 
@@ -978,27 +981,19 @@ function generateLink() {
     dashboard.innerHTML = (hasRed ? redHtml : '') + (hasGreen ? greenHtml : '');
     dashboard.style.display = 'flex';
   }
-
-  // 💡 互動功能：專屬綠燈區的「一鍵確認」
-  function resolveAllGreen() {
-    pendingAudits.forEach(item => {
-      if (item.isGreen) resolveAudit(item.id);
-    });
-  }
     
- // 💡 建立單個審查項目的 HTML 樣板 (支援預設綠燈通關)
+// 💡 建立單個審查項目的 HTML 樣板 (支援雙重後悔藥機制)
   function createAuditItemHtml(id, zh, py, targetTts, icon, isResolved) {
-    const resolvedClass = isResolved ? 'resolved' : '';
     return `
-      <div class="audit-item ${resolvedClass}" id="${id}">
-        <div class="audit-item-info">${icon} ${zh} <span class="pinyin">[${py}]</span></div>
+      <div class="audit-item" id="${id}" data-icon="${icon}">
+        <div class="audit-item-info"><span id="icon_${id}">${icon}</span> ${zh} <span class="pinyin">[${py}]</span></div>
         <div class="audit-actions">
           <button class="audit-btn audit-btn-play" onclick="playAudio('${targetTts}')">🔊 試聽發音</button>
-          <button class="audit-btn audit-btn-ok" onclick="resolveAudit('${id}')">✅ 沒問題</button>
+          <button class="audit-btn audit-btn-ok" id="btn_${id}" onclick="toggleResolve('${id}')">✅ 沒問題</button>
           <button class="audit-btn-tweak" onclick="toggleTweak('${id}')">⚙️</button>
         </div>
         <div class="audit-tweak-box" id="tweak_${id}">
-          <div class="audit-tweak-desc">如果自動發音有誤，請輸入同音異字來校正，如轉盤＝>囀盤：</div>
+          <div class="audit-tweak-desc">手動輸入拼音或加空白強制導正：</div>
           <div class="audit-tweak-input-group">
             <input type="text" id="input_${id}" value="${targetTts}">
             <button class="audit-btn audit-btn-play" onclick="playAudio(document.getElementById('input_${id}').value)">🔊 測試</button>
@@ -1008,22 +1003,32 @@ function generateLink() {
     `;
   }
     
-  // 💡 互動功能：老師點擊「✅ 沒問題」確認發音
-  function resolveAudit(id) {
+ // 💡 互動功能：單一詞彙的「切換確認 / 解鎖」(第一重後悔藥)
+  function toggleResolve(id) {
     const itemEl = document.getElementById(id);
+    const btnEl = document.getElementById(`btn_${id}`);
     const inputEl = document.getElementById(`input_${id}`);
-    
-    // 將老師最終確認的發音字串，更新到待審查清單中
+    const iconSpan = document.getElementById(`icon_${id}`);
     let auditObj = pendingAudits.find(item => item.id === id);
-    if (auditObj) {
-      auditObj.finalTts = inputEl.value; 
+    if (!auditObj) return;
+
+    auditObj.isResolved = !auditObj.isResolved; // 狀態反轉切換
+
+    if (auditObj.isResolved) {
+      auditObj.finalTts = inputEl.value; // 確認時寫入最終發音
+      itemEl.classList.add('resolved'); // 加上反灰半透明
+      btnEl.innerHTML = '🔓 解鎖';
+      iconSpan.innerText = '🟢'; // 確認後統一顯示綠燈
+    } else {
+      itemEl.classList.remove('resolved'); // 拔除反灰，恢復明亮
+      btnEl.innerHTML = '✅ 沒問題';
+      iconSpan.innerText = itemEl.getAttribute('data-icon'); // 恢復原本的紅綠燈狀態
     }
-    
-    // 視覺回饋：變為綠燈 (將紅燈 🔴 或藍燈 🔵 替換為綠燈 🟢)
-    itemEl.classList.add('resolved');
-    let infoDiv = itemEl.querySelector('.audit-item-info');
-    infoDiv.innerHTML = infoDiv.innerHTML.replace('🔴', '🟢').replace('🔵', '🟢');
   }
+
+  // 💡 互動功能：綠燈區一鍵全域控制 (第二重後悔藥)
+  function resolveAllGreen() { pendingAudits.forEach(item => { if (item.isGreen && !item.isResolved) toggleResolve(item.id); }); }
+  function unresolveAllGreen() { pendingAudits.forEach(item => { if (item.isGreen && item.isResolved) toggleResolve(item.id); }); }
 
   // 💡 互動功能：展開/收合進階微調框
   function toggleTweak(id) {
