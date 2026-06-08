@@ -956,18 +956,19 @@ function generateLink() {
       const tone = parts[5] ? parts[5].trim() : "";
       const fullZy = zy + tone; // 組合注音與聲調
       
-      // 檢查字典中是否有這個漢字
+     // 💡 全面預聽：無論是否有風險，全數加入儀表板
+      let targetOverride = zh; 
+      let icon = '🔵'; // 預設一般詞彙顯示藍燈
+      
       if (cheatDictionary[zh]) {
-        // 雙軌比對：如果拼音吻合，或注音吻合
-        let targetOverride = cheatDictionary[zh][py] || cheatDictionary[zh][fullZy];
-        
-        if (targetOverride) {
-          hasRisk = true;
-          const auditId = `audit_${index}`;
-          pendingAudits.push({ id: auditId, lineIndex: index, zh: zh, py: py || fullZy, originalLine: line, targetTts: targetOverride });
-          dashboardHtml += createAuditItemHtml(auditId, zh, py || fullZy, targetOverride);
-        }
+        let match = cheatDictionary[zh][py] || cheatDictionary[zh][fullZy];
+        if (match) { targetOverride = match; icon = '🔴'; } // 風險詞彙顯示紅燈
       }
+      
+      hasRisk = true; // 只要有字，就強制觸發展開儀表板
+      const auditId = `audit_${index}`;
+      pendingAudits.push({ id: auditId, lineIndex: index, finalTts: targetOverride });
+      dashboardHtml += createAuditItemHtml(auditId, zh, py || fullZy, targetOverride, icon);
     });
       // 如果有危險字，顯示儀表板
     if (hasRisk) {
