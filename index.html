@@ -793,24 +793,25 @@ function generateLink() {
       window.speechSynthesis.getVoices();
     };
   }
-  // 💡 升級版：強制篩選優質女聲配音員
+ // 💡 升級版：支援動態口音試聽 ＋ 強制篩選優質女聲配音員
   function playAudio(text) {
+    if (!text || text.trim() === "") return;
     if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel(); // 停止目前播放
       let msg = new SpeechSynthesisUtterance(text);
-      let targetLang = window.currentAccent || 'zh-TW';
+
+      // 🎯 核心修正：動態抓取老師在介面上選擇的口音
+      const langSelect = document.getElementById('inputLanguage');
+      const targetLang = langSelect ? langSelect.value : 'zh-TW'; 
       msg.lang = targetLang;
-      msg.rate = 0.85; 
-      
+      msg.rate = 0.85;
+
       let voices = window.speechSynthesis.getVoices();
-      // 🎯 涵蓋 Apple, Win, Google 的兩岸高級女聲名單
       let premiumFemales = ['Ting-Ting', 'Xiaoxiao', '曉曉', 'Huihui', 'Mei-Jia', '美佳', 'Hanhan', 'Google'];
       
-      // 1. 優先尋找「語系符合」且「名稱在高級名單內」的女聲
       let bestVoice = voices.find(v => v.lang.includes(targetLang) && premiumFemales.some(name => v.name.includes(name)));
-      
-      // 2. 找不到指定女聲時的保底機制，至少抓取該語系的預設聲音
       if (!bestVoice) bestVoice = voices.find(v => v.lang.includes(targetLang));
-      
+
       if (bestVoice) msg.voice = bestVoice;
       window.speechSynthesis.speak(msg);
     }
