@@ -749,14 +749,14 @@ function generateLink() {
       return; // 擋下打包程序
     }
 
-   // 📝 資料寫回：將確認好的隱藏發音字串，重新組合回文本中
+  // 📝 資料寫回：將確認好的隱藏發音字串，重新組合回文本中
     let lines = vText.split('\n');
     pendingAudits.forEach(item => {
       // 💡 因為已黏合成詞彙，item.lines 是一個陣列 (例如 [0,1] 代表 轉、盤)
       item.lines.forEach((lineIdx, idx) => {
         let parts = lines[lineIdx].split(',');
-        // 把完整的發音咒語寫在該詞彙的第一行，後面的行數清空，防止遊戲聲音重疊
-        parts[7] = (idx === 0) ? item.finalTts : ""; 
+        // 🎯 關鍵修正：將後面的字塞入「半形空白」，騙過防呆機制產生靜音，解決疊音問題
+        parts[7] = (idx === 0) ? item.finalTts : " "; 
         lines[lineIdx] = parts.join(',');
       });
     });
