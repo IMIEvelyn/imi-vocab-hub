@@ -723,11 +723,15 @@ body {
       document.getElementById('gameContainer').style.display = 'none';
     }
   };
-
-  function clearVocab() { 
+function clearVocab() { 
     document.getElementById('vocabInput').value = ''; 
     document.getElementById('linkResult').style.display = 'none';
     document.getElementById('generatedUrl').value = '';
+    
+    // 💡 任務一：連動清除並隱藏智慧儀表板，同時清空系統大腦的待審查清單
+    document.getElementById('auditDashboard').innerHTML = '';
+    document.getElementById('auditDashboard').style.display = 'none';
+    if (typeof pendingAudits !== 'undefined') pendingAudits = [];
   }
 
 function generateLink() {
@@ -745,13 +749,16 @@ function generateLink() {
       return; // 擋下打包程序
     }
 
-    // 📝 資料寫回：將確認好的隱藏發音字串，重新組合回文本中
+   // 📝 資料寫回：將確認好的隱藏發音字串，重新組合回文本中
     let lines = vText.split('\n');
     pendingAudits.forEach(item => {
-      let parts = lines[item.lineIndex].split(',');
-      // 將最終確認的發音 (finalTts) 寫入第 8 欄 (index 7)
-      parts[7] = item.finalTts;
-      lines[item.lineIndex] = parts.join(',');
+      // 💡 因為已黏合成詞彙，item.lines 是一個陣列 (例如 [0,1] 代表 轉、盤)
+      item.lines.forEach((lineIdx, idx) => {
+        let parts = lines[lineIdx].split(',');
+        // 把完整的發音咒語寫在該詞彙的第一行，後面的行數清空，防止遊戲聲音重疊
+        parts[7] = (idx === 0) ? item.finalTts : ""; 
+        lines[lineIdx] = parts.join(',');
+      });
     });
     vText = lines.join('\n'); // 更新 vText，準備打包
     
@@ -931,58 +938,52 @@ function generateLink() {
     this.scanTimeout = setTimeout(scanVocabForAudit, 500);
   });
 
-  // 💡 核心掃描與生成儀表板邏輯 (上半部)
+ // 💡 核心掃描與生成儀表板邏輯 (雙區域分流 ＋ 黏合詞彙)
   function scanVocabForAudit() {
     const rawText = document.getElementById('vocabInput').value;
     const dashboard = document.getElementById('auditDashboard');
-    pendingAudits = [];
-    dashboard.innerHTML = ''; 
-    
-    if (!rawText.trim()) {
-      dashboard.style.display = 'none';
-      return;
-    }
-    
-    let hasRisk = false;
-    let dashboardHtml = `<div class="audit-header">🔍 發音安全審查 (請確認紅燈詞彙)</div>`;
-      const lines = rawText.split('\n');
-    lines.forEach((line, index) => {
-      const parts = line.split(',');
-      if (parts.length < 3) return;
-      
-      const zh = parts[2].trim();
-      const py = parts[3] ? parts[3].trim() : "";
-      const zy = parts[4] ? parts[4].trim() : "";
-      const tone = parts[5] ? parts[5].trim() : "";
-      const fullZy = zy + tone; // 組合注音與聲調
-      
-     // 💡 全面預聽：無論是否有風險，全數加入儀表板
-      let targetOverride = zh; 
-      let icon = '🔵'; // 預設一般詞彙顯示藍燈
-      
-      if (cheatDictionary[zh]) {
-        let match = cheatDictionary[zh][py] || cheatDictionary[zh][fullZy];
-        if (match) { targetOverride = match; icon = '🔴'; } // 風險詞彙顯示紅燈
-      }
-      
-      hasRisk = true; // 只要有字，就強制觸發展開儀表板
-      const auditId = `audit_${index}`;
-      pendingAudits.push({ id: auditId, lineIndex: index, finalTts: targetOverride });
-      dashboardHtml += createAuditItemHtml(auditId, zh, py || fullZy, targetOverride, icon);
-    });
-      // 如果有危險字，顯示儀表板
-    if (hasRisk) {
-      dashboard.innerHTML = dashboardHtml;
-      dashboard.style.display = 'flex';
-    } else {
-      dashboard.style.display = 'none';
-    }
-  }
+    pendingAudits = []; dashboard.innerHTML = '';
+    if (!rawText.trim()) { dashboard.style.display = 'none'; return; }
 
-  // 💡 建立單個審查項目的 HTML 樣板 (支援動態紅藍燈號)
-  function createAuditItemHtml(id, zh, py, targetTts, icon) {
+    let groups = {}; // 🎯 第一步：利用 W1, W2 把切碎的單字黏合成完整詞彙
+    rawText.split('\n').forEach((line, index) => {
+      let p = line.split(','); if (p.length < 3) return;
+      let wId = p[0].trim();
+      if (!groups[wId]) groups[wId] = { lines: [], zh: "", py: [] };
+      groups[wId].lines.push(index);
+      groups[wId].zh += p[2].trim();
+      if(p[3]) groups[wId].py.push(p[3].trim());
+    });
+      let redHtml = `<div class="audit-header">🚨 待確認風險區 (請試聽並親手點擊確認)</div>`;
+    let greenHtml = `<div class="audit-header" style="margin-top:20px; color:#16a34a;">🛡️ 一般安全詞彙區 (已自動通關，無需動作)</div>`;
+    let hasRed = false, hasGreen = false;
+    const riskChars = ['轉', '重', '行', '髮', '教', '長', '樂', '假', '覺', '差']; // 🚨 高頻破音字警戒名單
+
+    // 🎯 第二步：逐一審查完整詞彙，並分流到紅綠燈區
+    Object.values(groups).forEach((g, i) => {
+      let pyStr = g.py.join(' '); let target = g.zh;
+      let isRisk = riskChars.some(c => g.zh.includes(c)) || cheatDictionary[g.zh];
+
+      if (cheatDictionary[g.zh] && cheatDictionary[g.zh][pyStr]) {
+        target = cheatDictionary[g.zh][pyStr]; // 命中作弊字典，自動套用替身咒語
+      }
+
+      let aId = `audit_${i}`;
+      pendingAudits.push({ id: aId, lines: g.lines, finalTts: target });
+
+      if (isRisk) { hasRed = true; redHtml += createAuditItemHtml(aId, g.zh, pyStr, target, '🔴', false); }
+      else { hasGreen = true; greenHtml += createAuditItemHtml(aId, g.zh, pyStr, target, '🟢', true); }
+    });
+
+    dashboard.innerHTML = (hasRed ? redHtml : '') + (hasGreen ? greenHtml : '');
+    dashboard.style.display = 'flex';
+  }
+    
+ // 💡 建立單個審查項目的 HTML 樣板 (支援預設綠燈通關)
+  function createAuditItemHtml(id, zh, py, targetTts, icon, isResolved) {
+    const resolvedClass = isResolved ? 'resolved' : '';
     return `
-      <div class="audit-item" id="${id}">
+      <div class="audit-item ${resolvedClass}" id="${id}">
         <div class="audit-item-info">${icon} ${zh} <span class="pinyin">[${py}]</span></div>
         <div class="audit-actions">
           <button class="audit-btn audit-btn-play" onclick="playAudio('${targetTts}')">🔊 試聽發音</button>
