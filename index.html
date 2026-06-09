@@ -853,7 +853,7 @@ function generateLink() {
 
       const fallbackLang = targetLang.replace('-', '_'); 
       msg.lang = targetLang;
-      msg.rate = 0.85;
+      msg.rate = (targetLang === 'zh-CN') ? 1.0 : 0.85;
 
       let voices = window.speechSynthesis.getVoices();
       let premiumFemales = ['Ting-Ting', 'Xiaoxiao', '曉曉', 'Huihui', 'Mei-Jia', '美佳', 'Hanhan', 'Google'];
