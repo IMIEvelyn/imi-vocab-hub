@@ -1023,11 +1023,10 @@ function generateLink() {
     `;
   }
     
- // 💡 互動功能：單一詞彙的「切換確認 / 解鎖」(第一重後悔藥)
+// 💡 互動功能：單一詞彙的「切換確認 / 解鎖」(第一重後悔藥)
   function toggleResolve(id) {
     const itemEl = document.getElementById(id);
     const btnEl = document.getElementById(`btn_${id}`);
-    const inputEl = document.getElementById(`input_${id}`);
     const iconSpan = document.getElementById(`icon_${id}`);
     let auditObj = pendingAudits.find(item => item.id === id);
     if (!auditObj) return;
@@ -1035,12 +1034,11 @@ function generateLink() {
     auditObj.isResolved = !auditObj.isResolved; // 狀態反轉切換
 
     if (auditObj.isResolved) {
-      auditObj.finalTts = inputEl.value; // 確認時寫入最終發音
       itemEl.classList.add('resolved'); // 加上反灰半透明
       btnEl.innerHTML = '🔓 解鎖';
       iconSpan.innerText = '🟢'; // 確認後統一顯示綠燈
     } else {
-      itemEl.classList.remove('resolved'); // 拔除反灰，恢復明亮
+      itemEl.classList.remove('resolved');
       btnEl.innerHTML = '✅ 沒問題';
       iconSpan.innerText = itemEl.getAttribute('data-icon'); // 恢復原本的紅綠燈狀態
     }
