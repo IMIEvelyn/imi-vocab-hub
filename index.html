@@ -1158,11 +1158,14 @@ function generateLink() {
     auditObj.lines.forEach(idx => lines[idx] = null); // 徹底清空舊資料
 
     let newLines = [];
-    for (let i = 0; i < zh.length; i++) {
-      let charTts = tts[i] || zh[i]; // 若無特別輸入咒語，則預設回歸漢字
-      // 將資料精準切碎，重組回系統標準格式
-      newLines.push(`${wordId}, ${tone[i]||'1'}, ${zh[i]}, ${py[i]||''}, ${zy[i]||''}, , ${native}, ${charTts}`);
-    }
+   for (let i = 0; i < zh.length; i++) {
+    let charTts = tts[i] || zh[i]; // 若無特別輸入咒語，則預設回歸漢字
+    // 🎯 自動淨化器：拔除注音自帶聲調，並依據數字生成標準聲調符號
+    let cleanZy = (zy[i] || '').replace(/[ˊˇˋ˙]/g, ''); 
+    let zyToneMark = {'1':'', '2':'ˊ', '3':'ˇ', '4':'ˋ', '5':'˙'}[tone[i] || '1'] || '';
+    // 將資料精準切碎，完美分裝至獨立欄位
+    newLines.push(`${wordId}, ${tone[i]||'1'}, ${zh[i]}, ${py[i]||''}, ${cleanZy}, ${zyToneMark}, ${native}, ${charTts}`);
+  }
 
     lines[auditObj.lines[0]] = newLines.join('\n'); // 將新資料塞回第一行的位置
     document.getElementById('vocabInput').value = lines.filter(l => l !== null).join('\n');
