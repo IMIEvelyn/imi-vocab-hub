@@ -739,19 +739,17 @@ body {
   };
 // 💡 互動功能：清除資料並自動展開視窗
   function clearVocab() { 
-    document.getElementById('vocabInput').value = ''; 
-    document.getElementById('linkResult').style.display = 'none';
-    document.getElementById('generatedUrl').value = '';
-    
-    // 🌟 確保清除後，文字框彈開，並將「收合按鈕」隱藏起來
-    toggleVocabInput(false); 
-    document.getElementById('toggleInputBtn').style.display = 'none';
+  document.getElementById('vocabInput').value = ''; 
+  document.getElementById('linkResult').style.display = 'none';
+  document.getElementById('generatedUrl').value = '';
+  
+  toggleVocabInput(false); 
+  document.getElementById('toggleInputBtn').style.display = 'none';
 
-    // 💡 任務一：連動清除並隱藏智慧儀表板，同時清空系統大腦的待審查清單
-    document.getElementById('auditDashboard').innerHTML = '';
-    document.getElementById('auditDashboard').style.display = 'none';
-    if (typeof pendingAudits !== 'undefined') pendingAudits = [];
-  }
+  document.getElementById('auditDashboard').innerHTML = '';
+  document.getElementById('auditDashboard').style.display = 'none';
+  if (typeof pendingAudits !== 'undefined') pendingAudits = [];
+}
 
 function generateLink() {
     let vText = document.getElementById('vocabInput').value;
