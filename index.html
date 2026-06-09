@@ -1008,16 +1008,16 @@ function generateLink() {
     dashboard.style.display = 'flex';
   }
     
-// 💡 建立單個審查項目的 HTML 樣板 (升級版：接軌彈出式編輯器)
+// 💡 建立單個審查項目的 HTML 樣板 (升級版：接軌彈出式編輯器與簡潔按鈕)
   function createAuditItemHtml(id, zh, py, targetTts, icon, isResolved) {
     return `
       <div class="audit-item" id="${id}" data-icon="${icon}">
         <div class="audit-item-info"><span id="icon_${id}">${icon}</span> ${zh} <span class="pinyin">[${py}]</span></div>
         <div class="audit-actions">
-          <button class="audit-btn audit-btn-play" onclick="playAudio('${targetTts}')">🔊 試聽發音</button>
-          <button class="audit-btn audit-btn-ok" id="btn_${id}" onclick="toggleResolve('${id}')">✅ 沒問題</button>
+          <button class="audit-btn audit-btn-play" onclick="playAudio('${targetTts}')">🔊 試聽</button>
           <button class="audit-btn audit-btn-edit" onclick="openEditorModal('${id}')">✏️ 編輯</button>
-          <button class="audit-btn audit-btn-del" onclick="deleteVocab('${id}')">🗑️ 刪除</button>
+          <button class="audit-btn audit-btn-ok" id="btn_${id}" onclick="toggleResolve('${id}')">✅ 沒問題</button>
+          <button class="audit-btn audit-btn-del" onclick="deleteVocab('${id}')" title="刪除">🗑️</button>
         </div>
       </div>
     `;
