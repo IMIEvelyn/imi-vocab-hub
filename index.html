@@ -604,6 +604,7 @@ body {
       <label style="font-size: 16px; font-weight: bold; color: #555; margin-left: 5px; margin-bottom: 8px;">📥 匯入單字資料</label>
       <button class="clear-btn" onclick="clearVocab()">🗑️ 清除資料</button>
     </div>
+      <button id="toggleInputBtn" onclick="toggleVocabInput()" style="margin-bottom: 10px; padding: 8px 15px; border-radius: 10px; border: 2px solid #e2e8f0; background: #f8fafc; color: #475569; cursor: pointer; font-weight: bold; transition: all 0.2s;">🔼 收合視窗</button>
     <textarea id="vocabInput" placeholder="請在此貼上 專屬Gem 的Json資料..."></textarea>
    <div id="auditDashboard"></div> 
     <button class="start-btn" onclick="generateLink()">🔗 生成學生專屬連結</button>
@@ -736,10 +737,15 @@ body {
       document.getElementById('gameContainer').style.display = 'none';
     }
   };
-function clearVocab() { 
+// 💡 互動功能：清除資料並自動展開視窗
+  function clearVocab() { 
     document.getElementById('vocabInput').value = ''; 
     document.getElementById('linkResult').style.display = 'none';
     document.getElementById('generatedUrl').value = '';
+    
+    // 🌟 確保清除後，文字框會自動彈開，讓老師能輸入新內容
+    toggleVocabInput(false); 
+  }
     
     // 💡 任務一：連動清除並隱藏智慧儀表板，同時清空系統大腦的待審查清單
     document.getElementById('auditDashboard').innerHTML = '';
@@ -1145,6 +1151,24 @@ function generateLink() {
     closeEditorModal(); // 關閉視窗
     scanVocabForAudit(); // 瞬間重新掃描並重繪儀表板
   }
+    // 💡 互動功能：收合/展開 JSON 文字框
+  function toggleVocabInput(forceCollapse = false) {
+    let input = document.getElementById('vocabInput');
+    let btn = document.getElementById('toggleInputBtn');
+    if (!input || !btn) return;
+    
+    if (forceCollapse === true || input.style.display !== 'none') {
+      input.style.display = 'none';
+      btn.innerText = '🔽 展開視窗';
+    } else {
+      input.style.display = 'block';
+      btn.innerText = '🔼 收合視窗';
+    }
+  }
+    // 💡 貼心設計：監聽文字框的「貼上」動作，0.1秒後自動收合
+  document.getElementById('vocabInput').addEventListener('paste', () => {
+    setTimeout(() => toggleVocabInput(true), 100);
+  });
   let validWords = []; let remainingWords = []; let tileQueue = []; let SLOTS = []; let currentSelection = []; 
   let stars = 0; let idleTimer = null; let toastTimer = null; 
   let isShuffling = false; 
