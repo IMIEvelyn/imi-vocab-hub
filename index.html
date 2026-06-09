@@ -540,6 +540,40 @@ body {
   .editor-modal { background: #fff; padding: 30px; border-radius: 20px; width: 90%; max-width: 500px; box-shadow: 0 20px 50px rgba(0,0,0,0.2); transform: translateY(20px); transition: transform 0.3s; max-height: 90vh; overflow-y: auto; }
   .editor-modal-overlay.show .editor-modal { transform: translateY(0); }
   .editor-modal h2 { margin: 0 0 20px 0; color: #1e293b; font-size: 24px; text-align: center; border-bottom: 2px dashed #e2e8f0; padding-bottom: 15px; }
+/* 👇 編輯表單內部細節美化 */
+  .editor-group { margin-bottom: 15px; display: flex; flex-direction: column; gap: 5px; }
+  .editor-group label { font-size: 16px; font-weight: bold; color: #475569; margin-left: 5px; }
+  .editor-group input { 
+    width: 100%; padding: 12px 15px; font-size: 16px; 
+    border: 2px solid #e2e8f0; border-radius: 12px; 
+    background: #f8fafc; color: #334155; 
+    transition: all 0.3s; box-sizing: border-box; outline: none; 
+  }
+  .editor-group input:focus { 
+    border-color: #4CAF50; background: #fff; 
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.15); 
+  }
+  .editor-hint { font-size: 13px; color: #94a3b8; margin-left: 5px; font-weight: bold; }
+  
+  /* 👇 底部按鈕區與錯誤提示美化 */
+  .editor-actions { 
+    display: flex; justify-content: flex-end; gap: 15px; 
+    margin-top: 25px; padding-top: 20px; border-top: 2px dashed #e2e8f0; 
+  }
+  .editor-btn { 
+    padding: 12px 25px; border: none; border-radius: 12px; 
+    font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.2s; 
+  }
+  .editor-btn-cancel { background: #f1f5f9; color: #64748b; }
+  .editor-btn-cancel:hover { background: #e2e8f0; transform: scale(0.95); }
+  .editor-btn-save { background: #4CAF50; color: white; box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3); }
+  .editor-btn-save:hover { background: #45a049; transform: scale(0.95); }
+  .editor-btn-save:disabled { background: #cbd5e1; box-shadow: none; cursor: not-allowed; transform: none; }
+  
+  .editor-feedback { 
+    color: #ef4444; font-size: 14px; font-weight: bold; 
+    margin-top: 10px; text-align: center; min-height: 20px; 
+  }
 </style>
 </head>
 
@@ -985,7 +1019,7 @@ function generateLink() {
         <span>🛡️ 一般安全詞彙區</span>
         <div>
           <button class="audit-btn audit-btn-play" onclick="unresolveAllGreen()" style="margin-right:10px;">🔓 全部解鎖</button>
-          <button class="audit-btn audit-btn-ok" onclick="resolveAllGreen()">✅ 綠燈一鍵確認</button>
+          <button class="audit-btn audit-btn-ok" onclick="resolveAllGreen()">✅ 一鍵全確認</button>
         </div>
       </div>`;
     let hasRed = false, hasGreen = false;
