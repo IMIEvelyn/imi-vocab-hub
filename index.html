@@ -533,47 +533,33 @@ body {
   .audit-btn-edit:hover { background: #e5e7eb; transform: scale(0.95); }
   .audit-btn-del { background: #fee2e2; color: #ef4444; }
   .audit-btn-del:hover { background: #fecaca; transform: scale(0.95); }
-  
-  /* 🌟 彈出式編輯器 (Modal) 基本樣式 */
+    
+/* 🌟 彈出式編輯器 (Modal) 溫暖網格版 */
   .editor-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(5px); z-index: 11000; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
   .editor-modal-overlay.show { display: flex; opacity: 1; }
-  .editor-modal { background: #fff; padding: 30px; border-radius: 20px; width: 90%; max-width: 500px; box-shadow: 0 20px 50px rgba(0,0,0,0.2); transform: translateY(20px); transition: transform 0.3s; max-height: 90vh; overflow-y: auto; }
+  .editor-modal { background: #FFFDF4; padding: 30px 40px; border-radius: 30px; border: 5px solid #FFD54F; box-shadow: 0 15px 0 #FFC107, 0 25px 40px rgba(0,0,0,0.2); width: 90%; max-width: 580px; transform: translateY(20px); transition: transform 0.3s; max-height: 90vh; overflow-y: auto; box-sizing: border-box; }
   .editor-modal-overlay.show .editor-modal { transform: translateY(0); }
-  .editor-modal h2 { margin: 0 0 20px 0; color: #1e293b; font-size: 24px; text-align: center; border-bottom: 2px dashed #e2e8f0; padding-bottom: 15px; }
-/* 👇 編輯表單內部細節美化 */
-  .editor-group { margin-bottom: 15px; display: flex; flex-direction: column; gap: 5px; }
-  .editor-group label { font-size: 16px; font-weight: bold; color: #475569; margin-left: 5px; }
-  .editor-group input { 
-    width: 100%; padding: 12px 15px; font-size: 16px; 
-    border: 2px solid #e2e8f0; border-radius: 12px; 
-    background: #f8fafc; color: #334155; 
-    transition: all 0.3s; box-sizing: border-box; outline: none; 
-  }
-  .editor-group input:focus { 
-    border-color: #4CAF50; background: #fff; 
-    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.15); 
-  }
-  .editor-hint { font-size: 13px; color: #94a3b8; margin-left: 5px; font-weight: bold; }
+  .editor-modal h2 { margin: 0 0 20px 0; color: #5D4037; font-size: 26px; text-align: center; border-bottom: 2px dashed #FFCA28; padding-bottom: 15px; }
   
-  /* 👇 底部按鈕區與錯誤提示美化 */
-  .editor-actions { 
-    display: flex; justify-content: flex-end; gap: 15px; 
-    margin-top: 25px; padding-top: 20px; border-top: 2px dashed #e2e8f0; 
-  }
-  .editor-btn { 
-    padding: 12px 25px; border: none; border-radius: 12px; 
-    font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.2s; 
-  }
-  .editor-btn-cancel { background: #f1f5f9; color: #64748b; }
-  .editor-btn-cancel:hover { background: #e2e8f0; transform: scale(0.95); }
-  .editor-btn-save { background: #4CAF50; color: white; box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3); }
-  .editor-btn-save:hover { background: #45a049; transform: scale(0.95); }
-  .editor-btn-save:disabled { background: #cbd5e1; box-shadow: none; cursor: not-allowed; transform: none; }
+  /* 左右並排排版大腦 (Flexbox) */
+  .editor-inputs-wrapper { display: flex; flex-wrap: wrap; justify-content: space-between; }
+  .editor-group { width: 48%; margin-bottom: 15px; display: flex; flex-direction: column; gap: 6px; }
+  .editor-group.full-width { width: 100%; }
+  .editor-group label { font-size: 16px; font-weight: bold; color: #795548; margin-left: 5px; }
+  .editor-group input { width: 100%; padding: 12px 15px; font-size: 16px; border: 2px solid #FFE082; border-radius: 12px; background: #ffffff; color: #3E2723; transition: all 0.3s; box-sizing: border-box; outline: none; }
+  .editor-group input:focus { border-color: #FFB300; box-shadow: 0 0 0 4px rgba(255, 179, 0, 0.2); }
+  .editor-hint { font-size: 12px; color: #A1887F; margin-left: 5px; font-weight: bold; }
   
-  .editor-feedback { 
-    color: #ef4444; font-size: 14px; font-weight: bold; 
-    margin-top: 10px; text-align: center; min-height: 20px; 
-  }
+  /* 活潑微立體按鈕 */
+  .editor-actions { display: flex; justify-content: center; gap: 20px; margin-top: 10px; padding-top: 20px; border-top: 2px dashed #FFCA28; }
+  .editor-btn { padding: 12px 30px; border: none; border-radius: 15px; font-size: 18px; font-weight: bold; cursor: pointer; transition: all 0.2s; }
+  .editor-btn-cancel { background: #FFF3E0; color: #FF8F00; box-shadow: 0 5px 0 #FFE0B2; }
+  .editor-btn-cancel:hover { transform: translateY(3px); box-shadow: 0 2px 0 #FFE0B2; }
+  .editor-btn-save { background: #4CAF50; color: white; box-shadow: 0 5px 0 #388E3C; }
+  .editor-btn-save:hover { transform: translateY(3px); box-shadow: 0 2px 0 #388E3C; }
+  .editor-btn-save:disabled { background: #E0E0E0; color: #9E9E9E; box-shadow: 0 5px 0 #BDBDBD; cursor: not-allowed; transform: translateY(0); }
+  .editor-feedback { color: #D84315; font-size: 15px; font-weight: bold; margin-top: 5px; text-align: center; min-height: 20px; width: 100%; }  
+
 </style>
 </head>
 
@@ -650,26 +636,30 @@ body {
   </div>
 
 <div id="editorModalOverlay" class="editor-modal-overlay">
-    <div class="editor-modal">
-      <h2 id="editorModalTitle">✏️ 編輯詞彙</h2>
-      <input type="hidden" id="editorId">
-      <input type="hidden" id="editorIsNew">
-      
+  <div class="editor-modal">
+    <h2 id="editorModalTitle">✏️ 編輯詞彙</h2>
+    <input type="hidden" id="editorId">
+    <input type="hidden" id="editorIsNew">
+    
+    <div class="editor-inputs-wrapper">
       <div class="editor-group"><label>漢字</label><input type="text" id="editorZh" placeholder="例：靠窗"></div>
-      <div class="editor-group"><label>拼音</label><input type="text" id="editorPy" placeholder="例：kào chuāng"><div class="editor-hint">各字拼音請用空白鍵隔開</div></div>
-      <div class="editor-group"><label>注音 (選填)</label><input type="text" id="editorZy" placeholder="例：ㄎㄠˋ ㄔㄨㄤ"><div class="editor-hint">無則留白，各字用空白鍵隔開</div></div>
-      <div class="editor-group"><label>聲調密碼</label><input type="text" id="editorTone" placeholder="例：4 1"><div class="editor-hint">輸入 1~5，各字用空白鍵隔開</div></div>
-      <div class="editor-group"><label>外語翻譯</label><input type="text" id="editorNative" placeholder="例：window seat"></div>
-      <div class="editor-group"><label>發音咒語 (選填)</label><input type="text" id="editorTts" placeholder="例：靠 窗"><div class="editor-hint">輸入同音字強制導正發音</div></div>
+      <div class="editor-group"><label>拼音(選填)</label><input type="text" id="editorPy" placeholder="例：kào chuāng"><div class="editor-hint">各字拼音請用空白鍵隔開</div></div>
       
-      <div id="editorFeedback" class="editor-feedback"></div>
+      <div class="editor-group"><label>注音 (選填)</label><input type="text" id="editorZy" placeholder="例：ㄎㄠ ㄔㄨㄤ"><div class="editor-hint">無則留白，各字用空白鍵隔開</div></div>
+      <div class="editor-group"><label>聲調數字</label><input type="text" id="editorTone" placeholder="例：4 1"><div class="editor-hint">輸入 1~5，各字用空白鍵隔開</div></div>
       
-      <div class="editor-actions">
-        <button class="editor-btn editor-btn-cancel" onclick="closeEditorModal()">取消</button>
-        <button class="editor-btn editor-btn-save" id="editorSaveBtn" onclick="saveEditorModal()" disabled>💾 儲存並同步</button>
-      </div>
+      <div class="editor-group full-width"><label>外語翻譯</label><input type="text" id="editorNative" placeholder="例：window seat"></div>
+      <div class="editor-group full-width"><label>發音調整 (同音異字)</label><input type="text" id="editorTts" placeholder="例：靠 窗"><div class="editor-hint">輸入同音字強制導正發音</div></div>
+    </div>
+    
+    <div id="editorFeedback" class="editor-feedback"></div>
+    
+    <div class="editor-actions">
+      <button class="editor-btn editor-btn-cancel" onclick="closeEditorModal()">取消</button>
+      <button class="editor-btn editor-btn-save" id="editorSaveBtn" onclick="saveEditorModal()" disabled>💾 儲存並同步</button>
     </div>
   </div>
+</div>
     
   <div id="winModal" class="win-overlay" style="display: none;">
     <div class="win-content">
