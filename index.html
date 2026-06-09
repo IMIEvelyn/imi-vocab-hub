@@ -1003,7 +1003,7 @@ function generateLink() {
       groups[wId].lines.push(index);
       groups[wId].zh += p[2] ? p[2].trim() : "";
       if(p[3] && p[3].trim()) groups[wId].py.push(p[3].trim());
-      if(p[4] && p[4].trim()) groups[wId].zy.push(p[4].trim()); // 🎯 確實把注音抓進來
+      if(p[4] && p[4].trim()) groups[wId].zy.push(p[4].trim() + ((p[5] && p[5].trim()) ? p[5].trim() : ""));
     });
 
     let redHtml = `<div class="audit-header">🚨 待確認風險區 (須手動試聽確認)</div>`;
