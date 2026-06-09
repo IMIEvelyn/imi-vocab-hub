@@ -988,46 +988,41 @@ function generateLink() {
     this.scanTimeout = setTimeout(scanVocabForAudit, 500);
   });
 
- // 💡 核心掃描與生成儀表板邏輯 (雙區域分流 ＋ 黏合詞彙)
+// 💡 核心掃描與生成儀表板邏輯 (雙區域分流 ＋ 黏合詞彙 ＋ 雙標音智慧顯示)
   function scanVocabForAudit() {
     const rawText = document.getElementById('vocabInput').value;
     const dashboard = document.getElementById('auditDashboard');
     pendingAudits = []; dashboard.innerHTML = '';
     if (!rawText.trim()) { dashboard.style.display = 'none'; return; }
 
-    let groups = {}; // 🎯 第一步：利用 W1, W2 把切碎的單字黏合成完整詞彙
+    let groups = {}; 
     rawText.split('\n').forEach((line, index) => {
       let p = line.split(','); if (p.length < 3) return;
       let wId = p[0].trim();
-      if (!groups[wId]) groups[wId] = { lines: [], zh: "", py: [] };
+      if (!groups[wId]) groups[wId] = { lines: [], zh: "", py: [], zy: [] }; // 🎯 擴充注音收納盒
       groups[wId].lines.push(index);
-      groups[wId].zh += p[2].trim();
-      if(p[3]) groups[wId].py.push(p[3].trim());
+      groups[wId].zh += p[2] ? p[2].trim() : "";
+      if(p[3] && p[3].trim()) groups[wId].py.push(p[3].trim());
+      if(p[4] && p[4].trim()) groups[wId].zy.push(p[4].trim()); // 🎯 確實把注音抓進來
     });
- let redHtml = `<div class="audit-header">🚨 待確認風險區 (須手動試聽確認)</div>`;
-    let greenHtml = `<div class="audit-header" style="margin-top:20px; color:#16a34a; display:flex; justify-content:space-between; align-items:center;">
-        <span>🛡️ 一般安全詞彙區</span>
-        <div>
-          <button class="audit-btn audit-btn-play" onclick="unresolveAllGreen()" style="margin-right:10px;">🔓 全部解鎖</button>
-          <button class="audit-btn audit-btn-ok" onclick="resolveAllGreen()">✅ 一鍵全確認</button>
-        </div>
-      </div>`;
-    let hasRed = false, hasGreen = false;
-    const riskChars = ['轉', '重', '行', '髮', '教', '長', '樂', '假', '覺', '差']; 
 
-    // 🎯 第二步：分流紅綠燈 (綠燈徹底解鎖，初始為 false)
+    let redHtml = `<div class="audit-header">🚨 待確認風險區 (須手動試聽確認)</div>`;
+    let greenHtml = `<div class="audit-header" style="margin-top:20px; color:#16a34a; display:flex; justify-content:space-between; align-items:center;"><span>🛡️ 一般安全詞彙區</span><div><button class="audit-btn audit-btn-play" onclick="unresolveAllGreen()" style="margin-right:10px;">🔓 全部解鎖</button><button class="audit-btn audit-btn-ok" onclick="resolveAllGreen()">✅ 綠燈一鍵確認</button></div></div>`;
+    let hasRed = false, hasGreen = false;
+    const riskChars = ['轉', '重', '行', '髮', '教', '長', '樂', '假', '覺', '差'];
+
     Object.values(groups).forEach((g, i) => {
-      let pyStr = g.py.join(' '); let target = g.zh;
+      let pyStr = g.py.join(' '); let zyStr = g.zy.join(' ');
+      let displayPy = [pyStr, zyStr].filter(Boolean).join(' / '); // 🎯 神奇魔法：有兩個就加斜線，只有一個就單獨顯示！
+      let target = g.zh; let cheatKey = pyStr || zyStr;
       let isRisk = riskChars.some(c => g.zh.includes(c)) || cheatDictionary[g.zh];
-      if (cheatDictionary[g.zh] && cheatDictionary[g.zh][pyStr]) target = cheatDictionary[g.zh][pyStr];
+      if (cheatDictionary[g.zh] && cheatDictionary[g.zh][cheatKey]) target = cheatDictionary[g.zh][cheatKey];
 
       let aId = `audit_${i}`;
-      pendingAudits.push({ id: aId, lines: g.lines, finalTts: target, isGreen: !isRisk }); // 💡 標記是否為綠燈
-
-      if (isRisk) { hasRed = true; redHtml += createAuditItemHtml(aId, g.zh, pyStr, target, '🔴', false); }
-      else { hasGreen = true; greenHtml += createAuditItemHtml(aId, g.zh, pyStr, target, '🟢', false); } // 🟢 徹底解鎖
+      pendingAudits.push({ id: aId, lines: g.lines, finalTts: target, isGreen: !isRisk }); 
+      if (isRisk) { hasRed = true; redHtml += createAuditItemHtml(aId, g.zh, displayPy, target, '🔴', false); }
+      else { hasGreen = true; greenHtml += createAuditItemHtml(aId, g.zh, displayPy, target, '🟢', false); } 
     });
-
     dashboard.innerHTML = (hasRed ? redHtml : '') + (hasGreen ? greenHtml : '');
     dashboard.style.display = 'flex';
   }
