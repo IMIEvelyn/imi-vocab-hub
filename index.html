@@ -643,7 +643,7 @@ body {
     
     <div class="editor-inputs-wrapper">
       <div class="editor-group"><label>漢字</label><input type="text" id="editorZh" placeholder="例：靠窗"></div>
-      <div class="editor-group"><label>拼音(選填)</label><input type="text" id="editorPy" placeholder="例：kào chuāng"><div class="editor-hint">各字拼音請用空白鍵隔開</div></div>
+      <div class="editor-group"><label>拼音(選填)</label><input type="text" id="editorPy" placeholder="例：kào chuāng"><div class="editor-hint">無則留白，各字用空白鍵隔開</div></div>
       
       <div class="editor-group"><label>注音 (選填)</label><input type="text" id="editorZy" placeholder="例：ㄎㄠ ㄔㄨㄤ"><div class="editor-hint">無則留白，各字用空白鍵隔開</div></div>
       <div class="editor-group"><label>聲調數字</label><input type="text" id="editorTone" placeholder="例：4 1"><div class="editor-hint">輸入 1~5，各字用空白鍵隔開</div></div>
@@ -1090,29 +1090,29 @@ function generateLink() {
     scanVocabForAudit(); // 瞬間重繪儀表板
   }
     // 💡 互動功能：開啟彈出式編輯器並萃取資料
+  // 💡 互動功能：開啟彈出式編輯器並萃取資料
   function openEditorModal(id) {
     let auditObj = pendingAudits.find(item => item.id === id);
     if (!auditObj) return;
 
     let lines = document.getElementById('vocabInput').value.split('\n');
     let zh = "", py = [], zy = [], tone = [], native = "";
-
-    // 🎯 精準萃取：從多行資料中組合出完整的詞彙屬性
+    
     auditObj.lines.forEach((lineIdx, i) => {
       let p = lines[lineIdx].split(',');
       zh += p[2] ? p[2].trim() : "";
-      if (p[3]) py.push(p[3].trim());
-      if (p[4]) zy.push(p[4].trim());
-      if (p[5]) tone.push(p[5].trim());
+      if (p[3] && p[3].trim()) py.push(p[3].trim());
+      if (p[4] && p[4].trim()) zy.push(p[4].trim());
+      if (p[1] && p[1].trim()) tone.push(p[1].trim()); // 🎯 修正：聲調密碼在 p[1]
       if (i === 0) native = p[6] ? p[6].trim() : "";
     });
 
     document.getElementById('editorId').value = id;
     document.getElementById('editorIsNew').value = "false";
     document.getElementById('editorZh').value = zh;
-    document.getElementById('editorPy').value = py.join(' ');
-    document.getElementById('editorZy').value = zy.join(' ');
-    document.getElementById('editorTone').value = tone.join(' ');
+    document.getElementById('editorPy').value = py.length > 0 ? py.join(' ') : ""; // 🎯 修正：過濾隱形空白
+    document.getElementById('editorZy').value = zy.length > 0 ? zy.join(' ') : ""; // 🎯 修正：過濾隱形空白
+    document.getElementById('editorTone').value = tone.length > 0 ? tone.join(' ') : ""; // 🎯 修正：過濾隱形空白
     document.getElementById('editorNative').value = native;
     document.getElementById('editorTts').value = (auditObj.finalTts === zh) ? "" : auditObj.finalTts;
     
