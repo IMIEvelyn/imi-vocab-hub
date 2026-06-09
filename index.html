@@ -999,9 +999,10 @@ function generateLink() {
     rawText.split('\n').forEach((line, index) => {
       let p = line.split(','); if (p.length < 3) return;
       let wId = p[0].trim();
-      if (!groups[wId]) groups[wId] = { lines: [], zh: "", py: [], zy: [] }; // 🎯 擴充注音收納盒
+      if (!groups[wId]) groups[wId] = { lines: [], zh: "", py: [], zy: [], tts: [] };
       groups[wId].lines.push(index);
       groups[wId].zh += p[2] ? p[2].trim() : "";
+      groups[wId].tts.push((p[7] && p[7].trim()) ? p[7].trim() : (p[2] ? p[2].trim() : ""));
       if(p[3] && p[3].trim()) groups[wId].py.push(p[3].trim());
       if(p[4] && p[4].trim()) groups[wId].zy.push(p[4].trim() + ((p[5] && p[5].trim()) ? p[5].trim() : ""));
     });
@@ -1014,9 +1015,11 @@ function generateLink() {
     Object.values(groups).forEach((g, i) => {
       let pyStr = g.py.join(' '); let zyStr = g.zy.join(' ');
       let displayPy = [pyStr, zyStr].filter(Boolean).join(' / '); // 🎯 神奇魔法：有兩個就加斜線，只有一個就單獨顯示！
-      let target = g.zh; let cheatKey = pyStr || zyStr;
+      let customTtsStr = g.tts.join('');
+      let target = (customTtsStr !== g.zh) ? g.tts.join(' ') : g.zh;
+      let cheatKey = g.py.join(' ') || g.zy.join(' ');
       let isRisk = riskChars.some(c => g.zh.includes(c)) || cheatDictionary[g.zh];
-      if (cheatDictionary[g.zh] && cheatDictionary[g.zh][cheatKey]) target = cheatDictionary[g.zh][cheatKey];
+      if (target === g.zh && cheatDictionary[g.zh] && cheatDictionary[g.zh][cheatKey]) target = cheatDictionary[g.zh][cheatKey];
 
       let aId = `audit_${i}`;
       pendingAudits.push({ id: aId, lines: g.lines, finalTts: target, isGreen: !isRisk }); 
