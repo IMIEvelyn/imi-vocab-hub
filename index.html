@@ -560,6 +560,10 @@ body {
   .editor-btn-save:disabled { background: #E0E0E0; color: #9E9E9E; box-shadow: 0 5px 0 #BDBDBD; cursor: not-allowed; transform: translateY(0); }
   .editor-feedback { color: #D84315; font-size: 15px; font-weight: bold; margin-top: 5px; text-align: center; min-height: 20px; width: 100%; }  
 
+    /* 🌟 獨立新增按鈕 (立體霸氣版) */
+  .add-vocab-btn { background: #FF9800; color: white; padding: 12px 30px; border: none; border-radius: 20px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 6px 0 #F57C00, 0 10px 20px rgba(0,0,0,0.1); transition: all 0.2s; letter-spacing: 1px; }
+  .add-vocab-btn:hover { transform: translateY(4px); box-shadow: 0 2px 0 #F57C00, 0 4px 8px rgba(0,0,0,0.1); }
+    
 </style>
 </head>
 
@@ -625,8 +629,9 @@ body {
       <button class="clear-btn" onclick="clearVocab()">🗑️ 清除資料</button>
     </div>
     <button id="toggleInputBtn" onclick="toggleVocabInput()" style="display: none; margin-bottom: 10px; padding: 8px 15px; border-radius: 10px; border: 2px solid #e2e8f0; background: #f8fafc; color: #475569; cursor: pointer; font-weight: bold; transition: all 0.2s;">🔼 收合視窗</button>
-    <textarea id="vocabInput" placeholder="請在此貼上 專屬Gem 的Json資料..."></textarea>
-   <div id="auditDashboard"></div> 
+   <textarea id="vocabInput" placeholder="請在此貼上 專屬Gem 的Json資料..."></textarea>
+    <div id="addVocabBar" style="display: none; justify-content: flex-end; margin-top: 15px;"><button class="add-vocab-btn" onclick="openAddModal()">➕ 新增詞彙</button></div>
+   <div id="auditDashboard"></div>
     <button class="start-btn" onclick="generateLink()">🔗 生成學生專屬連結</button>
     <div id="linkResult">
       <p style="margin: 0 0 10px 0; font-weight: bold; color: #2e7d32;">✅ 連結已生成！請點擊複製</p>
@@ -1118,7 +1123,7 @@ function generateLink() {
     document.getElementById('editorSaveBtn').disabled = false;
     document.getElementById('editorModalOverlay').classList.add('show');
   }
-    // 💡 互動功能：即時防呆檢查 (監聽字數是否對齊)
+
   // 💡 互動功能：即時防呆檢查 (拼音/注音選填，聲調必填)
   function validateEditor() {
     let zh = document.getElementById('editorZh').value.trim();
@@ -1144,9 +1149,21 @@ function generateLink() {
     let el = document.getElementById(id);
     if(el) el.addEventListener('input', validateEditor);
   });
-    // 💡 互動功能：儲存編輯並逆向同步資料庫
-  function saveEditorModal() {
+    
+// 💡 互動功能：開啟新增詞彙視窗 (清空欄位)
+  function openAddModal() {
+    document.getElementById('editorId').value = `new_${Date.now()}`;
+    document.getElementById('editorIsNew').value = "true";
+    ['editorZh', 'editorPy', 'editorZy', 'editorTone', 'editorNative', 'editorTts'].forEach(id => document.getElementById(id).value = "");
+    document.getElementById('editorFeedback').innerText = "";
+    document.getElementById('editorSaveBtn').disabled = true; 
+    document.getElementById('editorModalOverlay').classList.add('show');
+  }
+
+  // 💡 互動功能：儲存編輯並逆向同步資料庫
+    function saveEditorModal() {
     let id = document.getElementById('editorId').value;
+    let isNew = document.getElementById('editorIsNew').value === "true"; // 🎯 判斷是否為全新單字
     let zh = document.getElementById('editorZh').value.trim();
     let py = document.getElementById('editorPy').value.trim().split(/\s+/);
     let zy = document.getElementById('editorZy').value.trim().split(/\s+/);
@@ -1154,40 +1171,38 @@ function generateLink() {
     let native = document.getElementById('editorNative').value.trim();
     let tts = document.getElementById('editorTts').value.trim().split(/\s+/);
 
-    let auditObj = pendingAudits.find(item => item.id === id);
     let lines = document.getElementById('vocabInput').value.split('\n');
-    let wordId = lines[auditObj.lines[0]].split(',')[0].trim(); // 保留原始單字ID
+    let auditObj = isNew ? null : pendingAudits.find(item => item.id === id);
+    let wordId = isNew ? `w_${Date.now()}` : lines[auditObj.lines[0]].split(',')[0].trim();
 
-    auditObj.lines.forEach(idx => lines[idx] = null); // 徹底清空舊資料
+    if (!isNew) auditObj.lines.forEach(idx => lines[idx] = null); // 舊詞才需要清空舊佔位
 
     let newLines = [];
-   for (let i = 0; i < zh.length; i++) {
-    let charTts = tts[i] || zh[i]; // 若無特別輸入咒語，則預設回歸漢字
-    // 🎯 自動淨化器：拔除注音自帶聲調，並依據數字生成標準聲調符號
-    let cleanZy = (zy[i] || '').replace(/[ˊˇˋ˙]/g, ''); 
-    let zyToneMark = {'1':'', '2':'ˊ', '3':'ˇ', '4':'ˋ', '5':'˙'}[tone[i] || '1'] || '';
-    // 將資料精準切碎，完美分裝至獨立欄位
-    newLines.push(`${wordId}, ${tone[i]||'1'}, ${zh[i]}, ${py[i]||''}, ${cleanZy}, ${zyToneMark}, ${native}, ${charTts}`);
-  }
+    for (let i = 0; i < zh.length; i++) {
+      let cleanZy = (zy[i] || '').replace(/[ˊˇˋ˙]/g, '');
+      let zyToneMark = {'1':'', '2':'ˊ', '3':'ˇ', '4':'ˋ', '5':'˙'}[tone[i] || '1'] || '';
+      newLines.push(`${wordId}, ${tone[i]||'1'}, ${zh[i]}, ${py[i]||''}, ${cleanZy}, ${zyToneMark}, ${native}, ${tts[i] || zh[i]}`);
+    }
 
-    lines[auditObj.lines[0]] = newLines.join('\n'); // 將新資料塞回第一行的位置
+    if (isNew) lines.unshift(newLines.join('\n')); // 🎯 魔法：全新詞彙強制插隊到第 1 行！
+    else lines[auditObj.lines[0]] = newLines.join('\n'); // 編輯舊詞則回歸原位
+
     document.getElementById('vocabInput').value = lines.filter(l => l !== null).join('\n');
-
-    closeEditorModal(); // 關閉視窗
-    scanVocabForAudit(); // 瞬間重新掃描並重繪儀表板
+    closeEditorModal(); scanVocabForAudit();
   }
-    // 💡 互動功能：收合/展開 JSON 文字框
+    
+   // 💡 互動功能：收合/展開 JSON 文字框 (結合新增按鈕顯示邏輯)
   function toggleVocabInput(forceCollapse = false) {
     let input = document.getElementById('vocabInput');
     let btn = document.getElementById('toggleInputBtn');
+    let addBar = document.getElementById('addVocabBar');
     if (!input || !btn) return;
-    
     if (forceCollapse === true || input.style.display !== 'none') {
-      input.style.display = 'none';
-      btn.innerText = '🔽 展開視窗';
+      input.style.display = 'none'; btn.innerText = '🔽 展開視窗';
+      if(input.value.trim() && addBar) addBar.style.display = 'flex'; // 🎯 收合且有資料時，華麗現身
     } else {
-      input.style.display = 'block';
-      btn.innerText = '🔼 收合視窗';
+      input.style.display = 'block'; btn.innerText = '🔼 收合視窗';
+      if(addBar) addBar.style.display = 'none'; // 🎯 展開時，自動隱藏
     }
   }
    // 💡 貼心設計：監聽文字框的「貼上」動作
