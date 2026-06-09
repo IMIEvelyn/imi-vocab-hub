@@ -647,21 +647,21 @@ body {
     <input type="hidden" id="editorIsNew">
     
     <div class="editor-inputs-wrapper">
-      <div class="editor-group"><label>漢字</label><input type="text" id="editorZh" placeholder="例：靠窗"></div>
-      <div class="editor-group"><label>拼音(選填)</label><input type="text" id="editorPy" placeholder="例：kào chuāng"><div class="editor-hint">無則留白，各字用空白鍵隔開</div></div>
+      <div class="editor-group"><label>詞彙</label><input type="text" id="editorZh" placeholder="例：轉盤"></div>
+      <div class="editor-group"><label>拼音(選填)</label><input type="text" id="editorPy" placeholder="例：zhǎn pán"><div class="editor-hint">每個字的拼音之間，空白鍵隔開</div></div>
       
-      <div class="editor-group"><label>注音 (選填)</label><input type="text" id="editorZy" placeholder="例：ㄎㄠ ㄔㄨㄤ"><div class="editor-hint">無則留白，各字用空白鍵隔開</div></div>
-      <div class="editor-group"><label>聲調數字</label><input type="text" id="editorTone" placeholder="例：4 1"><div class="editor-hint">輸入 1~5，各字用空白鍵隔開</div></div>
+      <div class="editor-group"><label>注音 (選填)</label><input type="text" id="editorZy" placeholder="例：ㄎㄠ ㄔㄨㄤ"><div class="editor-hint">每個字的拼音之間，空白鍵隔開</div></div>
+      <div class="editor-group"><label>聲調數字 (必填)</label><input type="text" id="editorTone" placeholder="例：4 1"><div class="editor-hint">（一聲：1...輕聲：5），空白鍵隔開</div></div>
       
-      <div class="editor-group full-width"><label>外語翻譯</label><input type="text" id="editorNative" placeholder="例：window seat"></div>
-      <div class="editor-group full-width"><label>發音調整 (同音異字)</label><input type="text" id="editorTts" placeholder="例：靠 窗"><div class="editor-hint">輸入同音字強制導正發音</div></div>
+      <div class="editor-group full-width"><label>外語翻譯 (必填)</label><input type="text" id="editorNative" placeholder="例：window seat"></div>
+      <div class="editor-group full-width"><label>發音調整 (選填)</label><input type="text" id="editorTts" placeholder="例：囀 盤"><div class="editor-hint">輸入「同音異字」強制校音</div></div>
     </div>
     
     <div id="editorFeedback" class="editor-feedback"></div>
     
     <div class="editor-actions">
-      <button class="editor-btn editor-btn-cancel" onclick="closeEditorModal()">取消</button>
-      <button class="editor-btn editor-btn-save" id="editorSaveBtn" onclick="saveEditorModal()" disabled>💾 儲存並同步</button>
+      <button class="editor-btn editor-btn-cancel" onclick="closeEditorModal()">取消/關閉</button>
+      <button class="editor-btn editor-btn-save" id="editorSaveBtn" onclick="saveEditorModal()" disabled>💾 確認儲存</button>
     </div>
   </div>
 </div>
@@ -1012,8 +1012,8 @@ function generateLink() {
       if(p[4] && p[4].trim()) groups[wId].zy.push(p[4].trim() + ((p[5] && p[5].trim()) ? p[5].trim() : ""));
     });
 
-    let redHtml = `<div class="audit-header">🚨 待確認風險區 (須手動試聽確認)</div>`;
-    let greenHtml = `<div class="audit-header" style="margin-top:20px; color:#16a34a; display:flex; justify-content:space-between; align-items:center;"><span>🛡️ 一般安全詞彙區</span><div><button class="audit-btn audit-btn-play" onclick="unresolveAllGreen()" style="margin-right:10px;">🔓 全部解鎖</button><button class="audit-btn audit-btn-ok" onclick="resolveAllGreen()">✅ 綠燈一鍵確認</button></div></div>`;
+    let redHtml = `<div class="audit-header">💡 口音發音差異/一字多音 區 （請試聽確認）</div>`;
+    let greenHtml = `<div class="audit-header" style="margin-top:20px; color:#16a34a; display:flex; justify-content:space-between; align-items:center;"><span>🍵 非多音詞彙區（可試聽確認）</span><div><button class="audit-btn audit-btn-play" onclick="unresolveAllGreen()" style="margin-right:10px;">🔓 全部解鎖</button><button class="audit-btn audit-btn-ok" onclick="resolveAllGreen()">✅ 一鍵全確認</button></div></div>`;
     let hasRed = false, hasGreen = false;
     const riskChars = ['轉', '重', '行', '髮', '教', '長', '樂', '假', '覺', '差'];
 
