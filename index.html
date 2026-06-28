@@ -1034,10 +1034,10 @@ function generateLink() {
     const riskChars = ['轉', '重', '行', '髮', '教', '長', '樂', '假', '覺', '差'];
 
     Object.values(groups).forEach((g, i) => {
-      let pyStr = g.py.join(' '); let zyStr = g.zy.join(' ');
+     let pyStr = g.py.join(' '); let zyStr = g.zy.join(' ');
       let displayPy = [pyStr, zyStr].filter(Boolean).join(' / '); // 🎯 神奇魔法：有兩個就加斜線，只有一個就單獨顯示！
       let customTtsStr = g.tts.join('');
-      let target = (customTtsStr !== g.zh) ? g.tts.join(' ') : g.zh;
+      let target = (customTtsStr !== g.zh) ? g.tts.join('') : g.zh; // 🎯 修正：將 join(' ') 改為 join('') 無縫黏合，活化輕聲
       let cheatKey = g.py.join(' ') || g.zy.join(' ');
       let isRisk = riskChars.some(c => g.zh.includes(c)) || cheatDictionary[g.zh];
       if (target === g.zh && cheatDictionary[g.zh] && cheatDictionary[g.zh][cheatKey]) target = cheatDictionary[g.zh][cheatKey];
@@ -1108,14 +1108,13 @@ function generateLink() {
     document.getElementById('vocabInput').value = lines.filter(l => l !== null).join('\n');
     scanVocabForAudit(); // 瞬間重繪儀表板
   }
-    // 💡 互動功能：開啟彈出式編輯器並萃取資料
-  // 💡 互動功能：開啟彈出式編輯器並萃取資料
+// 💡 互動功能：開啟彈出式編輯器並萃取資料
   function openEditorModal(id) {
     let auditObj = pendingAudits.find(item => item.id === id);
     if (!auditObj) return;
 
     let lines = document.getElementById('vocabInput').value.split('\n');
-    let zh = "", py = [], zy = [], tone = [], native = "";
+    let zh = "", py = [], zy = [], tone = [], tts = [], native = ""; // 🎯 新增 tts 陣列
     
     auditObj.lines.forEach((lineIdx, i) => {
       let p = lines[lineIdx].split(',');
@@ -1124,6 +1123,7 @@ function generateLink() {
       if (p[4] && p[4].trim()) zy.push(p[4].trim());
       if (p[1] && p[1].trim()) tone.push(p[1].trim()); // 🎯 修正：聲調密碼在 p[1]
       if (i === 0) native = p[6] ? p[6].trim() : "";
+      tts.push((p[7] && p[7].trim()) ? p[7].trim() : (p[2] ? p[2].trim() : "")); // 🎯 精準萃取發音欄位
     });
 
     document.getElementById('editorId').value = id;
@@ -1133,7 +1133,7 @@ function generateLink() {
     document.getElementById('editorZy').value = zy.length > 0 ? zy.join(' ') : ""; // 🎯 修正：過濾隱形空白
     document.getElementById('editorTone').value = tone.length > 0 ? tone.join(' ') : ""; // 🎯 修正：過濾隱形空白
     document.getElementById('editorNative').value = native;
-    document.getElementById('editorTts').value = (auditObj.finalTts === zh) ? "" : auditObj.finalTts;
+    document.getElementById('editorTts').value = (auditObj.finalTts === zh) ? "" : tts.join(' '); // 🎯 重組為有空白的字串
     
     document.getElementById('editorFeedback').innerText = "";
     document.getElementById('editorSaveBtn').disabled = false;
