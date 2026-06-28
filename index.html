@@ -621,6 +621,13 @@ body {
       <option value="zh-CN">🇨🇳中國口音 (zh-CN)</option>
     </select>
   </div>
+  <div class="setting-item">
+    <label>👁️ 學生端外語顯示 (教師端預設)</label>
+    <select id="inputDisableTrans" class="styled-select">
+      <option value="false">開啟外語 (動態鷹架模式)</option>
+      <option value="true">關閉外語 (全中文模式)</option>
+    </select>
+  </div>
 
 </div>
 
@@ -733,11 +740,19 @@ body {
       // 💡 讀取語種設定，如果舊網址沒有就保底顯示 '外語'
         currentLang = dataObj.lang || '外語';
         
-        // 🎯 第二批次：解開口音暗號，並存入全域變數備用 (舊網址保底為臺灣腔)
+       // 🎯 第二批次：解開口音暗號，並存入全域變數備用 (舊網址保底為臺灣腔)
         window.currentAccent = dataObj.accent || 'zh-TW'; 
 
         const transBtn = document.getElementById('btnTrans');
-        if (transBtn) transBtn.innerText = `👁️ ${currentLang}`;
+        if (transBtn) {
+          if (dataObj.disableTrans === 'true') {
+            transBtn.style.display = 'none'; // 🎯 關閉外語：徹底隱藏按鈕
+            document.body.classList.add('hide-translation'); // 🎯 關閉外語：隱藏跑馬燈外語
+            transVisible = false; // 同步內部的開關狀態
+          } else {
+            transBtn.innerText = `👁️ ${currentLang}`;
+          }
+        }
         
         document.getElementById('displayMaterialName').innerText = dataObj.mName;
         
@@ -816,6 +831,7 @@ function generateLink() {
       dStr: document.getElementById('inputDate').value || '', 
       lang: document.getElementById('inputLanguage').value || '外語',
       accent: document.getElementById('inputAccent').value || 'zh-TW', // 🎯 新增：抓取發音口音
+      disableTrans: document.getElementById('inputDisableTrans').value || 'false', // 🎯 新增：抓取外語開關設定
       vText: vText 
     };
     const jsonString = JSON.stringify(gameData);
