@@ -596,7 +596,7 @@ body {
   }
 
 </style>
-<meta name="imi-build" content="student-link-compression-v2-20261020">
+<meta name="imi-build" content="student-friendly-save-share-20261021">
 <style id="studentOutcomeStyles">
 /* Batch 2: the student outcome is outside the scaled game canvas. */
 #previousResultBar[hidden], #resumePracticeBtn[hidden], #restartBtn[hidden], #resultClass[hidden] { display: none !important; }
@@ -739,6 +739,51 @@ body {
 #generateStudentLinkBtn:disabled{background:#e4e7e9;color:#59636a;cursor:not-allowed;box-shadow:none}
 #linkCompressionInfo{font-size:14px;color:#284e2a;line-height:1.6;overflow-wrap:anywhere;margin:0 0 10px}
 </style>
+<style id="friendlySaveStyles">
+.result-actions button,.result-actions a {display:flex;align-items:center;justify-content:center;gap:7px;line-height:1.2}
+.action-label {display:flex;flex-direction:column;gap:3px;min-width:0}
+.action-label .en {font-size:16px;font-weight:700}
+.action-label .zh {font-size:13px;font-weight:500}
+.imi-icon {width:23px;height:23px;flex:0 0 23px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+#achievementCard h1#resultHeading{font-size:clamp(30px,7vw,40px);font-weight:bold;margin:9px 0 3px;line-height:1.1;display:flex;align-items:center;justify-content:center;gap:11px;padding:8px 0 3px}
+.congrats-unit{display:inline-flex;align-items:center;gap:6px;position:relative;min-height:1.8em}
+.congrats-zhuyin{font-size:.35em;line-height:1.08;display:flex;flex-direction:column;align-items:center;position:relative;padding-right:.8em;font-weight:600;color:#374151}
+.congrats-tone{position:absolute;right:0;top:38%;font-size:1em}
+.congrats-tone.light{top:-.9em;left:0;right:.8em;text-align:center}
+.congrats-mark{font-size:.9em}
+#achievementCard .congrats-pinyin{margin:0;color:#374151;font-size:17px;line-height:1.4;font-weight:600}
+#achievementCard .result-congratulations{font-size:20px;line-height:1.3;margin:4px 0 9px;color:#365b3b;font-weight:700}
+.review-return{width:auto;min-width:75px;min-height:44px;display:flex;align-items:center;justify-content:center;gap:5px;font-size:14px;border-radius:18px;padding:8px 10px;background:#fff}
+.review-return .imi-icon{width:22px;height:22px;flex-basis:22px}
+#pdfStatus{font-size:14px;line-height:1.5;overflow-wrap:anywhere}
+#pdfStatus:empty{display:none}
+.imi-spinner{display:inline-block;box-sizing:border-box;width:21px;height:21px;border:3px solid currentColor;border-right-color:transparent;border-radius:50%;animation:imi-spin .8s linear infinite;flex:0 0 21px}
+@keyframes imi-spin{to{transform:rotate(360deg)}}
+#resultActions [aria-busy=true]{cursor:progress}
+.result-actions button:disabled{opacity:.65;cursor:progress}
+#imagePreview[hidden],#imagePreview [hidden],#pdfFallback[hidden]{display:none!important}
+#imagePreview{position:fixed;inset:0;z-index:12000;background:#fffcf5;overflow:auto;overscroll-behavior:contain;box-sizing:border-box;color:#26332f}
+#imagePreview *{box-sizing:border-box}
+.picture-page{width:100%;max-width:750px;margin:0 auto;padding:0 12px max(16px,env(safe-area-inset-bottom))}
+.picture-toolbar{position:sticky;top:0;z-index:1;background:#fffcf5f5;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:max(10px,env(safe-area-inset-top)) 0 10px;flex-wrap:wrap}
+.picture-toolbar h2{font-size:16px;margin:0;flex:1;text-align:center}
+.picture-toolbar button,.picture-toolbar a,#pdfFallback a{min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:8px 11px;border:2px solid #cbdfe9;border-radius:14px;background:white;color:#26332f;text-decoration:none;font:inherit;font-size:14px;font-weight:600;cursor:pointer}
+.picture-hint{text-align:center;margin:8px 0 12px;font-size:16px;line-height:1.5;color:#374151}
+#picturePreviewImage{display:block;width:100%;height:auto;border-radius:24px;user-select:auto;-webkit-user-select:auto;-webkit-touch-callout:default;touch-action:auto}
+#picturePreviewImage[aria-busy=true]{opacity:.5}
+.picture-subactions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:12px 0}
+.picture-status{font-size:14px;line-height:1.5;text-align:center;overflow-wrap:anywhere;color:#374151}
+#pdfFallback{margin-top:12px;padding-top:12px;border-top:1px solid #d7e1e7}
+#pdfFallback p{font-size:14px;line-height:1.5;margin:6px 0 10px;color:#374151}
+.pdf-fallback-actions{display:flex;gap:9px;flex-wrap:wrap}
+#pdfFallback a{flex:1;font-size:14px}
+@media(max-width:350px){.action-label .en{font-size:14px}.action-label .zh{font-size:12px}.result-actions button{padding:8px 5px;gap:5px}.imi-icon{width:21px;height:21px;flex-basis:21px}.picture-toolbar{gap:5px}.picture-toolbar button,.picture-toolbar a{padding:8px;font-size:13px}.picture-toolbar h2{font-size:14px}.review-return{min-width:68px;padding:7px 8px}}
+@media(max-height:700px){#achievementCard h1#resultHeading{font-size:30px;margin:4px 0 0;padding:3px 0 0}#achievementCard .congrats-pinyin{font-size:15px}#achievementCard .result-congratulations{font-size:18px;margin:2px 0 6px}.congrats-unit{min-height:1.7em}}
+@media(prefers-reduced-motion:reduce){.imi-spinner{animation-duration:1.6s}}
+
+.picture-toolbar h2 span,.picture-toolbar h2 small{display:block;white-space:nowrap}.picture-toolbar h2 small{font-size:12px;margin-top:2px;font-weight:500}
+
+</style>
 </head>
 
 <body id="gameBody">
@@ -854,8 +899,11 @@ body {
     <div class="result-shell">
       <div id="achievementCard" class="win-content">
         <p id="resultMaterial" class="result-material"></p>
-        <h1 id="resultHeading">太棒了！</h1>
-        <p class="result-congratulations">你學會了！</p>
+        <h1 id="resultHeading" aria-label="太棒了！ tài bàng le — Good job!">
+<span class="congrats-unit"><span>太</span><span class="congrats-zhuyin"><span>ㄊ</span><span>ㄞ</span><span class="congrats-tone">ˋ</span></span></span>
+<span class="congrats-unit"><span>棒</span><span class="congrats-zhuyin"><span>ㄅ</span><span>ㄤ</span><span class="congrats-tone">ˋ</span></span></span>
+<span class="congrats-unit"><span>了</span><span class="congrats-zhuyin"><span class="congrats-tone light">˙</span><span>ㄌ</span><span>ㄜ</span></span></span><span class="congrats-mark">！</span></h1><p class="congrats-pinyin">tài bàng le</p>
+        <p class="result-congratulations">Good job!</p>
         <div id="finalStarsContainer" class="final-stars" aria-hidden="true"></div>
         <p id="finalStarText" class="final-star-text"></p>
         <div id="resultIdentity" class="result-identification" hidden>
@@ -877,29 +925,30 @@ body {
         </form>
         <div id="resultActions" hidden>
           <div class="result-actions">
-            <button id="downloadPdfBtn" type="button">PDF ↓</button>
-            <button id="sharePdfBtn" type="button">PDF 分享 Share</button>
-            <button id="downloadImageBtn" type="button">圖卡 ↓</button>
-            <button id="shareImageBtn" type="button">圖卡分享 Share</button>
-            <a id="imageReadyLink" hidden>圖卡 ↓</a>
-            <button id="openReviewBtn" type="button">🔊 複習 Review</button>
-            <a id="pdfReadyLink" hidden>PDF ↓</a>
-              <button id="restartBtn" type="button" onclick="restartGame()">再次練習 Again</button>
-            <button id="resumePracticeBtn" type="button" hidden>返回練習</button>
+            <button id="downloadPdfBtn" type="button"><svg class="imi-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h12l4 4v14H3V3zm2 0v7h10V3M7 21v-8h10v8"/></svg><span class="action-label"><span class="en">Save PDF</span><span class="zh">儲存 PDF</span></span></button>
+            <button id="sharePdfBtn" type="button"><svg class="imi-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3m-5 5 5-5 5 5M5 13v8h14v-8"/></svg><span class="action-label"><span class="en">Share PDF</span><span class="zh">分享 PDF</span></span></button>
+            <button id="downloadImageBtn" type="button"><svg class="imi-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h12l4 4v14H3V3zm2 0v7h10V3M7 21v-8h10v8"/></svg><span class="action-label"><span class="en">Save</span><span class="zh">圖片儲存</span></span></button>
+            <button id="shareImageBtn" type="button"><svg class="imi-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3m-5 5 5-5 5 5M5 13v8h14v-8"/></svg><span class="action-label"><span class="en">Share</span><span class="zh">圖片分享</span></span></button>
+            <a id="imageReadyLink" hidden><svg class="imi-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h12l4 4v14H3V3zm2 0v7h10V3M7 21v-8h10v8"/></svg><span class="action-label"><span class="en">Save</span><span class="zh">圖片儲存</span></span></a>
+            <button id="openReviewBtn" type="button"><svg class="imi-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9h4l5-5v16l-5-5H3zM16 8q6 4 0 8M19 4q10 8 0 16"/></svg><span class="action-label"><span class="en">Review</span><span class="zh">複習</span></span></button>
+            <a id="pdfReadyLink" hidden><svg class="imi-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h12l4 4v14H3V3zm2 0v7h10V3M7 21v-8h10v8"/></svg><span class="action-label"><span class="en">Save PDF</span><span class="zh">儲存 PDF</span></span></a>
+              <button id="restartBtn" type="button" onclick="restartGame()"><svg class="imi-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10a8 8 0 1 1 1 9M4 3v7h7"/></svg><span class="action-label"><span class="en">Again</span><span class="zh">再次練習</span></span></button>
+            <button id="resumePracticeBtn" type="button" hidden><svg class="imi-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m10 5-7 7 7 7M3 12h12a6 6 0 0 1 6 6"/></svg><span class="action-label"><span class="en">Back</span><span class="zh">返回練習</span></span></button>
           </div>
-          <p id="pdfStatus" role="status" aria-live="polite"></p>
+          <p id="pdfStatus" role="status" aria-live="polite"></p><div id="pdfFallback" hidden><p>Save PDF → LINE ＋ File<br>先儲存，再到 LINE 附加檔案</p><div class="pdf-fallback-actions"><a id="pdfFallbackSave"><svg class="imi-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h12l4 4v14H3V3zm2 0v7h10V3M7 21v-8h10v8"/></svg>Save PDF 儲存</a><a id="pdfFallbackOpen" target="_blank" rel="noopener"><svg class="imi-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3h7v7M21 3l-11 11M10 5H3v16h16v-7"/></svg>Open PDF 開啟</a></div></div>
         </div>
         <details id="learningHistory" hidden>
-          <summary>本次學習歷程</summary>
+          <summary>My record 學習紀錄</summary>
           <ol id="learningTimeline"></ol>
         </details>
       </div>
     </div>
   </div>
 
+<section id="imagePreview" role="dialog" aria-modal="true" aria-labelledby="pictureTitle" hidden><div class="picture-page"><header class="picture-toolbar"><button id="pictureBack" type="button" aria-label="Back 返回成果"><svg class="imi-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m10 5-7 7 7 7M3 12h12a6 6 0 0 1 6 6"/></svg>Back 返回</button><h2 id="pictureTitle"><span>Picture</span><small>圖片</small></h2><button id="pictureShare" type="button" aria-label="Share 分享圖片"><svg class="imi-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V3m-5 5 5-5 5 5M5 13v8h14v-8"/></svg>Share 分享</button></header><p class="picture-hint">Hold to save<br>長按儲存</p><img id="picturePreviewImage" alt="學生成果圖片 Student result" draggable="false"><div class="picture-subactions"><a id="pictureSave" class="picture-save" style="display:inline-flex;align-items:center;gap:6px;padding:10px 16px;border-radius:14px;background:#e0f1fa;color:#26332f;text-decoration:none;min-height:44px" download><svg class="imi-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3h12l4 4v14H3V3zm2 0v7h10V3M7 21v-8h10v8"/></svg>Save 儲存</a></div><p id="pictureStatus" class="picture-status" role="status" aria-live="polite"></p></div></section>
 <section id="reviewOverlay" role="dialog" aria-modal="true" aria-labelledby="reviewTitle" hidden>
   <div class="review-page">
-    <header class="review-heading"><h2 id="reviewTitle"></h2><button id="reviewReturn" class="review-return" type="button" aria-label="返回星星成果 Back to result">⭐</button></header>
+    <header class="review-heading"><h2 id="reviewTitle"></h2><button id="reviewReturn" class="review-return" type="button" aria-label="Back 返回成果"><svg class="imi-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m10 5-7 7 7 7M3 12h12a6 6 0 0 1 6 6"/></svg><span>Back</span></button></header>
     <div id="reviewControls" class="scaffold-controls" aria-label="顯示設定">
       <button id="reviewTrans" class="toggle-btn" type="button" aria-pressed="true"></button>
       <button id="reviewPy" class="toggle-btn" type="button" aria-pressed="true">👁️ 拼音 Pinyin</button>
@@ -2025,7 +2074,7 @@ function toggleTranslation() {
       starContainer.appendChild(starEl);
     }
     
-  document.getElementById('finalStarText').innerText = `一共有 ${stars} 顆星星！`;
+  document.getElementById('finalStarText').innerText = `Stars 星星：${stars}`;
 
    // 💐 終極版：滿分專屬尊榮花束 (精準對齊時機與巨大化)
     if (Number(stars) === Number(validWords.length) && Number(validWords.length) > 0) {
@@ -2281,7 +2330,7 @@ const LearningRecord = (() => {
     const className = document.getElementById('resultClass');
     className.textContent = result.metadata.className;
     className.hidden = !result.metadata.className;
-    document.getElementById('resultCount').textContent = `完成 ${result.completedWords} / ${result.totalWords} 個詞彙`;
+    document.getElementById('resultCount').textContent = `Done 完成 ${result.completedWords} / ${result.totalWords}`;
     document.getElementById('resultTime').textContent = formatTime(result.completedAt, result.timeZone, true);
     document.getElementById('resultTime').dateTime = result.completedAt;
     const input = document.getElementById('studentNameInput');
@@ -2294,9 +2343,9 @@ const LearningRecord = (() => {
       time.dateTime = event.at;
       time.textContent = formatTime(event.at, result.timeZone);
       const text = document.createElement('span');
-      if (event.type === 'started') text.textContent = '開始練習';
+      if (event.type === 'started') text.textContent = 'Start 開始練習';
       else if (event.type === 'word_completed') text.textContent = `${event.word} · ${event.completedWords} / ${result.totalWords}`;
-      else text.textContent = `完成練習 · ${result.stars} 顆星星`;
+      else text.textContent = `Done 完成練習 · ${result.stars} ★`;
       li.append(time, text);
       list.append(li);
     });
@@ -2356,7 +2405,7 @@ const LearningRecord = (() => {
       if (i >= lastCompleted.stars) star.style.filter = 'grayscale(100%)';
       list.append(star);
     }
-    document.getElementById('finalStarText').textContent = `一共有 ${lastCompleted.stars} 顆星星！`;
+    document.getElementById('finalStarText').textContent = `Stars 星星：${lastCompleted.stars}`;
     renderInfo();
     document.getElementById('winModal').style.display = 'flex';
   }
@@ -2436,16 +2485,16 @@ const StudentPDF = (() => {
     const selected = [];
     const events = record.events || [];
     const start = events.find(event => event.type === 'started');
-    if (start) selected.push({ at: start.at, label: '開始練習' });
+    if (start) selected.push({ at: start.at, label: 'Start 開始練習' });
     const milestones = [...new Set([.25, .5, .75].map(ratio => Math.ceil(record.totalWords * ratio)))];
     for (const count of milestones) {
       if (count >= record.totalWords) continue;
       const event = events.find(event => event.type === 'word_completed' && event.completedWords >= count);
       if (event) {
-        selected.push({ at: event.at, label: `完成 ${event.completedWords} / ${record.totalWords} 個詞彙` });
+        selected.push({ at: event.at, label: `Done 完成 ${event.completedWords} / ${record.totalWords}` });
       }
     }
-    selected.push({ at: record.completedAt, label: `完成全部 ${record.completedWords} 個詞彙；獲得 ${record.stars} 顆星星` });
+    selected.push({ at: record.completedAt, label: `Done 完成 ${record.completedWords} · Stars 星星 ${record.stars}` });
     return selected;
   }
   function makeColumns(record) {
@@ -2576,7 +2625,7 @@ const StudentPDF = (() => {
   }
   function drawPage(ctx, plan, page, record, number) {
     ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, W, H);
-    text(ctx, page.first ? '學習歷程' : '學習歷程（續）', M, 70, page.first ? 52 : 40, true);
+    text(ctx, page.first ? 'My record 學習紀錄' : 'My record 學習紀錄（續）', M, 70, page.first ? 52 : 40, true);
     text(ctx, 'IMI MANDARIN', W - M, 90, 24, false, COLORS.text, 'right');
     ctx.strokeStyle = COLORS.peach; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(M, 148); ctx.lineTo(W - M, 148); ctx.stroke();
     if (page.first) {
@@ -2589,7 +2638,7 @@ const StudentPDF = (() => {
       }
       lines(ctx, h.completion, M, h.completionY, 28, 39);
       roundRect(ctx, M, h.historyY, W - 2 * M, h.historyHeight, 23, COLORS.cream);
-      text(ctx, '本次學習歷程', M + 28, h.historyY + 20, 30, true);
+      text(ctx, 'My record 學習紀錄', M + 28, h.historyY + 20, 30, true);
       h.timeline.forEach((event, i) => {
         const y = h.historyY + 65 + i * 40;
         text(ctx, LearningRecord.formatTime(event.at, record.timeZone), M + 28, y, 25, false, COLORS.text);
@@ -2675,13 +2724,15 @@ const StudentPDF = (() => {
     } catch (_) {}
     return [record.metadata.className && segment(record.metadata.className), segment(record.studentName), segment(record.metadata.materialName), date].filter(Boolean).join('_') + '.pdf';
   }
-  async function create(record, progress) {
+  async function create(record, progress, signal) {
     if (!record || !record.nameConfirmedAt || !record.studentName || !record.completedAt) throw new Error('Name required');
+    if (signal?.aborted) throw new DOMException('Canceled', 'AbortError');
     if (document.fonts && document.fonts.ready) await document.fonts.ready;
     const canvas = document.createElement('canvas'); canvas.width = W; canvas.height = H;
     const ctx = canvas.getContext('2d'); if (!ctx) throw new Error('Canvas unavailable');
     const plan = layout(record, ctx), images = [];
     for (let i = 0; i < plan.pages.length; i++) {
+      if (signal?.aborted) { canvas.width = canvas.height = 1; throw new DOMException('Canceled', 'AbortError'); }
       drawPage(ctx, plan, plan.pages[i], record, i + 1);
       const image = await new Promise((resolve, reject) => canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Image unavailable')), 'image/jpeg', .96));
       images.push(new Uint8Array(await image.arrayBuffer()));
@@ -2697,14 +2748,24 @@ window.IMIStudentPDF = StudentPDF;
 
 
 
-// Batch 4: real local files, prepared before invoking a native share sheet.
+// Student-friendly exports: prepare after Name OK, share only on a real ready-button click.
 const StudentExports = (() => {
-  let busy = false, generation = 0;
-  const cache = new Map();
-  const status = document.getElementById('pdfStatus');
-  const ids = ['downloadPdfBtn','sharePdfBtn','downloadImageBtn','shareImageBtn','openReviewBtn','editStudentName','restartBtn','resumePracticeBtn'];
-  const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
-  const key = record => [record.id, record.studentName, record.nameConfirmedAt].join('|');
+  const $=id=>document.getElementById(id),cache=new Map(),jobs=new Map(),states={pdf:'idle',image:'idle'};
+  const actionIds={pdf:['downloadPdfBtn','sharePdfBtn'],image:['downloadImageBtn','shareImageBtn']};
+  const originalLabels=new Map([...actionIds.pdf,...actionIds.image].map(id=>[id,$(id).innerHTML]));
+  let generation=0,activeKey='',sharing=false,wantPreview=false,previewScroll='',previewFocus=null;
+  const status=$('pdfStatus'),wait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+  const key=record=>record?[record.id,record.studentName,record.nameConfirmedAt].join('|'):'';
+  const spinner='<span class="imi-spinner" aria-hidden="true"></span>';
+  function message(value){status.textContent=value||'';if(!$('imagePreview').hidden)$('pictureStatus').textContent=value||'';}
+  function drawCelebration(ctx,y){
+    const units=[{zh:'太',zy:['ㄊ','ㄞ'],tone:'ˋ'},{zh:'棒',zy:['ㄅ','ㄤ'],tone:'ˋ'},{zh:'了',zy:['ㄌ','ㄜ'],tone:'˙'}];
+    ctx.font='600 68px "PingFang TC","Microsoft JhengHei",sans-serif';
+    const widths=units.map(unit=>ctx.measureText(unit.zh).width+65),total=widths.reduce((a,b)=>a+b,0)+35;
+    let x=500-total/2;const center=y+46;
+    units.forEach((unit,i)=>{ctx.font='600 68px "PingFang TC","Microsoft JhengHei",sans-serif';ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillStyle='#388E3C';ctx.fillText(unit.zh,x,center);const zx=x+widths[i]-40;ctx.font='600 23px "PingFang TC","Microsoft JhengHei",sans-serif';ctx.fillStyle='#374151';ctx.textAlign='center';unit.zy.forEach((symbol,n)=>ctx.fillText(symbol,zx,center-13+n*26));if(unit.tone==='˙'){ctx.beginPath();ctx.arc(zx,center-34,2.9,0,Math.PI*2);ctx.fill();}else{ctx.strokeStyle='#374151';ctx.lineWidth=2.5;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(zx+18,center-6);ctx.lineTo(zx+28,center+6);ctx.stroke();}x+=widths[i];});
+    ctx.font='600 60px "PingFang TC",sans-serif';ctx.textAlign='left';ctx.fillStyle='#388E3C';ctx.fillText('！',x,center);ctx.textAlign='center';ctx.textBaseline='top';
+  }
   function wrap(ctx, value, width, size, weight='400') {
     ctx.font = `${weight} ${size}px "PingFang TC","Microsoft JhengHei",sans-serif`;
     const lines=[]; let line='';
@@ -2724,9 +2785,9 @@ const StudentExports = (() => {
     const material=wrap(ctx,record.metadata.materialName,820,36,'600');
     const names=wrap(ctx,record.studentName,820,54,'600');
     const classes=record.metadata.className?wrap(ctx,record.metadata.className,820,30):[];
-    const teacher=wrap(ctx,'教師：'+record.metadata.teacherName,820,27);
+    const teacher=wrap(ctx,'Teacher 教師：'+record.metadata.teacherName,820,27);
     const cols=12,rows=Math.ceil(record.totalWords/cols),step=64;
-    const height=560+material.length*47+names.length*68+classes.length*42+teacher.length*38+rows*step;
+    const height=625+material.length*47+names.length*68+classes.length*42+teacher.length*38+rows*step;
     if(height>30000)throw Error('Too many stars');
     canvas.height=height;
     ctx.fillStyle='#FFFCF5';ctx.fillRect(0,0,1000,height);
@@ -2737,12 +2798,12 @@ const StudentExports = (() => {
     let y=76;ctx.textBaseline='top';ctx.textAlign='center';
     function line(value,size,color='#26332F',bold=false){ctx.font=`${bold?'600':'400'} ${size}px "PingFang TC","Microsoft JhengHei",sans-serif`;ctx.fillStyle=color;ctx.fillText(value,500,y);}
     material.forEach(value=>{line(value,36,'#374151',true);y+=47});y+=16;
-    line('太棒了！',68,'#388E3C',true);y+=90;line('你學會了！',37,'#374151');y+=65;
+    drawCelebration(ctx,y);y+=96;line('tài bàng le',32,'#374151',true);y+=48;line('Good job!',40,'#365B3B',true);y+=68;
     for(let i=0;i<record.totalWords;i++){const row=Math.floor(i/cols),rowCount=Math.min(cols,record.totalWords-row*cols);star(ctx,500+(i%cols-(rowCount-1)/2)*step,y+30+row*step,25,i<record.stars)}
-    y+=rows*step+14;line(`一共有 ${record.stars} 顆星星！`,40,'#8B651B',true);y+=72;
+    y+=rows*step+14;line(`Stars 星星：${record.stars}`,40,'#8B651B',true);y+=72;
     ctx.strokeStyle='#DDE7DF';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(90,y);ctx.lineTo(910,y);ctx.stroke();y+=32;
     names.forEach(value=>{line(value,54,'#26332F',true);y+=68});classes.forEach(value=>{line(value,30,'#374151');y+=42});
-    y+=10;line(`完成 ${record.completedWords} / ${record.totalWords} 個詞彙`,33,'#284E2A',true);y+=56;
+    y+=10;line(`Done 完成 ${record.completedWords} / ${record.totalWords}`,33,'#284E2A',true);y+=56;
     teacher.forEach(value=>{line(value,27,'#374151');y+=38});
     const date=wrap(ctx,LearningRecord.formatTime(record.completedAt,record.timeZone,true),820,27);date.forEach(value=>{line(value,27,'#374151');y+=38});
     ctx.font='26px "PingFang TC",sans-serif';ctx.fillStyle='#374151';ctx.fillText('Made by IMI Teacher Evelyn',500,height-82);
@@ -2750,46 +2811,135 @@ const StudentExports = (() => {
     canvas.width=canvas.height=1;
     return {blob,filename:StudentPDF.filename(record).replace(/\.pdf$/,'.png')};
   }
-  function current(kind){const record=LearningRecord.getConfirmedResult();const item=cache.get(kind);return record&&item&&item.key===key(record)?item:null;}
-  function toggleBusy(value){busy=value;ids.forEach(id=>{const el=document.getElementById(id);if(el)el.disabled=value;});document.querySelectorAll('#resultActions a').forEach(a=>{a.style.pointerEvents=value?'none':'';a.setAttribute('aria-disabled',String(value));});}
-  async function prepare(kind) {
-    if(busy)return null;
-    const record=LearningRecord.getConfirmedResult();if(!record)return null;
-    if(current(kind))return current(kind);
-    toggleBusy(true);const token=generation;
-    status.textContent=kind==='pdf'?'PDF…':'圖卡…';
-    try {
-      if(kind==='image'){
-        while(!LearningRecord.getLastCompleted()?.readyForExport){if(token!==generation)return null;await wait(120);}
+  function current(kind){const record=LearningRecord.getConfirmedResult(),item=cache.get(kind);return item&&record&&item.key===key(record)?item:null;}
+  function renderButtons(){
+    for(const kind of ['pdf','image']){
+      for(const id of actionIds[kind]){
+        const el=$(id),pending=states[kind]==='loading';
+        el.innerHTML=originalLabels.get(id);
+        if(pending){el.querySelector('svg')?.remove();el.insertAdjacentHTML('afterbegin',spinner);}
+        // Picture Save may queue an automatic preview while the image is being prepared.
+        el.disabled=(pending&&(kind==='pdf'||id==='shareImageBtn'))||(sharing&&id.startsWith('share'));
+        el.setAttribute('aria-busy',String(pending));
+        el.setAttribute('aria-label',(pending?'Wait 準備中 · ':'')+el.textContent.replace(/\s+/g,' ').trim());
       }
-      const result=kind==='pdf'?await StudentPDF.create(record,(n,total)=>status.textContent=`PDF ${n}/${total}`):await image(record);
-      if(token!==generation||key(LearningRecord.getConfirmedResult()||{})!==key(record))return null;
-      const item={...result,key:key(record),url:URL.createObjectURL(result.blob)};cache.set(kind,item);
-      const link=document.getElementById(kind==='pdf'?'pdfReadyLink':'imageReadyLink');link.href=item.url;link.download=item.filename;link.hidden=false;
-      document.getElementById(kind==='pdf'?'downloadPdfBtn':'downloadImageBtn').hidden=true;
-      return item;
-    }catch(error){console.error('Export failed',error);status.textContent='請重試 Try again';return null;}
-    finally{toggleBusy(false);}
-  }
-  async function download(kind){if(busy)return;const item=current(kind)||await prepare(kind);if(!item)return;document.getElementById(kind==='pdf'?'pdfReadyLink':'imageReadyLink').click();status.textContent=kind==='pdf'?'PDF OK':'圖卡 OK';}
-  async function share(kind){
-    if(busy)return;
-    const item=current(kind);
-    if(!item){const result=await prepare(kind);if(result)status.textContent='檔案已準備好，請再點分享。Tap Share.';return;}
-    const file=new File([item.blob],item.filename,{type:item.blob.type});
-    if(!navigator.share||!navigator.canShare||!navigator.canShare({files:[file]})){
-      status.textContent='請先下載，再附加到 LINE、WhatsApp、Email 或 Google 雲端。Download first.';return;
     }
-    toggleBusy(true);
-    try{await navigator.share({files:[file]});status.textContent='可返回繼續操作。';}
-    catch(error){status.textContent=error.name==='AbortError'?'已取消，可再分享。':'無法分享，請先下載再附加檔案。Download first.';}
-    finally{toggleBusy(false);}
+    $('pictureShare').disabled=sharing||!current('image');
   }
-  function invalidate(){generation++;for(const item of cache.values())URL.revokeObjectURL(item.url);cache.clear();['pdf','image'].forEach(kind=>{const link=document.getElementById(kind==='pdf'?'pdfReadyLink':'imageReadyLink');link.hidden=true;link.removeAttribute('href');document.getElementById(kind==='pdf'?'downloadPdfBtn':'downloadImageBtn').hidden=false;});if(!busy)status.textContent='';}
-  document.getElementById('downloadPdfBtn').onclick=()=>download('pdf');document.getElementById('downloadImageBtn').onclick=()=>download('image');
-  document.getElementById('sharePdfBtn').onclick=()=>share('pdf');document.getElementById('shareImageBtn').onclick=()=>share('image');
-  window.addEventListener('imi:resultchange',invalidate);
-  window.addEventListener('pagehide',invalidate);
+  function clear(){
+    generation++;activeKey='';wantPreview=false;
+    for(const job of jobs.values())job.controller.abort();jobs.clear();
+    closePreview(false);
+    for(const item of cache.values())URL.revokeObjectURL(item.url);cache.clear();
+    for(const kind of ['pdf','image']){states[kind]='idle';const link=$(kind==='pdf'?'pdfReadyLink':'imageReadyLink');link.hidden=true;link.removeAttribute('href');}
+    $('pdfFallback').hidden=true;for(const id of ['pdfFallbackSave','pdfFallbackOpen','pictureSave'])$(id).removeAttribute('href');
+    message('');renderButtons();
+  }
+  async function prepare(kind){
+    const record=LearningRecord.getConfirmedResult();if(!record)return null;
+    const ready=current(kind);if(ready)return ready;
+    const pending=jobs.get(kind);if(pending&&pending.key===key(record))return pending.promise;
+    const token=generation,recordKey=key(record),controller=typeof AbortController==='function'?new AbortController():{signal:{aborted:false},abort(){this.signal.aborted=true}};
+    const job={key:recordKey,controller,promise:null};jobs.set(kind,job);states[kind]='loading';renderButtons();
+    job.promise=(async()=>{
+      try{
+        if(kind==='image')while(!LearningRecord.getLastCompleted()?.readyForExport){if(controller.signal.aborted||token!==generation)return null;await wait(100);}
+        if(controller.signal.aborted||token!==generation)return null;
+        const result=kind==='pdf'?await StudentPDF.create(record,null,controller.signal):await image(record);
+        if(controller.signal.aborted||token!==generation||key(LearningRecord.getConfirmedResult())!==recordKey)return null;
+        const type=kind==='pdf'?'application/pdf':'image/png';
+        if(!result.blob.size||result.blob.type!==type)throw Error('File type');
+        if(kind==='pdf'&&new TextDecoder().decode(await result.blob.slice(0,5).arrayBuffer())!=='%PDF-')throw Error('PDF header');
+        if(controller.signal.aborted||token!==generation||key(LearningRecord.getConfirmedResult())!==recordKey)return null;
+        // ASCII PDF share filename avoids filename-encoding problems in receiving applications.
+        // Download keeps the original class/name/material filename; PDF contents keep the full identity.
+        const shareName=kind==='pdf'?'IMI_learning_record_'+StudentPDF.filename(record).slice(-14,-4).replace(/-/g,'')+'.pdf':result.filename;
+        const item={...result,key:recordKey,url:URL.createObjectURL(result.blob),file:new File([result.blob],shareName,{type})};
+        cache.set(kind,item);states[kind]='ready';
+        const link=$(kind==='pdf'?'pdfReadyLink':'imageReadyLink');link.href=item.url;link.download=item.filename;link.hidden=true;
+        if(kind==='pdf'){
+          $('pdfFallbackSave').href=item.url;$('pdfFallbackSave').download=item.filename;
+          $('pdfFallbackOpen').href=item.url;
+        }
+        if(kind==='image'&&wantPreview){wantPreview=false;openPreview(item);}
+        return item;
+      }catch(error){
+        if(token===generation&&!controller.signal.aborted){states[kind]='error';message('Try again 請重試');console.error('Export failed',error);}
+        return null;
+      }finally{if(jobs.get(kind)===job)jobs.delete(kind);if(token===generation)renderButtons();}
+    })();
+    return job.promise;
+  }
+  function sync(){
+    const record=LearningRecord.getConfirmedResult(),next=key(record);
+    if(next===activeKey){renderButtons();return;}
+    clear();if(!record)return;
+    activeKey=next;
+    // These jobs do not lock name editing, reviewing, going back or starting another round.
+    prepare('pdf');prepare('image');
+  }
+  async function savePDF(){
+    if(states.pdf==='loading')return;
+    const token=generation,item=current('pdf')||await prepare('pdf');
+    if(!item||token!==generation)return;
+    $('pdfReadyLink').click();message('');
+  }
+  function showPDFFallback(){if(current('pdf'))$('pdfFallback').hidden=false;message('Save first 先儲存');}
+  async function share(kind){
+    if(sharing)return;
+    const item=current(kind);
+    if(!item){if(states[kind]!=='loading')prepare(kind);return;}
+    const token=generation;
+    let supported=false;
+    try{supported=!!(navigator.share&&navigator.canShare&&navigator.canShare({files:[item.file]}));}catch(_){}
+    if(!supported){if(kind==='pdf')showPDFFallback();else{openPreview(item);message('Hold to save 長按儲存');}return;}
+    sharing=true;renderButtons();
+    try{
+      // No asynchronous work before this invocation: the file already exists when the student clicks.
+      await navigator.share({files:[item.file]});
+      if(token===generation)message('');
+    }catch(error){
+      if(token===generation){
+        if(error.name==='AbortError')message('Cancel 已取消');
+        else if(kind==='pdf')showPDFFallback();
+        else{openPreview(item);message('Save first 先儲存');}
+      }
+    }finally{sharing=false;renderButtons();}
+  }
+  function openPreview(item){
+    if(!item||item!==current('image'))return;
+    if($('imagePreview').hidden){previewScroll=document.body.style.overflow;previewFocus=document.activeElement;}
+    $('picturePreviewImage').src=item.url;$('pictureSave').href=item.url;$('pictureSave').download=item.filename;
+    $('picturePreviewImage').alt='Picture 圖片 · '+LearningRecord.getConfirmedResult().studentName;
+    $('pictureStatus').textContent='';$('winModal').inert=true;document.body.style.overflow='hidden';
+    $('imagePreview').hidden=false;$('imagePreview').scrollTop=0;renderButtons();$('pictureBack').focus({preventScroll:true});
+  }
+  function picture(){
+    message('');const item=current('image');if(item){openPreview(item);return;}
+    wantPreview=true;prepare('image');
+  }
+  function closePreview(focus=true){
+    if($('imagePreview').hidden)return;
+    $('imagePreview').hidden=true;$('picturePreviewImage').removeAttribute('src');$('winModal').inert=false;document.body.style.overflow=previewScroll;
+    if(focus){const target=previewFocus?.isConnected&&!previewFocus.disabled?previewFocus:$('downloadImageBtn');target?.focus({preventScroll:true});}
+    previewFocus=null;
+  }
+  $('downloadPdfBtn').onclick=savePDF;$('sharePdfBtn').onclick=()=>share('pdf');
+  $('downloadImageBtn').onclick=picture;$('shareImageBtn').onclick=()=>share('image');
+  $('pictureBack').onclick=()=>closePreview();$('pictureShare').onclick=()=>share('image');
+  $('pictureSave').onclick=()=>{$('pictureStatus').textContent='';};
+  $('imagePreview').addEventListener('keydown',event=>{
+    if(event.key==='Escape'){event.preventDefault();closePreview();return;}
+    if(event.key==='Tab'){
+      const elements=[...$('imagePreview').querySelectorAll('button:not([disabled]),a[href]')],first=elements[0],last=elements.at(-1);
+      if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+      else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+    }
+  });
+  window.addEventListener('imi:resultchange',sync);
+  window.addEventListener('pagehide',clear);
+  window.addEventListener('pageshow',event=>{if(event.persisted)sync();});
+  renderButtons();
   return Object.freeze({image});
 })();
 window.IMIStudentExports=StudentExports;
