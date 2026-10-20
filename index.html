@@ -21,9 +21,9 @@ body {
   }
   
   #gameContainer {
-    width: 100vw; display: flex; flex-direction: column;
+    width: 900px; display: flex; flex-direction: column;
     align-items: center; justify-content: flex-start; position: relative; padding-bottom: 40px;
-    transition: transform 0.3s ease; display: none; 
+    transform-origin: top left; display: none; 
   }
 
   /* 學生名牌與頂部狀態列 */
@@ -564,6 +564,180 @@ body {
   .add-vocab-btn { background: #FFF59D; color: #5D4037; padding: 12px 30px; border: none; border-radius: 20px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 3px 0 #FFD54F, 0 4px 10px rgba(0,0,0,0.05); transition: all 0.2s; letter-spacing: 1px; }
   .add-vocab-btn:hover { transform: translateY(2px); box-shadow: 0 1px 0 #FFD54F, 0 2px 5px rgba(0,0,0,0.05); }
     
+
+  /* Keep layout coordinates and scaling coordinates on the same 900px canvas.
+     The outer viewport reserves the scaled height; page-level overlays stay outside. */
+  #gameViewport {
+    display: none;
+    position: relative;
+    width: calc(100% - 24px);
+    max-width: 900px;
+    flex-shrink: 0;
+  }
+  #gameContainer { position: absolute; top: 0; left: 0; }
+  .top-bar { flex-wrap: wrap; gap: 20px; }
+  .scaffold-controls { flex-wrap: wrap; max-width: 100%; }
+  .star-status-group { margin-left: auto; }
+  .course-info { flex-wrap: wrap; }
+  .course-title, .info-tag { max-width: 100%; overflow-wrap: anywhere; }
+  .info-tag { white-space: normal; box-sizing: border-box; }
+  .settings-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #teacherPanel { min-width: 0; }
+  .setting-item, .brand-text { min-width: 0; }
+  .audit-item-info { min-width: 0; flex-wrap: wrap; overflow-wrap: anywhere; }
+  .audit-actions { flex-wrap: wrap; }
+  .brand-text { overflow-wrap: anywhere; }
+  .system-toast { box-sizing: border-box; max-width: calc(100% - 24px); }
+  @media (max-width: 768px) {
+    .settings-grid { grid-template-columns: minmax(0, 1fr); }
+    .setting-item input, .styled-select { min-width: 0; max-width: 100%; font-size: 16px; }
+    .course-info, .scaffold-controls { flex-wrap: wrap; }
+    .top-bar { flex-wrap: wrap; gap: 20px; }
+  }
+
+</style>
+<meta name="imi-build" content="student-link-compression-v2-20261020">
+<style id="studentOutcomeStyles">
+/* Batch 2: the student outcome is outside the scaled game canvas. */
+#previousResultBar[hidden], #resumePracticeBtn[hidden], #restartBtn[hidden], #resultClass[hidden] { display: none !important; }
+#previousResultBar { width: 850px; display: flex; justify-content: flex-end; margin: 0 0 16px; }
+#previousResultBtn { font-size: 19px; padding: 8px 18px; }
+#winModal { overflow-y: auto; overflow-x: hidden; justify-content: flex-start; padding: 16px 12px max(18px, env(safe-area-inset-bottom)); }
+.result-shell { width: 100%; max-width: 520px; margin: auto; flex-shrink: 0; min-width: 0; }
+#achievementCard { width: 100%; max-width: none; border: 4px solid transparent; border-radius: 30px; padding: 22px 18px 18px; background: linear-gradient(#fff,#fff) padding-box, linear-gradient(115deg,#f6adba,#ffd0a3,#ffe797,#c8e6b1,#b2ddf2,#dac4ef) border-box; box-shadow: 0 15px 40px rgba(65,84,62,.12); color: #26332f; }
+#achievementCard h1 { font-size: clamp(28px,6vw,40px); line-height: 1.2; margin: 8px 0; color: #388e3c; }
+#achievementCard .result-material { font-size: 16px; font-weight: bold; color: #374151; margin: 0 0 10px; overflow-wrap: anywhere; }
+#achievementCard .result-congratulations { font-size: 19px; margin: 8px 0 14px; color: #374151; }
+#achievementCard .final-stars { gap: 5px; min-height: 0; margin: 10px 0; }
+#achievementCard .final-star-item { font-size: clamp(26px,6vw,38px); line-height: 1.2; }
+#achievementCard .final-star-text { font-size: clamp(21px,5vw,27px); margin: 12px 0 18px; color: #966a16; text-shadow: none; }
+.result-identification { border-top: 1px solid #e2e8df; padding-top: 14px; }
+#resultStudent { font-size: clamp(24px,6vw,32px); margin: 0 0 8px; line-height: 1.3; overflow-wrap: anywhere; }
+#achievementCard #resultClass { font-size: 16px; color: #374151; margin: 6px 0; overflow-wrap: anywhere; }
+#achievementCard #resultCount { display: inline-block; border-radius: 24px; background: #edf6e8; padding: 8px 18px; font-size: 17px; color: #284e2a; margin: 10px 0; }
+#resultTime { display: block; font-size: 14px; color: #374151; line-height: 1.5; overflow-wrap: anywhere; }
+#achievementCard .result-signature { font-size: 13px; color: #374151; margin: 16px 0 0; }
+.result-controls { margin-top: 14px; padding: 14px; border: 1px solid #e0e5df; border-radius: 20px; background: #fffdf5; }
+.result-controls label { display: block; font-size: 16px; font-weight: bold; color: #26332f; margin-bottom: 8px; }
+#studentNameInput { display: block; width: 100%; min-width: 0; font: inherit; font-size: 17px; color: #26332f; background: white; padding: 11px 13px; border: 2px solid #b6d4fe; border-radius: 13px; box-sizing: border-box; }
+#studentNameInput:focus { outline: 3px solid #c7e1fb; outline-offset: 2px; }
+.result-actions { display: flex; gap: 10px; margin-top: 13px; }
+.result-actions button { width: 100%; min-height: 46px; padding: 11px 16px; border: 0; border-radius: 16px; background: #4caf50; color: white; font: inherit; font-size: 18px; font-weight: bold; cursor: pointer; white-space: normal; box-sizing: border-box; box-shadow: 0 4px 0 #388e3c; }
+#learningHistory { margin-top: 14px; border-top: 1px solid #e4e5dc; padding-top: 12px; color: #26332f; }
+#learningHistory summary { cursor: pointer; font-size: 15px; font-weight: bold; min-height: 30px; }
+#learningTimeline { list-style: none; padding: 0; margin: 10px 0 0; }
+#learningTimeline li { display: grid; grid-template-columns: 84px minmax(0,1fr); gap: 8px; font-size: 14px; line-height: 1.65; padding: 6px 0; border-top: 1px solid #e9e9df; }
+#learningTimeline time { color: #374151; font-variant-numeric: tabular-nums; }
+#learningTimeline span { overflow-wrap: anywhere; }
+@media (max-height: 700px) {
+  #achievementCard { padding: 14px 14px 13px; }
+  #achievementCard h1 { font-size: 29px; margin: 5px 0; }
+  #achievementCard .result-congratulations { font-size: 17px; margin: 5px 0 8px; }
+  #achievementCard .final-stars { margin: 6px 0; }
+  #achievementCard .final-star-item { font-size: 29px; }
+  #achievementCard .final-star-text { font-size: 22px; margin: 8px 0 10px; }
+  .result-identification { padding-top: 9px; }
+  #resultStudent { font-size: 26px; }
+  #achievementCard .result-signature { margin-top: 10px; }
+}
+/* Override the original restart button sizing inside the compact result controls. */
+.result-actions #restartBtn { min-height: 46px; padding: 11px 16px; font-size: 18px; box-shadow: 0 4px 0 #388e3c; }
+@media (max-height: 700px) {
+  .result-controls { padding: 12px; margin-top: 10px; }
+  #achievementCard .result-material { margin-bottom: 6px; font-size: 15px; }
+  #achievementCard #resultCount { margin: 7px 0; padding: 6px 15px; }
+  #resultTime { font-size: 13px; }
+}
+
+</style>
+<style id="nameGateAndPDFStyles">
+.result-shell [hidden], #previousResultBtn[hidden] { display: none !important; }
+.previous-result-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 2px solid #b6d4fe; cursor: pointer; font-family: inherit; background: white; box-shadow: 0 3px 8px #44607812; }
+.previous-result-btn:active { transform: scale(.97); }
+.previous-result-label { display: flex; flex-direction: column; gap: 2px; line-height: 1.2; }
+.previous-result-label small { font-size: 12px; color: #374151; font-weight: normal; }
+#nameForm { margin: 0; }
+.name-entry-row { display: flex; gap: 10px; align-items: stretch; }
+#studentNameInput { flex: 1; width: auto; }
+#confirmStudentName { flex: 0 0 64px; border: 0; border-radius: 13px; font: inherit; font-size: 18px; font-weight: bold; color: white; background: #4caf50; cursor: pointer; box-shadow: 0 3px 0 #388e3c; }
+#nameError { margin: 8px 0 0; color: #9d3024; font-size: 16px; font-weight: bold; }
+#studentNameInput[aria-invalid=true] { border-color: #b64b3d; }
+.result-name-row { display: flex; align-items: center; justify-content: center; gap: 8px; min-width: 0; }
+#resultStudent { min-width: 0; }
+#editStudentName { width: 35px; height: 35px; flex-shrink: 0; display: grid; place-items: center; border: 1px solid #d7e1e7; background: #f4f9fc; border-radius: 50%; color: #374151; cursor: pointer; }
+#editStudentName svg { width: 18px; height: 18px; }
+.result-actions { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.4fr); }
+#downloadPdfBtn { background: #526f88; box-shadow: 0 4px 0 #344d64; }
+.result-actions button:disabled, #editStudentName:disabled { opacity: .55; cursor: wait; }
+#pdfStatus { margin: 12px 0 0; font-size: 15px; color: #374151; }
+#pdfStatus:empty { display: none; }
+#pdfReadyLink { display: inline-block; margin-top: 8px; padding: 9px 16px; border-radius: 13px; background: #e0f1fa; color: #26332f; font-size: 16px; font-weight: bold; text-decoration: none; }
+@media (max-width:768px) { .previous-result-label small { font-size: 20px; } }
+
+#previousResultBtn { font-size: 16px; padding: 6px 15px; }
+@media (max-width:768px) { #previousResultBtn { font-size: 28px; padding: 10px 25px; } .previous-result-label small { font-size: 22px; } }
+
+.result-actions #pdfReadyLink { display:flex;align-items:center;justify-content:center;min-height:46px;margin:0;padding:11px 16px;border-radius:16px;background:#526f88;color:white;font:inherit;font-size:18px;font-weight:bold;box-shadow:0 4px 0 #344d64;box-sizing:border-box; }
+
+</style>
+<style id="finalUpgradeStyles">
+.result-actions {grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:0}
+.result-actions button,.result-actions #pdfReadyLink,.result-actions #imageReadyLink {font-size:16px;min-height:44px;padding:9px 8px;margin:0;text-align:center;line-height:1.35}
+.result-actions #openReviewBtn {background:#75628f;box-shadow:0 4px 0 #58466f}
+.result-actions #downloadImageBtn,.result-actions #imageReadyLink {background:#ab783f;box-shadow:0 4px 0 #805827;color:white}
+.result-actions #shareImageBtn,.result-actions #sharePdfBtn {background:#526f88;box-shadow:0 4px 0 #344d64}
+.result-actions #imageReadyLink {display:flex;align-items:center;justify-content:center;text-decoration:none;border-radius:16px;font-weight:bold}
+#reviewOverlay[hidden],#reviewOverlay [hidden]{display:none!important}
+#reviewOverlay {position:fixed;inset:0;z-index:11000;overflow-y:auto;overflow-x:hidden;background:#fffcf5;background-image:linear-gradient(#fffcf54d,#fffcf54d),var(--imi-review-background);background-size:cover;background-position:center;color:#26332f;padding:max(12px,env(safe-area-inset-top)) 12px max(12px,env(safe-area-inset-bottom));box-sizing:border-box;overscroll-behavior:contain}
+#reviewOverlay * {box-sizing:border-box}
+.review-page {width:100%;max-width:720px;min-height:100%;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.review-heading {display:flex;align-items:center;gap:10px;min-height:44px}
+#reviewTitle {margin:0;flex:1;min-width:0;font-size:16px;line-height:1.4;overflow-wrap:anywhere;color:#26332f}
+.review-return {width:46px;min-height:46px;flex-shrink:0;border-radius:50%;border:2px solid #fff;background:#fff9d9;font-size:25px;box-shadow:0 3px 0 #dac68a;cursor:pointer}
+#reviewControls {display:flex;flex-wrap:wrap;justify-content:center;gap:7px}
+#reviewOverlay .toggle-btn {font:inherit;font-weight:bold;font-size:14px;line-height:1.3;padding:8px 10px;min-height:40px;border-radius:20px;color:#374151;max-width:100%;white-space:normal;overflow-wrap:anywhere}
+#reviewOverlay .toggle-btn.off {color:#59636a;background:#f0f0f0;border-color:#cbd0d3}
+.review-main {flex:1;display:flex;align-items:center;justify-content:center;min-width:0}
+#reviewCard {width:100%;min-width:0;border:2px solid #fff;border-radius:28px;background:#fff1b8;box-shadow:0 12px 30px #5664551a;padding:26px 18px 22px;display:flex;flex-direction:column;align-items:center;gap:18px;touch-action:pan-y;transition:background .2s;color:#26332f}
+#reviewWord {width:100%;display:flex;justify-content:center;align-items:center;flex-wrap:wrap;column-gap:14px;row-gap:20px;padding:10px 0}
+.review-unit {display:inline-flex;align-items:center;gap:8px;position:relative;min-height:86px;padding-top:10px}
+.review-hz {font-size:clamp(38px,8vw,58px);font-weight:bold;line-height:1.15;color:#26332f}
+.review-annotation {position:relative;display:flex;flex-direction:column;align-items:center;font-size:18px;line-height:1.12;padding-right:15px;min-width:33px;color:#374151}
+.review-symbols {display:flex;flex-direction:column;align-items:center;line-height:1.12}
+.review-tone {position:absolute;right:0;top:40%;font-size:18px;line-height:1}
+.review-tone.light {left:0;right:15px;top:-15px;text-align:center;font-size:20px}
+#reviewPinyin,#reviewForeign {margin:0;width:100%;text-align:center;overflow-wrap:anywhere;color:#26332f;line-height:1.5}
+#reviewPinyin {font-size:21px;min-height:32px;font-weight:600}
+#reviewForeign {font-size:20px;min-height:30px}
+#reviewCard.hide-review-py #reviewPinyin,#reviewCard.hide-review-zy .review-annotation,#reviewCard.hide-review-foreign #reviewForeign {visibility:hidden}
+#reviewSpeak {position:relative;width:78px;height:78px;flex-shrink:0;border-radius:50%;border:3px solid white;display:grid;place-items:center;background:linear-gradient(150deg,#fff,#dfedf6);color:#36576e;box-shadow:0 6px 0 #9cb7c9,0 10px 20px #526f8826;cursor:pointer}
+#reviewSpeak:active{transform:translateY(3px);box-shadow:0 3px 0 #9cb7c9}
+#reviewSpeak svg {width:39px;height:39px}
+#reviewSpeak::after {content:'';position:absolute;inset:-8px;border:2px solid transparent;border-radius:50%;pointer-events:none}
+#reviewSpeak.playing::after {border-color:#658da6;animation:reviewWave 1s infinite}
+@keyframes reviewWave {from{transform:scale(.9);opacity:1}to{transform:scale(1.22);opacity:0}}
+.review-navigation {display:flex;align-items:center;justify-content:center;gap:28px;padding-bottom:5px}
+.review-navigation button {width:48px;height:46px;min-height:44px;border:2px solid white;border-radius:16px;background:#e0f1fa;box-shadow:0 3px 0 #b4cbd7;color:#374151;font-size:26px;cursor:pointer}
+.review-navigation button:disabled {opacity:.4;cursor:default}
+#reviewProgress {font-size:17px;min-width:68px;text-align:center;color:#374151;font-variant-numeric:tabular-nums}
+#reviewError {font-size:15px;color:#8d3125;margin:0;text-align:center;overflow-wrap:anywhere}
+.review-sr {position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+@media(max-height:560px) and (min-width:560px){.review-page{max-width:840px;display:grid;grid-template-columns:minmax(0,1fr) 135px;align-content:center;gap:8px 12px}.review-heading,#reviewControls{grid-column:1/-1}#reviewControls{gap:7px}.review-main{grid-column:1;grid-row:3}.review-navigation{grid-column:2;grid-row:3;flex-wrap:wrap;gap:10px;align-content:center}#reviewCard{padding:12px 16px;gap:8px;display:grid;grid-template-columns:minmax(0,1fr) 76px;align-items:center}#reviewWord,#reviewPinyin,#reviewForeign{grid-column:1}#reviewSpeak{grid-column:2;grid-row:1/4;width:68px;height:68px}.review-hz{font-size:40px}.review-unit{min-height:72px}#reviewPinyin{font-size:18px}#reviewForeign{font-size:17px}#reviewWord{padding:3px 0}.review-navigation #reviewProgress{order:-1;flex-basis:100%}#reviewError{grid-column:1/-1}}
+@media(prefers-reduced-motion:reduce){#reviewSpeak.playing::after{animation:none}#reviewCard{transition:none}}
+@media(max-height:700px) and (max-width:559px){.review-page{gap:8px}#reviewCard{padding:18px 12px;gap:12px}#reviewSpeak{width:68px;height:68px}.review-unit{min-height:80px}#reviewWord{padding:7px 0}}
+@media(max-width:450px){#reviewWord{column-gap:8px}.review-unit{gap:5px}.review-hz{font-size:38px}.review-annotation{font-size:16px;min-width:27px;padding-right:11px}.review-tone{font-size:16px}.review-tone.light{right:11px}}
+
+.review-signature {font-size:12px;line-height:1.4;text-align:center;color:#374151;padding:0 4px;overflow-wrap:anywhere}
+@media(max-height:560px) and (min-width:560px){.review-signature{grid-column:1/-1}}
+@media(max-width:350px){#reviewOverlay .toggle-btn{font-size:12px;padding:7px 8px;min-height:36px}#reviewControls{gap:5px}.review-page{gap:6px}#reviewTitle{font-size:14px}#reviewCard{padding:14px 12px;gap:8px}#reviewWord{row-gap:12px;padding:6px 0}#reviewWord[data-four-annotated="true"] .review-unit{flex:0 0 calc((100% - 8px)/2);justify-content:center}.review-unit{min-height:70px}.review-hz{font-size:36px}#reviewSpeak{width:62px;height:62px}#reviewPinyin{font-size:20px}#reviewForeign{font-size:18px}.review-navigation{padding-bottom:0}.review-signature{font-size:11px}}
+
+</style>
+<style id="studentLinkStyles">
+#linkEnvironmentWarning,#linkNotice{max-width:100%;box-sizing:border-box;overflow-wrap:anywhere;padding:12px 14px;border-radius:12px;background:#fff1b8;color:#5a3e16;font-size:15px;line-height:1.6;margin:12px 0}
+#linkNotice.link-error{background:#fff0e9;color:#843629}
+#linkEnvironmentWarning[hidden],#linkNotice[hidden]{display:none!important}
+#generateStudentLinkBtn:disabled{background:#e4e7e9;color:#59636a;cursor:not-allowed;box-shadow:none}
+#linkCompressionInfo{font-size:14px;color:#284e2a;line-height:1.6;overflow-wrap:anywhere;margin:0 0 10px}
 </style>
 </head>
 
@@ -639,9 +813,12 @@ body {
    <textarea id="vocabInput" placeholder="請在此貼上 專屬Gem 的Json資料..."></textarea>
     <div id="addVocabBar" style="display: none; justify-content: flex-end; margin-top: 15px;"><button class="add-vocab-btn" onclick="openAddModal()">➕ 新增詞彙</button></div>
    <div id="auditDashboard"></div>
-    <button class="start-btn" onclick="generateLink()">🔗 生成學生專屬連結</button>
+    <p id="linkEnvironmentWarning" role="status" hidden></p>
+    <p id="linkNotice" role="status" hidden></p>
+    <button id="generateStudentLinkBtn" class="start-btn" onclick="generateLink()">🔗 生成學生專屬連結</button>
     <div id="linkResult">
       <p style="margin: 0 0 10px 0; font-weight: bold; color: #2e7d32;">✅ 連結已生成！請點擊複製</p>
+      <p id="linkCompressionInfo"></p>
       <input type="text" id="generatedUrl" readonly><br>
       <button class="copy-btn" onclick="copyUrl()">📋 複製學生連結</button>
     </div>
@@ -673,16 +850,71 @@ body {
   </div>
 </div>
     
-  <div id="winModal" class="win-overlay" style="display: none;">
-    <div class="win-content">
-      <h1>🎉 🎉 🎉 太棒了！</h1>
-      <p>你學會了！</p>
-      <div id="finalStarsContainer" class="final-stars"></div>
-      <div id="finalStarText" class="final-star-text"></div>
-      <button id="restartBtn" onclick="restartGame()">再玩一次 Let's Play again</button>
+  <div id="winModal" class="win-overlay" role="dialog" aria-modal="true" aria-labelledby="resultHeading" style="display: none;">
+    <div class="result-shell">
+      <div id="achievementCard" class="win-content">
+        <p id="resultMaterial" class="result-material"></p>
+        <h1 id="resultHeading">太棒了！</h1>
+        <p class="result-congratulations">你學會了！</p>
+        <div id="finalStarsContainer" class="final-stars" aria-hidden="true"></div>
+        <p id="finalStarText" class="final-star-text"></p>
+        <div id="resultIdentity" class="result-identification" hidden>
+          <div class="result-name-row"><h2 id="resultStudent"></h2><button id="editStudentName" type="button" aria-label="修改姓名" data-export-exclude hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 16 12-12 4 4L8 20H4zm10-10 4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></button></div>
+          <p id="resultClass" hidden></p>
+          <p id="resultCount"></p>
+          <time id="resultTime"></time>
+        </div>
+        <p class="result-signature">Made by IMI Teacher Evelyn</p>
+      </div>
+      <div class="result-controls">
+        <form id="nameForm" novalidate>
+          <label for="studentNameInput">Name</label>
+          <div class="name-entry-row">
+            <input id="studentNameInput" type="text" maxlength="80" autocomplete="name" aria-required="true" aria-describedby="nameError">
+            <button id="confirmStudentName" type="submit">OK</button>
+          </div>
+          <p id="nameError" role="alert" hidden>Name?</p>
+        </form>
+        <div id="resultActions" hidden>
+          <div class="result-actions">
+            <button id="downloadPdfBtn" type="button">PDF ↓</button>
+            <button id="sharePdfBtn" type="button">PDF 分享 Share</button>
+            <button id="downloadImageBtn" type="button">圖卡 ↓</button>
+            <button id="shareImageBtn" type="button">圖卡分享 Share</button>
+            <a id="imageReadyLink" hidden>圖卡 ↓</a>
+            <button id="openReviewBtn" type="button">🔊 複習 Review</button>
+            <a id="pdfReadyLink" hidden>PDF ↓</a>
+              <button id="restartBtn" type="button" onclick="restartGame()">再次練習 Again</button>
+            <button id="resumePracticeBtn" type="button" hidden>返回練習</button>
+          </div>
+          <p id="pdfStatus" role="status" aria-live="polite"></p>
+        </div>
+        <details id="learningHistory" hidden>
+          <summary>本次學習歷程</summary>
+          <ol id="learningTimeline"></ol>
+        </details>
+      </div>
     </div>
   </div>
-  
+
+<section id="reviewOverlay" role="dialog" aria-modal="true" aria-labelledby="reviewTitle" hidden>
+  <div class="review-page">
+    <header class="review-heading"><h2 id="reviewTitle"></h2><button id="reviewReturn" class="review-return" type="button" aria-label="返回星星成果 Back to result">⭐</button></header>
+    <div id="reviewControls" class="scaffold-controls" aria-label="顯示設定">
+      <button id="reviewTrans" class="toggle-btn" type="button" aria-pressed="true"></button>
+      <button id="reviewPy" class="toggle-btn" type="button" aria-pressed="true">👁️ 拼音 Pinyin</button>
+      <button id="reviewZy" class="toggle-btn" type="button" aria-pressed="true">👁️ 注音ㄅㄆㄇ</button>
+    </div>
+    <main class="review-main"><article id="reviewCard" aria-label="詞彙複習字卡">
+      <div id="reviewWord"></div><p id="reviewPinyin"></p><p id="reviewForeign"></p>
+      <button id="reviewSpeak" type="button" aria-label="聽發音 Listen"><svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 19h8l11-9v28l-11-9H8z" fill="currentColor"/><path d="M33 16q10 8 0 16M37 10q17 14 0 28" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg></button>
+      <p id="reviewError" role="status" hidden></p><span id="reviewAudioStatus" class="review-sr" role="status"></span>
+    </article></main>
+    <nav class="review-navigation" aria-label="切換詞彙"><button id="reviewPrev" type="button" aria-label="上一個詞彙 Previous">‹</button><span id="reviewProgress" aria-live="polite"></span><button id="reviewNext" type="button" aria-label="下一個詞彙 Next">›</button></nav>
+    <footer class="review-signature">Made by IMI Teacher Evelyn</footer>
+  </div>
+</section>
+
   <div id="bigStarFeedback">
     <div class="star-bg">⭐</div>
     <div class="star-text-box" id="bigStarText"></div>
@@ -690,6 +922,7 @@ body {
 
   <div id="systemToast" class="system-toast"></div>
 
+  <div id="gameViewport">
   <div id="gameContainer">
     <div class="student-header">
       <h1 class="course-title" id="displayMaterialName">IMI_詞彙消消樂</h1>
@@ -722,20 +955,135 @@ body {
     <div class="footer-brand">Made by IMI Teacher Studio</div>
   </div>
 
+  </div><!-- gameViewport -->
 
+<script id="imiEmbeddedPako">
+/*
+(The MIT License)
+
+Copyright (C) 2014-2017 by Vitaly Puzrin and Andrei Tuputcyn
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+*/
+
+// (C) 1995-2013 Jean-loup Gailly and Mark Adler
+// (C) 2014-2017 Vitaly Puzrin and Andrey Tupitsin
+//
+// This software is provided 'as-is', without any express or implied
+// warranty. In no event will the authors be held liable for any damages
+// arising from the use of this software.
+//
+// Permission is granted to anyone to use this software for any purpose,
+// including commercial applications, and to alter it and redistribute it
+// freely, subject to the following restrictions:
+//
+// 1. The origin of this software must not be misrepresented; you must not
+//   claim that you wrote the original software. If you use this software
+//   in a product, an acknowledgment in the product documentation would be
+//   appreciated but is not required.
+// 2. Altered source versions must be plainly marked as such, and must not be
+//   misrepresented as being the original software.
+// 3. This notice may not be removed or altered from any source distribution.
+
+/*! pako 2.2.0 https://github.com/nodeca/pako @license (MIT AND Zlib) */
+!function(t,e){"object"==typeof exports&&"undefined"!=typeof module?e(exports):"function"==typeof define&&define.amd?define(["exports"],e):e((t="undefined"!=typeof globalThis?globalThis:t||self).pako={})}(this,(function(t){"use strict";function e(t){let e=t.length;for(;--e>=0;)t[e]=0}const a=256,i=286,n=30,s=15,r=new Uint8Array([0,0,0,0,0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,0]),l=new Uint8Array([0,0,0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,12,12,13,13]),o=new Uint8Array([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,3,7]),h=new Uint8Array([16,17,18,0,8,7,9,6,10,5,11,4,12,3,13,2,14,1,15]),d=new Array(576);e(d);const _=new Array(60);e(_);const f=new Array(512);e(f);const c=new Array(256);e(c);const u=new Array(29);e(u);const w=new Array(n);function m(t,e,a,i,n){this.static_tree=t,this.extra_bits=e,this.extra_base=a,this.elems=i,this.max_length=n,this.has_stree=t&&t.length}let b,g,p;function k(t,e){this.dyn_tree=t,this.max_code=0,this.stat_desc=e}e(w);const y=t=>t<256?f[t]:f[256+(t>>>7)],v=(t,e)=>{t.pending_buf[t.pending++]=255&e,t.pending_buf[t.pending++]=e>>>8&255},x=(t,e,a)=>{t.bi_valid>16-a?(t.bi_buf|=e<<t.bi_valid&65535,v(t,t.bi_buf),t.bi_buf=e>>16-t.bi_valid,t.bi_valid+=a-16):(t.bi_buf|=e<<t.bi_valid&65535,t.bi_valid+=a)},z=(t,e,a)=>{x(t,a[2*e],a[2*e+1])},A=(t,e)=>{let a=0;do{a|=1&t,t>>>=1,a<<=1}while(--e>0);return a>>>1},E=(t,e,a)=>{const i=new Array(16);let n,r,l=0;for(n=1;n<=s;n++)l=l+a[n-1]<<1,i[n]=l;for(r=0;r<=e;r++){let e=t[2*r+1];0!==e&&(t[2*r]=A(i[e]++,e))}},R=t=>{let e;for(e=0;e<i;e++)t.dyn_ltree[2*e]=0;for(e=0;e<n;e++)t.dyn_dtree[2*e]=0;for(e=0;e<19;e++)t.bl_tree[2*e]=0;t.dyn_ltree[512]=1,t.opt_len=t.static_len=0,t.sym_next=t.matches=0},Z=t=>{t.bi_valid>8?v(t,t.bi_buf):t.bi_valid>0&&(t.pending_buf[t.pending++]=t.bi_buf),t.bi_buf=0,t.bi_valid=0},U=(t,e,a,i)=>{const n=2*e,s=2*a;return t[n]<t[s]||t[n]===t[s]&&i[e]<=i[a]},S=(t,e,a)=>{const i=t.heap[a];let n=a<<1;for(;n<=t.heap_len&&(n<t.heap_len&&U(e,t.heap[n+1],t.heap[n],t.depth)&&n++,!U(e,i,t.heap[n],t.depth));)t.heap[a]=t.heap[n],a=n,n<<=1;t.heap[a]=i},D=(t,e,i)=>{let n,s,o,h,d=0;if(0!==t.sym_next)do{n=255&t.pending_buf[t.sym_buf+d++],n+=(255&t.pending_buf[t.sym_buf+d++])<<8,s=t.pending_buf[t.sym_buf+d++],0===n?z(t,s,e):(o=c[s],z(t,o+a+1,e),h=r[o],0!==h&&(s-=u[o],x(t,s,h)),n--,o=y(n),z(t,o,i),h=l[o],0!==h&&(n-=w[o],x(t,n,h)))}while(d<t.sym_next);z(t,256,e)},T=(t,e)=>{const a=e.dyn_tree,i=e.stat_desc.static_tree,n=e.stat_desc.has_stree,r=e.stat_desc.elems;let l,o,h,d=-1;for(t.heap_len=0,t.heap_max=573,l=0;l<r;l++)0!==a[2*l]?(t.heap[++t.heap_len]=d=l,t.depth[l]=0):a[2*l+1]=0;for(;t.heap_len<2;)h=t.heap[++t.heap_len]=d<2?++d:0,a[2*h]=1,t.depth[h]=0,t.opt_len--,n&&(t.static_len-=i[2*h+1]);for(e.max_code=d,l=t.heap_len>>1;l>=1;l--)S(t,a,l);h=r;do{l=t.heap[1],t.heap[1]=t.heap[t.heap_len--],S(t,a,1),o=t.heap[1],t.heap[--t.heap_max]=l,t.heap[--t.heap_max]=o,a[2*h]=a[2*l]+a[2*o],t.depth[h]=(t.depth[l]>=t.depth[o]?t.depth[l]:t.depth[o])+1,a[2*l+1]=a[2*o+1]=h,t.heap[1]=h++,S(t,a,1)}while(t.heap_len>=2);t.heap[--t.heap_max]=t.heap[1],((t,e)=>{const a=e.dyn_tree,i=e.max_code,n=e.stat_desc.static_tree,r=e.stat_desc.has_stree,l=e.stat_desc.extra_bits,o=e.stat_desc.extra_base,h=e.stat_desc.max_length;let d,_,f,c,u,w,m=0;for(c=0;c<=s;c++)t.bl_count[c]=0;for(a[2*t.heap[t.heap_max]+1]=0,d=t.heap_max+1;d<573;d++)_=t.heap[d],c=a[2*a[2*_+1]+1]+1,c>h&&(c=h,m++),a[2*_+1]=c,_>i||(t.bl_count[c]++,u=0,_>=o&&(u=l[_-o]),w=a[2*_],t.opt_len+=w*(c+u),r&&(t.static_len+=w*(n[2*_+1]+u)));if(0!==m){do{for(c=h-1;0===t.bl_count[c];)c--;t.bl_count[c]--,t.bl_count[c+1]+=2,t.bl_count[h]--,m-=2}while(m>0);for(c=h;0!==c;c--)for(_=t.bl_count[c];0!==_;)f=t.heap[--d],f>i||(a[2*f+1]!==c&&(t.opt_len+=(c-a[2*f+1])*a[2*f],a[2*f+1]=c),_--)}})(t,e),E(a,d,t.bl_count)},O=(t,e,a)=>{let i,n,s=-1,r=e[1],l=0,o=7,h=4;for(0===r&&(o=138,h=3),e[2*(a+1)+1]=65535,i=0;i<=a;i++)n=r,r=e[2*(i+1)+1],++l<o&&n===r||(l<h?t.bl_tree[2*n]+=l:0!==n?(n!==s&&t.bl_tree[2*n]++,t.bl_tree[32]++):l<=10?t.bl_tree[34]++:t.bl_tree[36]++,l=0,s=n,0===r?(o=138,h=3):n===r?(o=6,h=3):(o=7,h=4))},F=(t,e,a)=>{let i,n,s=-1,r=e[1],l=0,o=7,h=4;for(0===r&&(o=138,h=3),i=0;i<=a;i++)if(n=r,r=e[2*(i+1)+1],!(++l<o&&n===r)){if(l<h)do{z(t,n,t.bl_tree)}while(0!=--l);else 0!==n?(n!==s&&(z(t,n,t.bl_tree),l--),z(t,16,t.bl_tree),x(t,l-3,2)):l<=10?(z(t,17,t.bl_tree),x(t,l-3,3)):(z(t,18,t.bl_tree),x(t,l-11,7));l=0,s=n,0===r?(o=138,h=3):n===r?(o=6,h=3):(o=7,h=4)}};let I=!1;const L=(t,e,a,i)=>{x(t,0+(i?1:0),3),Z(t),v(t,a),v(t,~a),a&&t.pending_buf.set(t.window.subarray(e,e+a),t.pending),t.pending+=a};var N=(t,e,i,n)=>{let s,r,l=0;t.level>0?(2===t.strm.data_type&&(t.strm.data_type=(t=>{let e,i=4093624447;for(e=0;e<=31;e++,i>>>=1)if(1&i&&0!==t.dyn_ltree[2*e])return 0;if(0!==t.dyn_ltree[18]||0!==t.dyn_ltree[20]||0!==t.dyn_ltree[26])return 1;for(e=32;e<a;e++)if(0!==t.dyn_ltree[2*e])return 1;return 0})(t)),T(t,t.l_desc),T(t,t.d_desc),l=(t=>{let e;for(O(t,t.dyn_ltree,t.l_desc.max_code),O(t,t.dyn_dtree,t.d_desc.max_code),T(t,t.bl_desc),e=18;e>=3&&0===t.bl_tree[2*h[e]+1];e--);return t.opt_len+=3*(e+1)+5+5+4,e})(t),s=t.opt_len+3+7>>>3,r=t.static_len+3+7>>>3,r<=s&&(s=r)):s=r=i+5,i+4<=s&&-1!==e?L(t,e,i,n):4===t.strategy||r===s?(x(t,2+(n?1:0),3),D(t,d,_)):(x(t,4+(n?1:0),3),((t,e,a,i)=>{let n;for(x(t,e-257,5),x(t,a-1,5),x(t,i-4,4),n=0;n<i;n++)x(t,t.bl_tree[2*h[n]+1],3);F(t,t.dyn_ltree,e-1),F(t,t.dyn_dtree,a-1)})(t,t.l_desc.max_code+1,t.d_desc.max_code+1,l+1),D(t,t.dyn_ltree,t.dyn_dtree)),R(t),n&&Z(t)},B={_tr_init:t=>{I||((()=>{let t,e,a,h,k;const y=new Array(16);for(a=0,h=0;h<28;h++)for(u[h]=a,t=0;t<1<<r[h];t++)c[a++]=h;for(c[a-1]=h,k=0,h=0;h<16;h++)for(w[h]=k,t=0;t<1<<l[h];t++)f[k++]=h;for(k>>=7;h<n;h++)for(w[h]=k<<7,t=0;t<1<<l[h]-7;t++)f[256+k++]=h;for(e=0;e<=s;e++)y[e]=0;for(t=0;t<=143;)d[2*t+1]=8,t++,y[8]++;for(;t<=255;)d[2*t+1]=9,t++,y[9]++;for(;t<=279;)d[2*t+1]=7,t++,y[7]++;for(;t<=287;)d[2*t+1]=8,t++,y[8]++;for(E(d,287,y),t=0;t<n;t++)_[2*t+1]=5,_[2*t]=A(t,5);b=new m(d,r,257,i,s),g=new m(_,l,0,n,s),p=new m(new Array(0),o,0,19,7)})(),I=!0),t.l_desc=new k(t.dyn_ltree,b),t.d_desc=new k(t.dyn_dtree,g),t.bl_desc=new k(t.bl_tree,p),t.bi_buf=0,t.bi_valid=0,R(t)},_tr_stored_block:L,_tr_flush_block:N,_tr_tally:(t,e,i)=>(t.pending_buf[t.sym_buf+t.sym_next++]=e,t.pending_buf[t.sym_buf+t.sym_next++]=e>>8,t.pending_buf[t.sym_buf+t.sym_next++]=i,0===e?t.dyn_ltree[2*i]++:(t.matches++,e--,t.dyn_ltree[2*(c[i]+a+1)]++,t.dyn_dtree[2*y(e)]++),t.sym_next===t.sym_end),_tr_align:t=>{x(t,2,3),z(t,256,d),(t=>{16===t.bi_valid?(v(t,t.bi_buf),t.bi_buf=0,t.bi_valid=0):t.bi_valid>=8&&(t.pending_buf[t.pending++]=255&t.bi_buf,t.bi_buf>>=8,t.bi_valid-=8)})(t)}};var C=(t,e,a,i)=>{let n=65535&t|0,s=t>>>16&65535|0,r=0;for(;0!==a;){r=a>2e3?2e3:a,a-=r;do{n=n+e[i++]|0,s=s+n|0}while(--r);n%=65521,s%=65521}return n|s<<16|0};const H=new Uint32Array((()=>{let t,e=[];for(var a=0;a<256;a++){t=a;for(var i=0;i<8;i++)t=1&t?3988292384^t>>>1:t>>>1;e[a]=t}return e})());var M=(t,e,a,i)=>{const n=H,s=i+a;t^=-1;for(let a=i;a<s;a++)t=t>>>8^n[255&(t^e[a])];return-1^t},j={2:"need dictionary",1:"stream end",0:"","-1":"file error","-2":"stream error","-3":"data error","-4":"insufficient memory","-5":"buffer error","-6":"incompatible version"},K={Z_NO_FLUSH:0,Z_PARTIAL_FLUSH:1,Z_SYNC_FLUSH:2,Z_FULL_FLUSH:3,Z_FINISH:4,Z_BLOCK:5,Z_TREES:6,Z_OK:0,Z_STREAM_END:1,Z_NEED_DICT:2,Z_ERRNO:-1,Z_STREAM_ERROR:-2,Z_DATA_ERROR:-3,Z_MEM_ERROR:-4,Z_BUF_ERROR:-5,Z_NO_COMPRESSION:0,Z_BEST_SPEED:1,Z_BEST_COMPRESSION:9,Z_DEFAULT_COMPRESSION:-1,Z_FILTERED:1,Z_HUFFMAN_ONLY:2,Z_RLE:3,Z_FIXED:4,Z_DEFAULT_STRATEGY:0,Z_BINARY:0,Z_TEXT:1,Z_UNKNOWN:2,Z_DEFLATED:8};const{_tr_init:P,_tr_stored_block:Y,_tr_flush_block:G,_tr_tally:X,_tr_align:W}=B,{Z_NO_FLUSH:q,Z_PARTIAL_FLUSH:J,Z_FULL_FLUSH:Q,Z_FINISH:V,Z_BLOCK:$,Z_OK:tt,Z_STREAM_END:et,Z_STREAM_ERROR:at,Z_DATA_ERROR:it,Z_BUF_ERROR:nt,Z_DEFAULT_COMPRESSION:st,Z_FILTERED:rt,Z_HUFFMAN_ONLY:lt,Z_RLE:ot,Z_FIXED:ht,Z_DEFAULT_STRATEGY:dt,Z_UNKNOWN:_t,Z_DEFLATED:ft}=K,ct=258,ut=262,wt=42,mt=113,bt=666,gt=(t,e)=>(t.msg=j[e],e),pt=t=>2*t-(t>4?9:0),kt=t=>{let e=t.length;for(;--e>=0;)t[e]=0},yt=t=>{let e,a,i,n=t.w_size;e=t.hash_size,i=e;do{a=t.head[--i],t.head[i]=a>=n?a-n:0}while(--e);e=n,i=e;do{a=t.prev[--i],t.prev[i]=a>=n?a-n:0}while(--e)};let vt=(t,e,a)=>(e<<t.hash_shift^a)&t.hash_mask;const xt=(t,e)=>{let a;if(t.legacy_hash)a=t.ins_h=vt(t,t.ins_h,t.window[e+3-1]);else{const i=t.window,n=i[e]|i[e+1]<<8|i[e+2]<<16|i[e+3]<<24;a=t.ins_h=Math.imul(n,66521)+66521>>>16&t.hash_mask}const i=t.prev[e&t.w_mask]=t.head[a];return t.head[a]=e,i},zt=t=>{const e=t.state;let a=e.pending;a>t.avail_out&&(a=t.avail_out),0!==a&&(t.output.set(e.pending_buf.subarray(e.pending_out,e.pending_out+a),t.next_out),t.next_out+=a,e.pending_out+=a,t.total_out+=a,t.avail_out-=a,e.pending-=a,0===e.pending&&(e.pending_out=0))},At=(t,e)=>{G(t,t.block_start>=0?t.block_start:-1,t.strstart-t.block_start,e),t.block_start=t.strstart,zt(t.strm)},Et=(t,e)=>{t.pending_buf[t.pending++]=e},Rt=(t,e)=>{t.pending_buf[t.pending++]=e>>>8&255,t.pending_buf[t.pending++]=255&e},Zt=(t,e,a,i)=>{let n=t.avail_in;return n>i&&(n=i),0===n?0:(t.avail_in-=n,e.set(t.input.subarray(t.next_in,t.next_in+n),a),1===t.state.wrap?t.adler=C(t.adler,e,n,a):2===t.state.wrap&&(t.adler=M(t.adler,e,n,a)),t.next_in+=n,t.total_in+=n,n)},Ut=(t,e)=>{let a,i,n=t.max_chain_length,s=t.strstart,r=t.prev_length,l=t.nice_match;const o=t.strstart>t.w_size-ut?t.strstart-(t.w_size-ut):0,h=t.window,d=t.w_mask,_=t.prev,f=t.strstart+ct;let c=h[s+r-1],u=h[s+r];t.prev_length>=t.good_match&&(n>>=2),l>t.lookahead&&(l=t.lookahead);do{if(a=e,h[a+r]===u&&h[a+r-1]===c&&h[a]===h[s]&&h[++a]===h[s+1]){s+=2,a++;do{}while(h[++s]===h[++a]&&h[++s]===h[++a]&&h[++s]===h[++a]&&h[++s]===h[++a]&&h[++s]===h[++a]&&h[++s]===h[++a]&&h[++s]===h[++a]&&h[++s]===h[++a]&&s<f);if(i=ct-(f-s),s=f-ct,i>r){if(t.match_start=e,r=i,i>=l)break;c=h[s+r-1],u=h[s+r]}}}while((e=_[e&d])>o&&0!=--n);return r<=t.lookahead?r:t.lookahead},St=t=>{const e=t.w_size;let a,i,n;do{if(i=t.window_size-t.lookahead-t.strstart,t.strstart>=e+(e-ut)&&(t.window.set(t.window.subarray(e,e+e-i),0),t.match_start-=e,t.strstart-=e,t.block_start-=e,t.insert>t.strstart&&(t.insert=t.strstart),yt(t),i+=e),0===t.strm.avail_in)break;if(a=Zt(t.strm,t.window,t.strstart+t.lookahead,i),t.lookahead+=a,t.legacy_hash){if(t.lookahead+t.insert>=3)for(n=t.strstart-t.insert,t.ins_h=t.window[n],t.ins_h=vt(t,t.ins_h,t.window[n+1]);t.insert&&(xt(t,n),n++,t.insert--,!(t.lookahead+t.insert<3)););}else if(t.lookahead+t.insert>3)for(n=t.strstart-t.insert;t.insert&&(xt(t,n),n++,t.insert--,!(t.lookahead+t.insert<=3)););}while(t.lookahead<ut&&0!==t.strm.avail_in)},Dt=(t,e)=>{let a,i,n,s=t.pending_buf_size-5>t.w_size?t.w_size:t.pending_buf_size-5,r=0,l=t.strm.avail_in;do{if(a=65535,n=t.bi_valid+42>>3,t.strm.avail_out<n)break;if(n=t.strm.avail_out-n,i=t.strstart-t.block_start,a>i+t.strm.avail_in&&(a=i+t.strm.avail_in),a>n&&(a=n),a<s&&(0===a&&e!==V||e===q||a!==i+t.strm.avail_in))break;r=e===V&&a===i+t.strm.avail_in?1:0,Y(t,0,0,r),t.pending_buf[t.pending-4]=a,t.pending_buf[t.pending-3]=a>>8,t.pending_buf[t.pending-2]=~a,t.pending_buf[t.pending-1]=~a>>8,zt(t.strm),i&&(i>a&&(i=a),t.strm.output.set(t.window.subarray(t.block_start,t.block_start+i),t.strm.next_out),t.strm.next_out+=i,t.strm.avail_out-=i,t.strm.total_out+=i,t.block_start+=i,a-=i),a&&(Zt(t.strm,t.strm.output,t.strm.next_out,a),t.strm.next_out+=a,t.strm.avail_out-=a,t.strm.total_out+=a)}while(0===r);return l-=t.strm.avail_in,l&&(l>=t.w_size?(t.matches=2,t.window.set(t.strm.input.subarray(t.strm.next_in-t.w_size,t.strm.next_in),0),t.strstart=t.w_size,t.insert=t.strstart):(t.window_size-t.strstart<=l&&(t.strstart-=t.w_size,t.window.set(t.window.subarray(t.w_size,t.w_size+t.strstart),0),t.matches<2&&t.matches++,t.insert>t.strstart&&(t.insert=t.strstart)),t.window.set(t.strm.input.subarray(t.strm.next_in-l,t.strm.next_in),t.strstart),t.strstart+=l,t.insert+=l>t.w_size-t.insert?t.w_size-t.insert:l),t.block_start=t.strstart),t.high_water<t.strstart&&(t.high_water=t.strstart),r?4:e!==q&&e!==V&&0===t.strm.avail_in&&t.strstart===t.block_start?2:(n=t.window_size-t.strstart,t.strm.avail_in>n&&t.block_start>=t.w_size&&(t.block_start-=t.w_size,t.strstart-=t.w_size,t.window.set(t.window.subarray(t.w_size,t.w_size+t.strstart),0),t.matches<2&&t.matches++,n+=t.w_size,t.insert>t.strstart&&(t.insert=t.strstart)),n>t.strm.avail_in&&(n=t.strm.avail_in),n&&(Zt(t.strm,t.window,t.strstart,n),t.strstart+=n,t.insert+=n>t.w_size-t.insert?t.w_size-t.insert:n),t.high_water<t.strstart&&(t.high_water=t.strstart),n=t.bi_valid+42>>3,n=t.pending_buf_size-n>65535?65535:t.pending_buf_size-n,s=n>t.w_size?t.w_size:n,i=t.strstart-t.block_start,(i>=s||(i||e===V)&&e!==q&&0===t.strm.avail_in&&i<=n)&&(a=i>n?n:i,r=e===V&&0===t.strm.avail_in&&a===i?1:0,Y(t,t.block_start,a,r),t.block_start+=a,zt(t.strm)),r?3:1)},Tt=(t,e)=>{let a,i;for(;;){if(t.lookahead<ut){if(St(t),t.lookahead<ut&&e===q)return 1;if(0===t.lookahead)break}if(a=0,t.lookahead>=3&&(a=xt(t,t.strstart)),0!==a&&t.strstart-a<=t.w_size-ut&&(t.match_length=Ut(t,a)),t.match_length>=3)if(i=X(t,t.strstart-t.match_start,t.match_length-3),t.lookahead-=t.match_length,t.match_length<=t.max_lazy_match&&t.lookahead>=3){t.match_length--;do{t.strstart++,a=xt(t,t.strstart)}while(0!=--t.match_length);t.strstart++}else t.strstart+=t.match_length,t.match_length=0,t.legacy_hash&&(t.ins_h=t.window[t.strstart],t.ins_h=vt(t,t.ins_h,t.window[t.strstart+1]));else i=X(t,0,t.window[t.strstart]),t.lookahead--,t.strstart++;if(i&&(At(t,!1),0===t.strm.avail_out))return 1}return t.insert=t.strstart<2?t.strstart:2,e===V?(At(t,!0),0===t.strm.avail_out?3:4):t.sym_next&&(At(t,!1),0===t.strm.avail_out)?1:2},Ot=(t,e)=>{let a,i,n;for(;;){if(t.lookahead<ut){if(St(t),t.lookahead<ut&&e===q)return 1;if(0===t.lookahead)break}if(a=0,t.lookahead>=3&&(a=xt(t,t.strstart)),t.prev_length=t.match_length,t.prev_match=t.match_start,t.match_length=2,0!==a&&t.prev_length<t.max_lazy_match&&t.strstart-a<=t.w_size-ut&&(t.match_length=Ut(t,a),t.match_length<=5&&(t.strategy===rt||3===t.match_length&&t.strstart-t.match_start>4096)&&(t.match_length=2)),t.prev_length>=3&&t.match_length<=t.prev_length){n=t.strstart+t.lookahead-3,i=X(t,t.strstart-1-t.prev_match,t.prev_length-3),t.lookahead-=t.prev_length-1,t.prev_length-=2;do{++t.strstart<=n&&(a=xt(t,t.strstart))}while(0!=--t.prev_length);if(t.match_available=0,t.match_length=2,t.strstart++,i&&(At(t,!1),0===t.strm.avail_out))return 1}else if(t.match_available){if(i=X(t,0,t.window[t.strstart-1]),i&&At(t,!1),t.strstart++,t.lookahead--,0===t.strm.avail_out)return 1}else t.match_available=1,t.strstart++,t.lookahead--}return t.match_available&&(i=X(t,0,t.window[t.strstart-1]),t.match_available=0),t.insert=t.strstart<2?t.strstart:2,e===V?(At(t,!0),0===t.strm.avail_out?3:4):t.sym_next&&(At(t,!1),0===t.strm.avail_out)?1:2};function Ft(t,e,a,i,n){this.good_length=t,this.max_lazy=e,this.nice_length=a,this.max_chain=i,this.func=n}const It=[new Ft(0,0,0,0,Dt),new Ft(4,4,8,4,Tt),new Ft(4,5,16,8,Tt),new Ft(4,6,32,32,Tt),new Ft(4,4,16,16,Ot),new Ft(8,16,32,32,Ot),new Ft(8,16,128,128,Ot),new Ft(8,32,128,256,Ot),new Ft(32,128,258,1024,Ot),new Ft(32,258,258,4096,Ot)];function Lt(){this.strm=null,this.status=0,this.pending_buf=null,this.pending_buf_size=0,this.pending_out=0,this.pending=0,this.wrap=0,this.gzhead=null,this.gzindex=0,this.method=ft,this.last_flush=-1,this.w_size=0,this.w_bits=0,this.w_mask=0,this.window=null,this.window_size=0,this.prev=null,this.head=null,this.ins_h=0,this.legacy_hash=0,this.hash_size=0,this.hash_bits=0,this.hash_mask=0,this.hash_shift=0,this.block_start=0,this.match_length=0,this.prev_match=0,this.match_available=0,this.strstart=0,this.match_start=0,this.lookahead=0,this.prev_length=0,this.max_chain_length=0,this.max_lazy_match=0,this.level=0,this.strategy=0,this.good_match=0,this.nice_match=0,this.dyn_ltree=new Uint16Array(1146),this.dyn_dtree=new Uint16Array(122),this.bl_tree=new Uint16Array(78),kt(this.dyn_ltree),kt(this.dyn_dtree),kt(this.bl_tree),this.l_desc=null,this.d_desc=null,this.bl_desc=null,this.bl_count=new Uint16Array(16),this.heap=new Uint16Array(573),kt(this.heap),this.heap_len=0,this.heap_max=0,this.depth=new Uint16Array(573),kt(this.depth),this.sym_buf=0,this.lit_bufsize=0,this.sym_next=0,this.sym_end=0,this.opt_len=0,this.static_len=0,this.matches=0,this.insert=0,this.bi_buf=0,this.bi_valid=0}const Nt=t=>{if(!t)return 1;const e=t.state;return!e||e.strm!==t||e.status!==wt&&57!==e.status&&69!==e.status&&73!==e.status&&91!==e.status&&103!==e.status&&e.status!==mt&&e.status!==bt?1:0},Bt=t=>{if(Nt(t))return gt(t,at);t.total_in=t.total_out=0,t.data_type=_t;const e=t.state;return e.pending=0,e.pending_out=0,e.wrap<0&&(e.wrap=-e.wrap),e.status=2===e.wrap?57:e.wrap?wt:mt,t.adler=2===e.wrap?0:1,e.last_flush=-2,P(e),tt},Ct=t=>{const e=Bt(t);var a;return e===tt&&((a=t.state).window_size=2*a.w_size,kt(a.head),a.max_lazy_match=It[a.level].max_lazy,a.good_match=It[a.level].good_length,a.nice_match=It[a.level].nice_length,a.max_chain_length=It[a.level].max_chain,a.strstart=0,a.block_start=0,a.lookahead=0,a.insert=0,a.match_length=a.prev_length=2,a.match_available=0,a.ins_h=0),e},Ht=(t,e,a,i,n,s,r)=>{if(!t)return at;let l=1;if(e===st&&(e=6),i<0?(l=0,i=-i):i>15&&(l=2,i-=16),n<1||n>9||a!==ft||i<8||i>15||e<0||e>9||s<0||s>ht||8===i&&1!==l)return gt(t,at);8===i&&(i=9);const o=new Lt;return t.state=o,o.strm=t,o.status=wt,o.wrap=l,o.gzhead=null,o.w_bits=i,o.w_size=1<<o.w_bits,o.w_mask=o.w_size-1,o.legacy_hash=r?1:0,o.hash_bits=n+7,!o.legacy_hash&&o.hash_bits<15&&(o.hash_bits=15),o.hash_size=1<<o.hash_bits,o.hash_mask=o.hash_size-1,o.hash_shift=~~((o.hash_bits+3-1)/3),o.window=new Uint8Array(2*o.w_size),o.head=new Uint16Array(o.hash_size),o.prev=new Uint16Array(o.w_size),o.lit_bufsize=1<<n+6,o.pending_buf_size=4*o.lit_bufsize,o.pending_buf=new Uint8Array(o.pending_buf_size),o.sym_buf=o.lit_bufsize,o.sym_end=3*(o.lit_bufsize-1),o.level=e,o.strategy=s,o.method=a,Ct(t)};var Mt={deflateInit:(t,e)=>Ht(t,e,ft,15,8,dt),deflateInit2:Ht,deflateReset:Ct,deflateResetKeep:Bt,deflateSetHeader:(t,e)=>Nt(t)||2!==t.state.wrap?at:(t.state.gzhead=e,tt),deflate:(t,e)=>{if(Nt(t)||e>$||e<0)return t?gt(t,at):at;const a=t.state;if(!t.output||0!==t.avail_in&&!t.input||a.status===bt&&e!==V)return gt(t,0===t.avail_out?nt:at);const i=a.last_flush;if(a.last_flush=e,0!==a.pending){if(zt(t),0===t.avail_out)return a.last_flush=-1,tt}else if(0===t.avail_in&&pt(e)<=pt(i)&&e!==V)return gt(t,nt);if(a.status===bt&&0!==t.avail_in)return gt(t,nt);if(a.status===wt&&0===a.wrap&&(a.status=mt),a.status===wt){let e=ft+(a.w_bits-8<<4)<<8,i=-1;if(i=a.strategy>=lt||a.level<2?0:a.level<6?1:6===a.level?2:3,e|=i<<6,0!==a.strstart&&(e|=32),e+=31-e%31,Rt(a,e),0!==a.strstart&&(Rt(a,t.adler>>>16),Rt(a,65535&t.adler)),t.adler=1,a.status=mt,zt(t),0!==a.pending)return a.last_flush=-1,tt}if(57===a.status)if(t.adler=0,Et(a,31),Et(a,139),Et(a,8),a.gzhead)Et(a,(a.gzhead.text?1:0)+(a.gzhead.hcrc?2:0)+(a.gzhead.extra?4:0)+(a.gzhead.name?8:0)+(a.gzhead.comment?16:0)),Et(a,255&a.gzhead.time),Et(a,a.gzhead.time>>8&255),Et(a,a.gzhead.time>>16&255),Et(a,a.gzhead.time>>24&255),Et(a,9===a.level?2:a.strategy>=lt||a.level<2?4:0),Et(a,255&a.gzhead.os),a.gzhead.extra&&a.gzhead.extra.length&&(Et(a,255&a.gzhead.extra.length),Et(a,a.gzhead.extra.length>>8&255)),a.gzhead.hcrc&&(t.adler=M(t.adler,a.pending_buf,a.pending,0)),a.gzindex=0,a.status=69;else if(Et(a,0),Et(a,0),Et(a,0),Et(a,0),Et(a,0),Et(a,9===a.level?2:a.strategy>=lt||a.level<2?4:0),Et(a,3),a.status=mt,zt(t),0!==a.pending)return a.last_flush=-1,tt;if(69===a.status){if(a.gzhead.extra){let e=a.pending,i=(65535&a.gzhead.extra.length)-a.gzindex;for(;a.pending+i>a.pending_buf_size;){let n=a.pending_buf_size-a.pending;if(a.pending_buf.set(a.gzhead.extra.subarray(a.gzindex,a.gzindex+n),a.pending),a.pending=a.pending_buf_size,a.gzhead.hcrc&&a.pending>e&&(t.adler=M(t.adler,a.pending_buf,a.pending-e,e)),a.gzindex+=n,zt(t),0!==a.pending)return a.last_flush=-1,tt;e=0,i-=n}let n=new Uint8Array(a.gzhead.extra);a.pending_buf.set(n.subarray(a.gzindex,a.gzindex+i),a.pending),a.pending+=i,a.gzhead.hcrc&&a.pending>e&&(t.adler=M(t.adler,a.pending_buf,a.pending-e,e)),a.gzindex=0}a.status=73}if(73===a.status){if(a.gzhead.name){let e,i=a.pending;do{if(a.pending===a.pending_buf_size){if(a.gzhead.hcrc&&a.pending>i&&(t.adler=M(t.adler,a.pending_buf,a.pending-i,i)),zt(t),0!==a.pending)return a.last_flush=-1,tt;i=0}e=a.gzindex<a.gzhead.name.length?255&a.gzhead.name.charCodeAt(a.gzindex++):0,Et(a,e)}while(0!==e);a.gzhead.hcrc&&a.pending>i&&(t.adler=M(t.adler,a.pending_buf,a.pending-i,i)),a.gzindex=0}a.status=91}if(91===a.status){if(a.gzhead.comment){let e,i=a.pending;do{if(a.pending===a.pending_buf_size){if(a.gzhead.hcrc&&a.pending>i&&(t.adler=M(t.adler,a.pending_buf,a.pending-i,i)),zt(t),0!==a.pending)return a.last_flush=-1,tt;i=0}e=a.gzindex<a.gzhead.comment.length?255&a.gzhead.comment.charCodeAt(a.gzindex++):0,Et(a,e)}while(0!==e);a.gzhead.hcrc&&a.pending>i&&(t.adler=M(t.adler,a.pending_buf,a.pending-i,i))}a.status=103}if(103===a.status){if(a.gzhead.hcrc){if(a.pending+2>a.pending_buf_size&&(zt(t),0!==a.pending))return a.last_flush=-1,tt;Et(a,255&t.adler),Et(a,t.adler>>8&255),t.adler=0}if(a.status=mt,zt(t),0!==a.pending)return a.last_flush=-1,tt}if(0!==t.avail_in||0!==a.lookahead||e!==q&&a.status!==bt){let i=0===a.level?Dt(a,e):a.strategy===lt?((t,e)=>{let a;for(;;){if(0===t.lookahead&&(St(t),0===t.lookahead)){if(e===q)return 1;break}if(t.match_length=0,a=X(t,0,t.window[t.strstart]),t.lookahead--,t.strstart++,a&&(At(t,!1),0===t.strm.avail_out))return 1}return t.insert=0,e===V?(At(t,!0),0===t.strm.avail_out?3:4):t.sym_next&&(At(t,!1),0===t.strm.avail_out)?1:2})(a,e):a.strategy===ot?((t,e)=>{let a,i,n,s;const r=t.window;for(;;){if(t.lookahead<=ct){if(St(t),t.lookahead<=ct&&e===q)return 1;if(0===t.lookahead)break}if(t.match_length=0,t.lookahead>=3&&t.strstart>0&&(n=t.strstart-1,i=r[n],i===r[++n]&&i===r[++n]&&i===r[++n])){s=t.strstart+ct;do{}while(i===r[++n]&&i===r[++n]&&i===r[++n]&&i===r[++n]&&i===r[++n]&&i===r[++n]&&i===r[++n]&&i===r[++n]&&n<s);t.match_length=ct-(s-n),t.match_length>t.lookahead&&(t.match_length=t.lookahead)}if(t.match_length>=3?(a=X(t,1,t.match_length-3),t.lookahead-=t.match_length,t.strstart+=t.match_length,t.match_length=0):(a=X(t,0,t.window[t.strstart]),t.lookahead--,t.strstart++),a&&(At(t,!1),0===t.strm.avail_out))return 1}return t.insert=0,e===V?(At(t,!0),0===t.strm.avail_out?3:4):t.sym_next&&(At(t,!1),0===t.strm.avail_out)?1:2})(a,e):It[a.level].func(a,e);if(3!==i&&4!==i||(a.status=bt),1===i||3===i)return 0===t.avail_out&&(a.last_flush=-1),tt;if(2===i&&(e===J?W(a):e!==$&&(Y(a,0,0,!1),e===Q&&(kt(a.head),0===a.lookahead&&(a.strstart=0,a.block_start=0,a.insert=0))),zt(t),0===t.avail_out))return a.last_flush=-1,tt}return e!==V?tt:a.wrap<=0?et:(2===a.wrap?(Et(a,255&t.adler),Et(a,t.adler>>8&255),Et(a,t.adler>>16&255),Et(a,t.adler>>24&255),Et(a,255&t.total_in),Et(a,t.total_in>>8&255),Et(a,t.total_in>>16&255),Et(a,t.total_in>>24&255)):(Rt(a,t.adler>>>16),Rt(a,65535&t.adler)),zt(t),a.wrap>0&&(a.wrap=-a.wrap),0!==a.pending?tt:et)},deflateEnd:t=>{if(Nt(t))return at;const e=t.state.status;return t.state=null,e===mt?gt(t,it):tt},deflateSetDictionary:(t,e)=>{let a=e.length;if(Nt(t))return at;const i=t.state,n=i.wrap;if(2===n||1===n&&i.status!==wt||i.lookahead)return at;if(1===n&&(t.adler=C(t.adler,e,a,0)),i.wrap=0,a>=i.w_size){0===n&&(kt(i.head),i.strstart=0,i.block_start=0,i.insert=0);let t=new Uint8Array(i.w_size);t.set(e.subarray(a-i.w_size,a),0),e=t,a=i.w_size}const s=t.avail_in,r=t.next_in,l=t.input;for(t.avail_in=a,t.next_in=0,t.input=e,St(i);i.lookahead>=3;){let t=i.strstart,e=i.lookahead-2;do{xt(i,t),t++}while(--e);i.strstart=t,i.lookahead=2,St(i)}return i.strstart+=i.lookahead,i.block_start=i.strstart,i.insert=i.lookahead,i.lookahead=0,i.match_length=i.prev_length=2,i.match_available=0,t.next_in=r,t.input=l,t.avail_in=s,i.wrap=n,tt},deflateInfo:"pako deflate (from Nodeca project)"};const jt=(t,e)=>Object.prototype.hasOwnProperty.call(t,e);var Kt=function(t){const e=Array.prototype.slice.call(arguments,1);for(;e.length;){const a=e.shift();if(a){if("object"!=typeof a)throw new TypeError(a+"must be non-object");for(const e in a)jt(a,e)&&(t[e]=a[e])}}return t},Pt=t=>{let e=0;for(let a=0,i=t.length;a<i;a++)e+=t[a].length;const a=new Uint8Array(e);for(let e=0,i=0,n=t.length;e<n;e++){let n=t[e];a.set(n,i),i+=n.length}return a};let Yt=!0;try{String.fromCharCode.apply(null,new Uint8Array(1))}catch(t){Yt=!1}const Gt=new Uint8Array(256);for(let t=0;t<256;t++)Gt[t]=t>=252?6:t>=248?5:t>=240?4:t>=224?3:t>=192?2:1;Gt[254]=Gt[255]=1;var Xt=t=>{if("function"==typeof TextEncoder&&TextEncoder.prototype.encode)return(new TextEncoder).encode(t);let e,a,i,n,s,r=t.length,l=0;for(n=0;n<r;n++)a=t.charCodeAt(n),55296==(64512&a)&&n+1<r&&(i=t.charCodeAt(n+1),56320==(64512&i)&&(a=65536+(a-55296<<10)+(i-56320),n++)),l+=a<128?1:a<2048?2:a<65536?3:4;for(e=new Uint8Array(l),s=0,n=0;s<l;n++)a=t.charCodeAt(n),55296==(64512&a)&&n+1<r&&(i=t.charCodeAt(n+1),56320==(64512&i)&&(a=65536+(a-55296<<10)+(i-56320),n++)),a<128?e[s++]=a:a<2048?(e[s++]=192|a>>>6,e[s++]=128|63&a):a<65536?(e[s++]=224|a>>>12,e[s++]=128|a>>>6&63,e[s++]=128|63&a):(e[s++]=240|a>>>18,e[s++]=128|a>>>12&63,e[s++]=128|a>>>6&63,e[s++]=128|63&a);return e},Wt=(t,e)=>{const a=e||t.length;if("function"==typeof TextDecoder&&TextDecoder.prototype.decode)return(new TextDecoder).decode(t.subarray(0,e));let i,n;const s=new Array(2*a);for(n=0,i=0;i<a;){let e=t[i++];if(e<128){s[n++]=e;continue}let r=Gt[e];if(r>4)s[n++]=65533,i+=r-1;else{for(e&=2===r?31:3===r?15:7;r>1&&i<a;)e=e<<6|63&t[i++],r--;r>1?s[n++]=65533:e<65536?s[n++]=e:(e-=65536,s[n++]=55296|e>>10&1023,s[n++]=56320|1023&e)}}return((t,e)=>{if(e<65534&&t.subarray&&Yt)return String.fromCharCode.apply(null,t.length===e?t:t.subarray(0,e));let a="";for(let i=0;i<e;i++)a+=String.fromCharCode(t[i]);return a})(s,n)},qt=(t,e)=>{(e=e||t.length)>t.length&&(e=t.length);let a=e-1;for(;a>=0&&128==(192&t[a]);)a--;return a<0||0===a?e:a+Gt[t[a]]>e?a:e};var Jt=function(){this.input=null,this.next_in=0,this.avail_in=0,this.total_in=0,this.output=null,this.next_out=0,this.avail_out=0,this.total_out=0,this.msg="",this.state=null,this.data_type=2,this.adler=0};const Qt=Object.prototype.toString,{Z_NO_FLUSH:Vt,Z_SYNC_FLUSH:$t,Z_FULL_FLUSH:te,Z_FINISH:ee,Z_OK:ae,Z_STREAM_END:ie,Z_DEFAULT_COMPRESSION:ne,Z_DEFAULT_STRATEGY:se,Z_DEFLATED:re}=K,le={level:ne,method:re,chunkSize:16384,windowBits:15,memLevel:8,strategy:se,legacyHash:!0};function oe(t){this.options=Kt({},le,t||{});let e=this.options;e.raw&&e.windowBits>0?e.windowBits=-e.windowBits:e.gzip&&e.windowBits>0&&e.windowBits<16&&(e.windowBits+=16),this.err=0,this.msg="",this.ended=!1,this.chunks=[],this.strm=new Jt,this.strm.avail_out=0;let a=Mt.deflateInit2(this.strm,e.level,e.method,e.windowBits,e.memLevel,e.strategy,e.legacyHash);if(a!==ae)throw new Error(j[a]);if(e.header&&Mt.deflateSetHeader(this.strm,e.header),e.dictionary){let t;if(t="string"==typeof e.dictionary?Xt(e.dictionary):"[object ArrayBuffer]"===Qt.call(e.dictionary)?new Uint8Array(e.dictionary):e.dictionary,a=Mt.deflateSetDictionary(this.strm,t),a!==ae)throw new Error(j[a]);this._dict_set=!0}}function he(t,e){const a=new oe(e);if(a.push(t,!0),a.err)throw a.msg||j[a.err];return a.result}oe.prototype.push=function(t,e){const a=this.strm,i=this.options.chunkSize;let n,s;if(this.ended)return!1;for(s=e===~~e?e:!0===e?ee:Vt,"string"==typeof t?a.input=Xt(t):"[object ArrayBuffer]"===Qt.call(t)?a.input=new Uint8Array(t):a.input=t,a.next_in=0,a.avail_in=a.input.length;;)if(0===a.avail_out&&(a.output=new Uint8Array(i),a.next_out=0,a.avail_out=i),(s===$t||s===te)&&a.avail_out<=6)this.onData(a.output.subarray(0,a.next_out)),a.avail_out=0;else{if(n=Mt.deflate(a,s),n===ie)return a.next_out>0&&this.onData(a.output.subarray(0,a.next_out)),n=Mt.deflateEnd(this.strm),this.onEnd(n),this.ended=!0,n===ae;if(0!==a.avail_out){if(s>0&&a.next_out>0)this.onData(a.output.subarray(0,a.next_out)),a.avail_out=0;else if(0===a.avail_in)break}else this.onData(a.output)}return!0},oe.prototype.onData=function(t){this.chunks.push(t)},oe.prototype.onEnd=function(t){t===ae&&(this.result=Pt(this.chunks)),this.chunks=[],this.err=t,this.msg=this.strm.msg};var de={Deflate:oe,deflate:he,deflateRaw:function(t,e){return(e=e||{}).raw=!0,he(t,e)},gzip:function(t,e){return(e=e||{}).gzip=!0,he(t,e)},constants:K};const _e=16209;var fe=function(t,e){let a,i,n,s,r,l,o,h,d,_,f,c,u,w,m,b,g,p,k,y,v,x,z,A;const E=t.state;a=t.next_in,z=t.input,i=a+(t.avail_in-5),n=t.next_out,A=t.output,s=n-(e-t.avail_out),r=n+(t.avail_out-257),l=E.dmax,o=E.wsize,h=E.whave,d=E.wnext,_=E.window,f=E.hold,c=E.bits,u=E.lencode,w=E.distcode,m=(1<<E.lenbits)-1,b=(1<<E.distbits)-1;t:do{c<15&&(f+=z[a++]<<c,c+=8,f+=z[a++]<<c,c+=8),g=u[f&m];e:for(;;){if(p=g>>>24,f>>>=p,c-=p,p=g>>>16&255,0===p)A[n++]=65535&g;else{if(!(16&p)){if(0==(64&p)){g=u[(65535&g)+(f&(1<<p)-1)];continue e}if(32&p){E.mode=16191;break t}t.msg="invalid literal/length code",E.mode=_e;break t}k=65535&g,p&=15,p&&(c<p&&(f+=z[a++]<<c,c+=8),k+=f&(1<<p)-1,f>>>=p,c-=p),c<15&&(f+=z[a++]<<c,c+=8,f+=z[a++]<<c,c+=8),g=w[f&b];a:for(;;){if(p=g>>>24,f>>>=p,c-=p,p=g>>>16&255,!(16&p)){if(0==(64&p)){g=w[(65535&g)+(f&(1<<p)-1)];continue a}t.msg="invalid distance code",E.mode=_e;break t}if(y=65535&g,p&=15,c<p&&(f+=z[a++]<<c,c+=8,c<p&&(f+=z[a++]<<c,c+=8)),y+=f&(1<<p)-1,y>l){t.msg="invalid distance too far back",E.mode=_e;break t}if(f>>>=p,c-=p,p=n-s,y>p){if(p=y-p,p>h&&E.sane){t.msg="invalid distance too far back",E.mode=_e;break t}if(v=0,x=_,0===d){if(v+=o-p,p<k){k-=p;do{A[n++]=_[v++]}while(--p);v=n-y,x=A}}else if(d<p){if(v+=o+d-p,p-=d,p<k){k-=p;do{A[n++]=_[v++]}while(--p);if(v=0,d<k){p=d,k-=p;do{A[n++]=_[v++]}while(--p);v=n-y,x=A}}}else if(v+=d-p,p<k){k-=p;do{A[n++]=_[v++]}while(--p);v=n-y,x=A}for(;k>2;)A[n++]=x[v++],A[n++]=x[v++],A[n++]=x[v++],k-=3;k&&(A[n++]=x[v++],k>1&&(A[n++]=x[v++]))}else{v=n-y;do{A[n++]=A[v++],A[n++]=A[v++],A[n++]=A[v++],k-=3}while(k>2);k&&(A[n++]=A[v++],k>1&&(A[n++]=A[v++]))}break}}break}}while(a<i&&n<r);k=c>>3,a-=k,c-=k<<3,f&=(1<<c)-1,t.next_in=a,t.next_out=n,t.avail_in=a<i?i-a+5:5-(a-i),t.avail_out=n<r?r-n+257:257-(n-r),E.hold=f,E.bits=c};const ce=15,ue=new Uint16Array([3,4,5,6,7,8,9,10,11,13,15,17,19,23,27,31,35,43,51,59,67,83,99,115,131,163,195,227,258,0,0]),we=new Uint8Array([16,16,16,16,16,16,16,16,17,17,17,17,18,18,18,18,19,19,19,19,20,20,20,20,21,21,21,21,16,199,75]),me=new Uint16Array([1,2,3,4,5,7,9,13,17,25,33,49,65,97,129,193,257,385,513,769,1025,1537,2049,3073,4097,6145,8193,12289,16385,24577,0,0]),be=new Uint8Array([16,16,16,16,17,17,18,18,19,19,20,20,21,21,22,22,23,23,24,24,25,25,26,26,27,27,28,28,29,29,64,64]);var ge=(t,e,a,i,n,s,r,l)=>{const o=l.bits;let h,d,_,f,c,u,w=0,m=0,b=0,g=0,p=0,k=0,y=0,v=0,x=0,z=0,A=null;const E=new Uint16Array(16),R=new Uint16Array(16);let Z,U,S,D=null;for(w=0;w<=ce;w++)E[w]=0;for(m=0;m<i;m++)E[e[a+m]]++;for(p=o,g=ce;g>=1&&0===E[g];g--);if(p>g&&(p=g),0===g)return n[s++]=20971520,n[s++]=20971520,l.bits=1,0;for(b=1;b<g&&0===E[b];b++);for(p<b&&(p=b),v=1,w=1;w<=ce;w++)if(v<<=1,v-=E[w],v<0)return-1;if(v>0&&(0===t||1!==g))return-1;for(R[1]=0,w=1;w<ce;w++)R[w+1]=R[w]+E[w];for(m=0;m<i;m++)0!==e[a+m]&&(r[R[e[a+m]]++]=m);if(0===t?(A=D=r,u=20):1===t?(A=ue,D=we,u=257):(A=me,D=be,u=0),z=0,m=0,w=b,c=s,k=p,y=0,_=-1,x=1<<p,f=x-1,1===t&&x>852||2===t&&x>592)return 1;for(;;){Z=w-y,r[m]+1<u?(U=0,S=r[m]):r[m]>=u?(U=D[r[m]-u],S=A[r[m]-u]):(U=96,S=0),h=1<<w-y,d=1<<k,b=d;do{d-=h,n[c+(z>>y)+d]=Z<<24|U<<16|S|0}while(0!==d);for(h=1<<w-1;z&h;)h>>=1;if(0!==h?(z&=h-1,z+=h):z=0,m++,0==--E[w]){if(w===g)break;w=e[a+r[m]]}if(w>p&&(z&f)!==_){for(0===y&&(y=p),c+=b,k=w-y,v=1<<k;k+y<g&&(v-=E[k+y],!(v<=0));)k++,v<<=1;if(x+=1<<k,1===t&&x>852||2===t&&x>592)return 1;_=z&f,n[_]=p<<24|k<<16|c-s|0}}return 0!==z&&(n[c+z]=w-y<<24|64<<16|0),l.bits=p,0};const{Z_FINISH:pe,Z_BLOCK:ke,Z_TREES:ye,Z_OK:ve,Z_STREAM_END:xe,Z_NEED_DICT:ze,Z_STREAM_ERROR:Ae,Z_DATA_ERROR:Ee,Z_MEM_ERROR:Re,Z_BUF_ERROR:Ze,Z_DEFLATED:Ue}=K,Se=16180,De=16190,Te=16191,Oe=16192,Fe=16194,Ie=16199,Le=16200,Ne=16206,Be=16209,Ce=t=>(t>>>24&255)+(t>>>8&65280)+((65280&t)<<8)+((255&t)<<24);function He(){this.strm=null,this.mode=0,this.last=!1,this.wrap=0,this.havedict=!1,this.flags=0,this.dmax=0,this.check=0,this.total=0,this.head=null,this.wbits=0,this.wsize=0,this.whave=0,this.wnext=0,this.window=null,this.hold=0,this.bits=0,this.length=0,this.offset=0,this.extra=0,this.lencode=null,this.distcode=null,this.lenbits=0,this.distbits=0,this.ncode=0,this.nlen=0,this.ndist=0,this.have=0,this.next=null,this.lens=new Uint16Array(320),this.work=new Uint16Array(288),this.lendyn=null,this.distdyn=null,this.sane=0,this.back=0,this.was=0}const Me=t=>{if(!t)return 1;const e=t.state;return!e||e.strm!==t||e.mode<Se||e.mode>16211?1:0},je=t=>{if(Me(t))return Ae;const e=t.state;return t.total_in=t.total_out=e.total=0,t.msg="",e.wrap&&(t.adler=1&e.wrap),e.mode=Se,e.last=0,e.havedict=0,e.flags=-1,e.dmax=32768,e.head=null,e.hold=0,e.bits=0,e.lencode=e.lendyn=new Int32Array(852),e.distcode=e.distdyn=new Int32Array(592),e.sane=1,e.back=-1,ve},Ke=t=>{if(Me(t))return Ae;const e=t.state;return e.wsize=0,e.whave=0,e.wnext=0,je(t)},Pe=(t,e)=>{let a;if(Me(t))return Ae;const i=t.state;return e<0?(a=0,e=-e):(a=5+(e>>4),e<48&&(e&=15)),e&&(e<8||e>15)?Ae:(null!==i.window&&i.wbits!==e&&(i.window=null),i.wrap=a,i.wbits=e,Ke(t))},Ye=(t,e)=>{if(!t)return Ae;const a=new He;t.state=a,a.strm=t,a.window=null,a.mode=Se;const i=Pe(t,e);return i!==ve&&(t.state=null),i};let Ge,Xe,We=!0;const qe=t=>{if(We){Ge=new Int32Array(512),Xe=new Int32Array(32);let e=0;for(;e<144;)t.lens[e++]=8;for(;e<256;)t.lens[e++]=9;for(;e<280;)t.lens[e++]=7;for(;e<288;)t.lens[e++]=8;for(ge(1,t.lens,0,288,Ge,0,t.work,{bits:9}),e=0;e<32;)t.lens[e++]=5;ge(2,t.lens,0,32,Xe,0,t.work,{bits:5}),We=!1}t.lencode=Ge,t.lenbits=9,t.distcode=Xe,t.distbits=5},Je=(t,e,a,i)=>{let n;const s=t.state;return null===s.window&&(s.window=new Uint8Array(1<<s.wbits)),0===s.wsize&&(s.wsize=1<<s.wbits,s.wnext=0,s.whave=0),i>=s.wsize?(s.window.set(e.subarray(a-s.wsize,a),0),s.wnext=0,s.whave=s.wsize):(n=s.wsize-s.wnext,n>i&&(n=i),s.window.set(e.subarray(a-i,a-i+n),s.wnext),(i-=n)?(s.window.set(e.subarray(a-i,a),0),s.wnext=i,s.whave=s.wsize):(s.wnext+=n,s.wnext===s.wsize&&(s.wnext=0),s.whave<s.wsize&&(s.whave+=n))),0};var Qe={inflateReset:Ke,inflateReset2:Pe,inflateResetKeep:je,inflateInit:t=>Ye(t,15),inflateInit2:Ye,inflate:(t,e)=>{let a,i,n,s,r,l,o,h,d,_,f,c,u,w,m,b,g,p,k,y,v,x,z=0;const A=new Uint8Array(4);let E,R;const Z=new Uint8Array([16,17,18,0,8,7,9,6,10,5,11,4,12,3,13,2,14,1,15]);if(Me(t)||!t.output||!t.input&&0!==t.avail_in)return Ae;a=t.state,a.mode===Te&&(a.mode=Oe),r=t.next_out,n=t.output,o=t.avail_out,s=t.next_in,i=t.input,l=t.avail_in,h=a.hold,d=a.bits,_=l,f=o,x=ve;t:for(;;)switch(a.mode){case Se:if(0===a.wrap){a.mode=Oe;break}for(;d<16;){if(0===l)break t;l--,h+=i[s++]<<d,d+=8}if(2&a.wrap&&35615===h){0===a.wbits&&(a.wbits=15),a.check=0,A[0]=255&h,A[1]=h>>>8&255,a.check=M(a.check,A,2,0),h=0,d=0,a.mode=16181;break}if(a.head&&(a.head.done=!1),!(1&a.wrap)||(((255&h)<<8)+(h>>8))%31){t.msg="incorrect header check",a.mode=Be;break}if((15&h)!==Ue){t.msg="unknown compression method",a.mode=Be;break}if(h>>>=4,d-=4,v=8+(15&h),0===a.wbits&&(a.wbits=v),v>15||v>a.wbits){t.msg="invalid window size",a.mode=Be;break}a.dmax=1<<a.wbits,a.flags=0,t.adler=a.check=1,a.mode=512&h?16189:Te,h=0,d=0;break;case 16181:for(;d<16;){if(0===l)break t;l--,h+=i[s++]<<d,d+=8}if(a.flags=h,(255&a.flags)!==Ue){t.msg="unknown compression method",a.mode=Be;break}if(57344&a.flags){t.msg="unknown header flags set",a.mode=Be;break}a.head&&(a.head.text=h>>8&1),512&a.flags&&4&a.wrap&&(A[0]=255&h,A[1]=h>>>8&255,a.check=M(a.check,A,2,0)),h=0,d=0,a.mode=16182;case 16182:for(;d<32;){if(0===l)break t;l--,h+=i[s++]<<d,d+=8}a.head&&(a.head.time=h),512&a.flags&&4&a.wrap&&(A[0]=255&h,A[1]=h>>>8&255,A[2]=h>>>16&255,A[3]=h>>>24&255,a.check=M(a.check,A,4,0)),h=0,d=0,a.mode=16183;case 16183:for(;d<16;){if(0===l)break t;l--,h+=i[s++]<<d,d+=8}a.head&&(a.head.xflags=255&h,a.head.os=h>>8),512&a.flags&&4&a.wrap&&(A[0]=255&h,A[1]=h>>>8&255,a.check=M(a.check,A,2,0)),h=0,d=0,a.mode=16184;case 16184:if(1024&a.flags){for(;d<16;){if(0===l)break t;l--,h+=i[s++]<<d,d+=8}a.length=h,a.head&&(a.head.extra_len=h),512&a.flags&&4&a.wrap&&(A[0]=255&h,A[1]=h>>>8&255,a.check=M(a.check,A,2,0)),h=0,d=0}else a.head&&(a.head.extra=null);a.mode=16185;case 16185:if(1024&a.flags&&(c=a.length,c>l&&(c=l),c&&(a.head&&(v=a.head.extra_len-a.length,a.head.extra||(a.head.extra=new Uint8Array(a.head.extra_len)),a.head.extra.set(i.subarray(s,s+c),v)),512&a.flags&&4&a.wrap&&(a.check=M(a.check,i,c,s)),l-=c,s+=c,a.length-=c),a.length))break t;a.length=0,a.mode=16186;case 16186:if(2048&a.flags){if(0===l)break t;c=0;do{v=i[s+c++],a.head&&v&&a.length<65536&&(a.head.name+=String.fromCharCode(v))}while(v&&c<l);if(512&a.flags&&4&a.wrap&&(a.check=M(a.check,i,c,s)),l-=c,s+=c,v)break t}else a.head&&(a.head.name=null);a.length=0,a.mode=16187;case 16187:if(4096&a.flags){if(0===l)break t;c=0;do{v=i[s+c++],a.head&&v&&a.length<65536&&(a.head.comment+=String.fromCharCode(v))}while(v&&c<l);if(512&a.flags&&4&a.wrap&&(a.check=M(a.check,i,c,s)),l-=c,s+=c,v)break t}else a.head&&(a.head.comment=null);a.mode=16188;case 16188:if(512&a.flags){for(;d<16;){if(0===l)break t;l--,h+=i[s++]<<d,d+=8}if(4&a.wrap&&h!==(65535&a.check)){t.msg="header crc mismatch",a.mode=Be;break}h=0,d=0}a.head&&(a.head.hcrc=a.flags>>9&1,a.head.done=!0),t.adler=a.check=0,a.mode=Te;break;case 16189:for(;d<32;){if(0===l)break t;l--,h+=i[s++]<<d,d+=8}t.adler=a.check=Ce(h),h=0,d=0,a.mode=De;case De:if(0===a.havedict)return t.next_out=r,t.avail_out=o,t.next_in=s,t.avail_in=l,a.hold=h,a.bits=d,ze;t.adler=a.check=1,a.mode=Te;case Te:if(e===ke||e===ye)break t;case Oe:if(a.last){h>>>=7&d,d-=7&d,a.mode=Ne;break}for(;d<3;){if(0===l)break t;l--,h+=i[s++]<<d,d+=8}switch(a.last=1&h,h>>>=1,d-=1,3&h){case 0:a.mode=16193;break;case 1:if(qe(a),a.mode=Ie,e===ye){h>>>=2,d-=2;break t}break;case 2:a.mode=16196;break;case 3:t.msg="invalid block type",a.mode=Be}h>>>=2,d-=2;break;case 16193:for(h>>>=7&d,d-=7&d;d<32;){if(0===l)break t;l--,h+=i[s++]<<d,d+=8}if((65535&h)!=(h>>>16^65535)){t.msg="invalid stored block lengths",a.mode=Be;break}if(a.length=65535&h,h=0,d=0,a.mode=Fe,e===ye)break t;case Fe:a.mode=16195;case 16195:if(c=a.length,c){if(c>l&&(c=l),c>o&&(c=o),0===c)break t;n.set(i.subarray(s,s+c),r),l-=c,s+=c,o-=c,r+=c,a.length-=c;break}a.mode=Te;break;case 16196:for(;d<14;){if(0===l)break t;l--,h+=i[s++]<<d,d+=8}if(a.nlen=257+(31&h),h>>>=5,d-=5,a.ndist=1+(31&h),h>>>=5,d-=5,a.ncode=4+(15&h),h>>>=4,d-=4,a.nlen>286||a.ndist>30){t.msg="too many length or distance symbols",a.mode=Be;break}a.have=0,a.mode=16197;case 16197:for(;a.have<a.ncode;){for(;d<3;){if(0===l)break t;l--,h+=i[s++]<<d,d+=8}a.lens[Z[a.have++]]=7&h,h>>>=3,d-=3}for(;a.have<19;)a.lens[Z[a.have++]]=0;if(a.lencode=a.lendyn,a.lenbits=7,E={bits:a.lenbits},x=ge(0,a.lens,0,19,a.lencode,0,a.work,E),a.lenbits=E.bits,x){t.msg="invalid code lengths set",a.mode=Be;break}a.have=0,a.mode=16198;case 16198:for(;a.have<a.nlen+a.ndist;){for(;z=a.lencode[h&(1<<a.lenbits)-1],m=z>>>24,b=z>>>16&255,g=65535&z,!(m<=d);){if(0===l)break t;l--,h+=i[s++]<<d,d+=8}if(g<16)h>>>=m,d-=m,a.lens[a.have++]=g;else{if(16===g){for(R=m+2;d<R;){if(0===l)break t;l--,h+=i[s++]<<d,d+=8}if(h>>>=m,d-=m,0===a.have){t.msg="invalid bit length repeat",a.mode=Be;break}v=a.lens[a.have-1],c=3+(3&h),h>>>=2,d-=2}else if(17===g){for(R=m+3;d<R;){if(0===l)break t;l--,h+=i[s++]<<d,d+=8}h>>>=m,d-=m,v=0,c=3+(7&h),h>>>=3,d-=3}else{for(R=m+7;d<R;){if(0===l)break t;l--,h+=i[s++]<<d,d+=8}h>>>=m,d-=m,v=0,c=11+(127&h),h>>>=7,d-=7}if(a.have+c>a.nlen+a.ndist){t.msg="invalid bit length repeat",a.mode=Be;break}for(;c--;)a.lens[a.have++]=v}}if(a.mode===Be)break;if(0===a.lens[256]){t.msg="invalid code -- missing end-of-block",a.mode=Be;break}if(a.lenbits=9,E={bits:a.lenbits},x=ge(1,a.lens,0,a.nlen,a.lencode,0,a.work,E),a.lenbits=E.bits,x){t.msg="invalid literal/lengths set",a.mode=Be;break}if(a.distbits=6,a.distcode=a.distdyn,E={bits:a.distbits},x=ge(2,a.lens,a.nlen,a.ndist,a.distcode,0,a.work,E),a.distbits=E.bits,x){t.msg="invalid distances set",a.mode=Be;break}if(a.mode=Ie,e===ye)break t;case Ie:a.mode=Le;case Le:if(l>=6&&o>=258){t.next_out=r,t.avail_out=o,t.next_in=s,t.avail_in=l,a.hold=h,a.bits=d,fe(t,f),r=t.next_out,n=t.output,o=t.avail_out,s=t.next_in,i=t.input,l=t.avail_in,h=a.hold,d=a.bits,a.mode===Te&&(a.back=-1);break}for(a.back=0;z=a.lencode[h&(1<<a.lenbits)-1],m=z>>>24,b=z>>>16&255,g=65535&z,!(m<=d);){if(0===l)break t;l--,h+=i[s++]<<d,d+=8}if(b&&0==(240&b)){for(p=m,k=b,y=g;z=a.lencode[y+((h&(1<<p+k)-1)>>p)],m=z>>>24,b=z>>>16&255,g=65535&z,!(p+m<=d);){if(0===l)break t;l--,h+=i[s++]<<d,d+=8}h>>>=p,d-=p,a.back+=p}if(h>>>=m,d-=m,a.back+=m,a.length=g,0===b){a.mode=16205;break}if(32&b){a.back=-1,a.mode=Te;break}if(64&b){t.msg="invalid literal/length code",a.mode=Be;break}a.extra=15&b,a.mode=16201;case 16201:if(a.extra){for(R=a.extra;d<R;){if(0===l)break t;l--,h+=i[s++]<<d,d+=8}a.length+=h&(1<<a.extra)-1,h>>>=a.extra,d-=a.extra,a.back+=a.extra}a.was=a.length,a.mode=16202;case 16202:for(;z=a.distcode[h&(1<<a.distbits)-1],m=z>>>24,b=z>>>16&255,g=65535&z,!(m<=d);){if(0===l)break t;l--,h+=i[s++]<<d,d+=8}if(0==(240&b)){for(p=m,k=b,y=g;z=a.distcode[y+((h&(1<<p+k)-1)>>p)],m=z>>>24,b=z>>>16&255,g=65535&z,!(p+m<=d);){if(0===l)break t;l--,h+=i[s++]<<d,d+=8}h>>>=p,d-=p,a.back+=p}if(h>>>=m,d-=m,a.back+=m,64&b){t.msg="invalid distance code",a.mode=Be;break}a.offset=g,a.extra=15&b,a.mode=16203;case 16203:if(a.extra){for(R=a.extra;d<R;){if(0===l)break t;l--,h+=i[s++]<<d,d+=8}a.offset+=h&(1<<a.extra)-1,h>>>=a.extra,d-=a.extra,a.back+=a.extra}if(a.offset>a.dmax){t.msg="invalid distance too far back",a.mode=Be;break}a.mode=16204;case 16204:if(0===o)break t;if(c=f-o,a.offset>c){if(c=a.offset-c,c>a.whave&&a.sane){t.msg="invalid distance too far back",a.mode=Be;break}c>a.wnext?(c-=a.wnext,u=a.wsize-c):u=a.wnext-c,c>a.length&&(c=a.length),w=a.window}else w=n,u=r-a.offset,c=a.length;c>o&&(c=o),o-=c,a.length-=c;do{n[r++]=w[u++]}while(--c);0===a.length&&(a.mode=Le);break;case 16205:if(0===o)break t;n[r++]=a.length,o--,a.mode=Le;break;case Ne:if(a.wrap){for(;d<32;){if(0===l)break t;l--,h|=i[s++]<<d,d+=8}if(f-=o,t.total_out+=f,a.total+=f,4&a.wrap&&f&&(t.adler=a.check=a.flags?M(a.check,n,f,r-f):C(a.check,n,f,r-f)),f=o,4&a.wrap&&(a.flags?h:Ce(h))!==a.check){t.msg="incorrect data check",a.mode=Be;break}h=0,d=0}a.mode=16207;case 16207:if(a.wrap&&a.flags){for(;d<32;){if(0===l)break t;l--,h+=i[s++]<<d,d+=8}if(4&a.wrap&&h!==(4294967295&a.total)){t.msg="incorrect length check",a.mode=Be;break}h=0,d=0}a.mode=16208;case 16208:x=xe;break t;case Be:x=Ee;break t;case 16210:return Re;default:return Ae}return t.next_out=r,t.avail_out=o,t.next_in=s,t.avail_in=l,a.hold=h,a.bits=d,(a.wsize||f!==t.avail_out&&a.mode<Be&&(a.mode<Ne||e!==pe))&&Je(t,t.output,t.next_out,f-t.avail_out),_-=t.avail_in,f-=t.avail_out,t.total_in+=_,t.total_out+=f,a.total+=f,4&a.wrap&&f&&(t.adler=a.check=a.flags?M(a.check,n,f,t.next_out-f):C(a.check,n,f,t.next_out-f)),t.data_type=a.bits+(a.last?64:0)+(a.mode===Te?128:0)+(a.mode===Ie||a.mode===Fe?256:0),(0===_&&0===f||e===pe)&&x===ve&&(x=Ze),x},inflateEnd:t=>{if(Me(t))return Ae;let e=t.state;return e.window&&(e.window=null),t.state=null,ve},inflateGetHeader:(t,e)=>{if(Me(t))return Ae;const a=t.state;return 0==(2&a.wrap)?Ae:(a.head=e,e.done=!1,ve)},inflateSetDictionary:(t,e)=>{const a=e.length;let i,n,s;return Me(t)?Ae:(i=t.state,0!==i.wrap&&i.mode!==De?Ae:i.mode===De&&(n=1,n=C(n,e,a,0),n!==i.check)?Ee:(s=Je(t,e,a,a),s?(i.mode=16210,Re):(i.havedict=1,ve)))},inflateInfo:"pako inflate (from Nodeca project)"};var Ve=function(){this.text=0,this.time=0,this.xflags=0,this.os=0,this.extra=null,this.extra_len=0,this.name="",this.comment="",this.hcrc=0,this.done=!1};const $e=Object.prototype.toString,{Z_NO_FLUSH:ta,Z_FINISH:ea,Z_OK:aa,Z_STREAM_END:ia,Z_NEED_DICT:na,Z_STREAM_ERROR:sa,Z_DATA_ERROR:ra,Z_MEM_ERROR:la,Z_BUF_ERROR:oa}=K,ha={chunkSize:65536,windowBits:15,to:""};function da(t){this.options=Kt({},ha,t||{});const e=this.options;e.raw&&e.windowBits>=0&&e.windowBits<16&&(e.windowBits=-e.windowBits,0===e.windowBits&&(e.windowBits=-15)),!(e.windowBits>=0&&e.windowBits<16)||t&&t.windowBits||(e.windowBits+=32),e.windowBits>15&&e.windowBits<48&&0==(15&e.windowBits)&&(e.windowBits|=15),this.err=0,this.msg="",this.ended=!1,this.chunks=[],this.strm=new Jt,this.strm.avail_out=0;let a=Qe.inflateInit2(this.strm,e.windowBits);if(a!==aa)throw new Error(j[a]);if(this.header=new Ve,Qe.inflateGetHeader(this.strm,this.header),e.dictionary&&("string"==typeof e.dictionary?e.dictionary=Xt(e.dictionary):"[object ArrayBuffer]"===$e.call(e.dictionary)&&(e.dictionary=new Uint8Array(e.dictionary)),e.raw&&(a=Qe.inflateSetDictionary(this.strm,e.dictionary),a!==aa)))throw new Error(j[a])}function _a(t,e){const a=new da(e);if(a.push(t,!0),a.err)throw a.msg||j[a.err];return a.result}da.prototype.push=function(t,e){const a=this.strm,i=this.options.chunkSize,n=this.options.dictionary;let s,r,l;if(this.ended)return!1;for(r=e===~~e?e:!0===e?ea:ta,"[object ArrayBuffer]"===$e.call(t)?a.input=new Uint8Array(t):a.input=t,a.next_in=0,a.avail_in=a.input.length;;){for(0===a.avail_out&&(a.output=new Uint8Array(i),a.next_out=0,a.avail_out=i),s=Qe.inflate(a,r),s===na&&n&&(s=Qe.inflateSetDictionary(a,n),s===aa?s=Qe.inflate(a,r):s===ra&&(s=na));a.avail_in>0&&s===ia&&2&a.state.wrap&&0!==a.state.flags&&0!==a.input[a.next_in];)Qe.inflateReset(a),s=Qe.inflate(a,r);switch(s){case sa:case ra:case na:case la:return this.onEnd(s),this.ended=!0,!1}if(l=a.avail_out,a.next_out&&(0===a.avail_out||s===ia||r>0))if("string"===this.options.to){let t=qt(a.output,a.next_out),e=a.next_out-t,n=Wt(a.output,t);a.next_out=e,a.avail_out=i-e,e&&a.output.set(a.output.subarray(t,t+e),0),this.onData(n)}else this.onData(a.output.length===a.next_out?a.output:a.output.subarray(0,a.next_out)),a.avail_out=0,a.next_out=0;if(s!==aa&&s!==oa||0!==l){if(s===ia)return s=Qe.inflateEnd(this.strm),this.onEnd(s),this.ended=!0,!0;if(0===a.avail_in){if(r===ea)return s=Qe.inflateEnd(this.strm),this.onEnd(s===aa?oa:s),this.ended=!0,!1;break}}}return!0},da.prototype.onData=function(t){this.chunks.push(t)},da.prototype.onEnd=function(t){t===aa&&("string"===this.options.to?this.result=this.chunks.join(""):this.result=Pt(this.chunks)),this.chunks=[],this.err=t,this.msg=this.strm.msg};var fa={Inflate:da,inflate:_a,inflateRaw:function(t,e){return(e=e||{}).raw=!0,_a(t,e)},ungzip:_a,constants:K};const{Deflate:ca,deflate:ua,deflateRaw:wa,gzip:ma}=de,{Inflate:ba,inflate:ga,inflateRaw:pa,ungzip:ka}=fa;var ya=ca,va=ua,xa=wa,za=ma,Aa=ba,Ea=ga,Ra=pa,Za=ka,Ua=K,Sa={Deflate:ya,deflate:va,deflateRaw:xa,gzip:za,Inflate:Aa,inflate:Ea,inflateRaw:Ra,ungzip:Za,constants:Ua};t.Deflate=ya,t.Inflate=Aa,t.constants=Ua,t.default=Sa,t.deflate=va,t.deflateRaw=xa,t.gzip=za,t.inflate=Ea,t.inflateRaw=Ra,t.ungzip=Za,Object.defineProperty(t,"__esModule",{value:!0})}));
+
+</script>
 <script>
+// Versioned, self-contained lesson links. No account, upload or shortening service.
+const StudentLinks = (() => {
+  const MAX_BYTES = 8 * 1024 * 1024, MAX_TOKEN = 2 * 1024 * 1024;
+  function binary(bytes) { let out='';for(let i=0;i<bytes.length;i+=16384)out+=String.fromCharCode.apply(null,bytes.subarray(i,i+16384));return out; }
+  function utf8(text) { return typeof TextEncoder!=='undefined'?new TextEncoder().encode(text):Uint8Array.from(unescape(encodeURIComponent(text)),c=>c.charCodeAt(0)); }
+  function fromUTF8(bytes) { return typeof TextDecoder!=='undefined'?new TextDecoder('utf-8',{fatal:true}).decode(bytes):decodeURIComponent(escape(binary(bytes))); }
+  function base64url(bytes) { return btoa(binary(bytes)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''); }
+  function validate(data) {
+    if(!data||typeof data!=='object'||Array.isArray(data)||typeof data.vText!=='string'||!data.vText.trim())throw Error('教材內容不完整，請向老師取得完整連結。');
+    const usable=data.vText.split('\n').some(line=>{if(line.includes('```'))return false;const columns=line.split(',');return columns.length>=3&&columns[0].trim()&&columns[2].trim();});
+    if(!usable)throw Error('找不到可使用的詞彙，請檢查匯入資料。');
+    for(const field of ['mName','tName','cName','dStr','lang','accent'])if(data[field]!=null&&typeof data[field]!=='string')throw Error('教材設定格式不正確。');
+    return data;
+  }
+  function legacy(text){return btoa(binary(utf8(text)));}
+  function decode(token) {
+    if(!token||token.length>MAX_TOKEN)throw Error('連結不完整或資料過大，請向老師取得完整連結。');
+    let json;
+    if(token.startsWith('v2.')){
+      const payload=token.slice(3);
+      if(!payload||!/^[A-Za-z0-9_-]+$/.test(payload)||payload.length%4===1)throw Error('連結資料已損壞，請重新複製完整連結。');
+      const raw=atob(payload.replace(/-/g,'+').replace(/_/g,'/')+'='.repeat((4-payload.length%4)%4));
+      const bytes=Uint8Array.from(raw,c=>c.charCodeAt(0)),chunks=[];let size=0;
+      const inflater=new pako.Inflate({chunkSize:16384});
+      inflater.onData=chunk=>{size+=chunk.length;if(size>MAX_BYTES)throw Error('教材資料過大，請老師拆成較小教材。');chunks.push(chunk);};
+      inflater.push(bytes,true);
+      if(inflater.err||!inflater.ended||!size)throw Error('連結資料不完整，請重新複製完整連結。');
+      const output=new Uint8Array(size);let offset=0;chunks.forEach(chunk=>{output.set(chunk,offset);offset+=chunk.length;});json=fromUTF8(output);
+    }else{
+      if(/^v\d+\./.test(token))throw Error('這份連結使用較新的格式，請確認老師網站已更新。');
+      // URLSearchParams interprets an unescaped + as a space in older shared links.
+      const raw=atob(token.replace(/ /g,'+'));if(raw.length>MAX_BYTES)throw Error('教材資料過大。');
+      json=fromUTF8(Uint8Array.from(raw,c=>c.charCodeAt(0)));
+    }
+    return validate(JSON.parse(json));
+  }
+  function encode(data) {
+    validate(data);const json=JSON.stringify(data),bytes=utf8(json);
+    if(bytes.length>MAX_BYTES)throw Error('教材資料過大，請分成較小教材再產生連結。');
+    const original=encodeURIComponent(legacy(json));
+    const packed='v2.'+base64url(pako.deflate(bytes,{level:9}));
+    const token=packed.length<original.length?packed:original;
+    if(token.length>MAX_TOKEN)throw Error('壓縮後資料仍過大，請分成較小教材。');
+    // Verify exact round trip before exposing a student URL; no fields are removed.
+    if(JSON.stringify(decode(token===original?decodeURIComponent(token):token))!==json)throw Error('資料檢查未通過，請重新產生連結。');
+    return {token,originalLength:original.length,tokenLength:token.length,compressed:token===packed};
+  }
+  function locationProblem(value=window.location.href) {
+    let url;try{url=new URL(value);}catch(_){return '目前不是可分享的網站網址。';}
+    const host=url.hostname.toLowerCase().replace(/\.$/,'');
+    if(url.protocol!=='https:')return '目前是本機檔案或非 HTTPS 頁面。請先上傳 GitHub，再從正式網站產生學生連結。';
+    const privateHost=!host||host==='localhost'||host.endsWith('.localhost')||host.endsWith('.local')||host.endsWith('.test')||host.endsWith('.invalid')||host==='[::1]'||/^(127\.|10\.|192\.168\.|169\.254\.|0\.)/.test(host)||/^172\.(1[6-9]|2\d|3[01])\./.test(host);
+    if(privateHost)return '目前是本機或區域網路網址。請從學生可以開啟的正式 HTTPS 網站產生連結。';
+    const previews=['github.com','www.github.com','raw.githubusercontent.com','gist.github.com','chatgpt.com','www.chatgpt.com','chat.openai.com','git.chatgpt-team.site'];
+    if(previews.includes(host)||host.endsWith('.github.dev')||host.endsWith('.githubpreview.dev')||host.endsWith('.oaiusercontent.com')||host.endsWith('.chatgpt-team.site'))return '目前是檔案或預覽頁面。請開啟 GitHub Pages 正式教材網站，再產生學生連結。';
+    return '';
+  }
+  function notice(message,error=false){const el=document.getElementById('linkNotice');el.textContent=message;el.hidden=!message;el.classList.toggle('link-error',error);}
+  function init(){const reason=locationProblem();const warning=document.getElementById('linkEnvironmentWarning');warning.hidden=!reason;warning.textContent=reason;const button=document.getElementById('generateStudentLinkBtn');button.disabled=!!reason;button.title=reason;}
+  function guard(){const reason=locationProblem();if(!reason)return true;document.getElementById('generatedUrl').value='';document.getElementById('linkResult').style.display='none';notice(reason,true);init();return false;}
+  return Object.freeze({encode,decode,locationProblem,notice,guard,init});
+})();
+window.IMIStudentLinks=StudentLinks;
+
     const SCRIPT_URL = window.location.origin + window.location.pathname;
     const URL_DATA = new URLSearchParams(window.location.search).get('data') || "";
      let originalVocabString = ""; 
   
   window.onload = function() {
+    StudentLinks.init();
     document.getElementById('inputDate').valueAsDate = new Date();
     if (URL_DATA) {
       document.getElementById('teacherPanel').style.display = 'none';
       document.getElementById('gameContainer').style.display = 'flex'; 
       try {
-       const decodedString = decodeURIComponent(escape(atob(URL_DATA)));
-        const dataObj = JSON.parse(decodedString);
+       const dataObj = StudentLinks.decode(URL_DATA);
+        LearningRecord.setMetadata(dataObj);
         
       // 💡 讀取語種設定，如果舊網址沒有就保底顯示 '外語'
         currentLang = dataObj.lang || '外語';
@@ -768,17 +1116,19 @@ body {
         }
         
         document.getElementById('displayInfoTags').innerHTML = tagsHtml;
+        LearningRecord.attachPreviousButton();
         document.title = `${dataObj.mName} - IMI 詞彙消消樂`;
         parseAndStart(dataObj.vText);
       } catch(e) {
         console.error(e); 
-        alert("資料讀取失敗，請確認這是不是完整的學生網址喔！");
+        StudentLinks.notice("學生連結無法讀取：" + (e.message || "請重新複製完整連結。"), true);
         document.getElementById('teacherPanel').style.display = 'flex'; 
         document.getElementById('gameContainer').style.display = 'none';
       }
     } else {
       document.getElementById('teacherPanel').style.display = 'flex';
       document.getElementById('gameContainer').style.display = 'none';
+      if(new URLSearchParams(window.location.search).has('data'))StudentLinks.notice('學生連結缺少教材資料，請重新複製完整連結。',true);
     }
   };
 // 💡 互動功能：清除資料並自動展開視窗
@@ -796,6 +1146,10 @@ body {
 }
 
 function generateLink() {
+    if (!StudentLinks.guard()) return;
+    StudentLinks.notice('');
+    document.getElementById('generatedUrl').value='';
+    document.getElementById('linkResult').style.display='none';
     let vText = document.getElementById('vocabInput').value;
     if (!vText.trim()) { alert("(請貼上 專屬Gem 生成的Json資料喔！)"); return; }
 
@@ -834,16 +1188,26 @@ function generateLink() {
       disableTrans: document.getElementById('inputDisableTrans').value || 'false', // 🎯 新增：抓取外語開關設定
       vText: vText 
     };
-    const jsonString = JSON.stringify(gameData);
-    const safeBase64 = btoa(unescape(encodeURIComponent(jsonString)));
-    const finalUrl = SCRIPT_URL + "?data=" + encodeURIComponent(safeBase64);
-    document.getElementById('generatedUrl').value = finalUrl;
-    document.getElementById('linkResult').style.display = 'block';
+    try {
+      const result = StudentLinks.encode(gameData);
+      const finalUrl = SCRIPT_URL + "?data=" + result.token;
+      document.getElementById('generatedUrl').value = finalUrl;
+      const oldLength = SCRIPT_URL.length + 6 + result.originalLength;
+      const saved = Math.max(0, Math.round((1-finalUrl.length/oldLength)*100));
+      document.getElementById('linkCompressionInfo').textContent = result.compressed
+        ? `已壓縮：約縮短 ${saved}%（${oldLength} → ${finalUrl.length} 字元）。`
+        : `連結已檢查（${finalUrl.length} 字元）。`;
+      document.getElementById('linkResult').style.display = 'block';
+      if(finalUrl.length>8000)StudentLinks.notice('這份教材壓縮後仍較長。若通訊軟體無法完整傳送，建議拆成較小教材。');
+    } catch(error) {
+      StudentLinks.notice('無法產生連結：' + (error.message || '請檢查教材資料。'), true);
+    }
   }
 
   function copyUrl() {
     const copyText = document.getElementById('generatedUrl');
-    copyText.select(); copyText.setSelectionRange(0, 99999); 
+    if (!copyText.value || !StudentLinks.guard()) return;
+    copyText.select(); copyText.setSelectionRange(0, copyText.value.length); 
     document.execCommand("copy"); alert("學生專屬連結已複製！");
   }
 // 💡 預先喚醒機制：解決首次點擊變成男聲或亂碼的「暖機遲到」問題
@@ -857,7 +1221,7 @@ function generateLink() {
   }
     
 // 💡 升級版：雙軌偵測口音 (教師端即時抓取選單，學生端讀取全域變數) ＋ 篩選優質女聲
-  function playAudio(text) {
+  function playAudio(text, callbacks) {
     if (!text || text.trim() === "") return;
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel(); // 停止目前播放
@@ -883,7 +1247,9 @@ function generateLink() {
       if (!bestVoice) bestVoice = voices.find(v => v.lang.includes(targetLang) || v.lang.includes(fallbackLang));
 
       if (bestVoice) msg.voice = bestVoice;
+      if (callbacks) { msg.onstart = callbacks.start; msg.onend = callbacks.end; msg.onerror = callbacks.error; }
       window.speechSynthesis.speak(msg);
+      return msg;
     }
   }
 
@@ -985,6 +1351,7 @@ function generateLink() {
           overlay.style.opacity = 0;
           setTimeout(() => {
             overlay.style.display = 'none';
+            LearningRecord.start();
             resetIdleTimer();
             if (SLOTS.some(s => s.tileData !== null)) executeHint(true);
           }, 500);
@@ -1337,6 +1704,7 @@ function toggleTranslation() {
   }
 
   function initGame() { 
+    LearningRecord.begin(validWords);
     initSlots(); 
     remainingWords = [...validWords];
     tileQueue = getPlayableShuffle(tileQueue);
@@ -1353,7 +1721,27 @@ function toggleTranslation() {
     runStartSequence(); 
   }
 
-  function adjustScale() { const container = document.getElementById('gameContainer'); const screenWidth = window.innerWidth; if (screenWidth < 900) { const scaleRatio = screenWidth / 900; container.style.transform = `scale(${scaleRatio})`; container.style.transformOrigin = 'top center'; document.body.style.minHeight = `${container.getBoundingClientRect().height + 40}px`; } else { container.style.transform = 'none'; document.body.style.minHeight = '100vh'; } }
+  function adjustScale() {
+    const container = document.getElementById('gameContainer');
+    const viewport = document.getElementById('gameViewport');
+    if (getComputedStyle(container).display === 'none') {
+      viewport.style.display = 'none';
+      return;
+    }
+    viewport.style.display = 'block';
+    const scaleRatio = Math.min(1, viewport.clientWidth / 900);
+    container.style.transform = `scale(${scaleRatio})`;
+    viewport.style.height = `${Math.ceil(container.offsetHeight * scaleRatio)}px`;
+  }
+
+  // Refit after rotation, browser UI changes, text wrapping and font loading.
+  if (window.ResizeObserver) {
+    const gameLayoutObserver = new ResizeObserver(adjustScale);
+    gameLayoutObserver.observe(document.getElementById('gameContainer'));
+    gameLayoutObserver.observe(document.getElementById('gameViewport'));
+  }
+  if (window.visualViewport) window.visualViewport.addEventListener('resize', adjustScale);
+  if (document.fonts) document.fonts.ready.then(adjustScale);
   
   function updateMarquee() {
     const box = document.getElementById('marqueeInner');
@@ -1504,7 +1892,8 @@ function toggleTranslation() {
         stars++; 
     }
     hintUsedThisTurn = false; // 進入下一題，防弊鎖解開
-    updateStarUI(); 
+    updateStarUI();
+    LearningRecord.completedWord(matchObj, stars); 
 
     setTimeout(() => { 
         refillBoard(); 
@@ -1615,6 +2004,8 @@ function toggleTranslation() {
   }
   
   function triggerWin() { 
+    const completedRoundId = LearningRecord.finish(stars);
+    if (!completedRoundId) return;
     clearTimeout(idleTimer); hideRescueUI(); 
     document.getElementById('starBtn').style.opacity = '0'; 
     document.getElementById('btnPy').style.opacity = '0'; 
@@ -1643,6 +2034,7 @@ function toggleTranslation() {
 
       // 2. 在星星全亮後才喚醒花束
       setTimeout(() => {
+        if (!LearningRecord.isShowingRound(completedRoundId)) return;
         const flower = document.createElement('div');
         flower.innerText = '💐';
         flower.style.position = 'fixed';
@@ -1669,10 +2061,10 @@ function toggleTranslation() {
       }, starTime); // <-- 使用動態計算的時間
     }
     
-    setTimeout(() => { document.getElementById('winModal').style.display = 'flex'; }, 1200); 
+    setTimeout(() => { if (LearningRecord.isShowingRound(completedRoundId)) document.getElementById('winModal').style.display = 'flex'; }, 1200); 
   }
   
-  function restartGame() { document.getElementById('winModal').style.display = 'none'; document.getElementById('starBtn').style.opacity = '1'; document.getElementById('btnPy').style.opacity = '1'; document.getElementById('btnZy').style.opacity = '1'; parseAndStart(originalVocabString); }
+  function restartGame() { if (!LearningRecord.canRestart()) return; document.getElementById('winModal').style.display = 'none'; document.getElementById('starBtn').style.opacity = '1'; document.getElementById('btnPy').style.opacity = '1'; document.getElementById('btnZy').style.opacity = '1'; parseAndStart(originalVocabString); }
   function updateStarUI() { document.getElementById('starCount').innerText = stars + " / " + validWords.length; }
   
   // 💡 絕對安全的計時器重置函數
@@ -1741,6 +2133,726 @@ function toggleTranslation() {
         idleTimer = setTimeout(triggerRescue, 10000); 
     } 
   }
+
+// Batch 3: confirm Name with OK before using results. Scores remain owned by the game.
+const LearningRecord = (() => {
+  const NAME_KEY = 'imi.vocab.studentName.v1';
+  let studentName = '';
+  let metadata = {};
+  let current = null;
+  let lastCompleted = null;
+  let wordKeys = new Map();
+  let viewingPrevious = false;
+  let readyTimer = null;
+  let roundNumber = 0;
+  let nameEditing = false;
+  const copy = value => value == null ? null : JSON.parse(JSON.stringify(value));
+  const clean = (value, limit = 300) => typeof value === 'string' ? value.trim().slice(0, limit) : '';
+  const now = () => new Date().toISOString();
+  const timezone = () => {
+    try { return Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'; }
+    catch (_) { return 'UTC'; }
+  };
+  function readName() {
+    try { studentName = clean(localStorage.getItem(NAME_KEY), 80); }
+    catch (_) { /* Private / restricted storage must not block the game. */ }
+  }
+  function formatTime(value, zone, full = false) {
+    if (!value) return '';
+    try {
+      const options = full
+        ? { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23', timeZoneName: 'short', timeZone: zone }
+        : { hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23', timeZone: zone };
+      return new Intl.DateTimeFormat('zh-TW', options).format(new Date(value));
+    } catch (_) { return value; }
+  }
+  function setMetadata(data) {
+    metadata = {
+      materialName: clean(data.mName) || 'IMI_詞彙消消樂',
+      className: clean(data.cName),
+      teacherName: clean(data.tName) || 'Evelyn 老師',
+      courseDate: clean(data.dStr),
+      language: clean(data.lang) || '外語',
+      accent: clean(data.accent) || 'zh-TW'
+    };
+  }
+  function begin(words) {
+    clearTimeout(readyTimer);
+    if (lastCompleted) lastCompleted.readyForExport = true;
+    viewingPrevious = false;
+    nameEditing = false;
+    roundNumber += 1;
+    const id = `${Date.now()}-${roundNumber}-${Math.random().toString(36).slice(2, 8)}`;
+    wordKeys = new Map();
+    const vocabulary = words.map((word, index) => {
+      const key = `word-${index + 1}`;
+      wordKeys.set(word, key);
+      return { key, text: word.str, ttsText: word.ttsStr || word.str, translation: word.native || '', tiles: copy(word.tiles || []) };
+    });
+    current = {
+      schemaVersion: 2, id, roundNumber, studentName, nameConfirmedAt: null,
+      metadata: copy(metadata), timeZone: timezone(),
+      createdAt: now(), startedAt: null, completedAt: null,
+      totalWords: vocabulary.length, completedWords: 0, stars: 0,
+      vocabulary, events: [], readyForExport: false
+    };
+    updatePreviousButton();
+  }
+  function start() {
+    if (!current || current.completedAt || current.startedAt) return;
+    current.startedAt = now();
+    current.events.push({ type: 'started', at: current.startedAt });
+  }
+  function completedWord(word, starCount) {
+    if (!current || current.completedAt) return;
+    const key = wordKeys.get(word);
+    if (!key || current.events.some(event => event.type === 'word_completed' && event.wordKey === key)) return;
+    start();
+    current.completedWords += 1;
+    current.stars = starCount;
+    current.events.push({
+      type: 'word_completed', at: now(), wordKey: key,
+      word: word.str, completedWords: current.completedWords, stars: starCount
+    });
+  }
+  function finish(starCount) {
+    if (!current || current.completedAt || !current.totalWords || current.completedWords !== current.totalWords) return;
+    start();
+    current.completedAt = now();
+    current.stars = starCount;
+    current.studentName = studentName;
+    current.events.push({ type: 'completed', at: current.completedAt, completedWords: current.completedWords, stars: starCount });
+    current.readyForExport = false;
+    lastCompleted = copy(current);
+    lastCompleted.nameConfirmedAt = null;
+    nameEditing = true;
+    viewingPrevious = false;
+    renderInfo();
+    const capturedId = current.id;
+    readyTimer = setTimeout(() => {
+      if (!lastCompleted || lastCompleted.id !== capturedId) return;
+      lastCompleted.readyForExport = true;
+      if (current && current.id === capturedId) current.readyForExport = true;
+    }, 1200 + current.totalWords * 150 + 700);
+    updatePreviousButton();
+    return capturedId;
+  }
+  function attachPreviousButton() {
+    const group = document.getElementById('displayInfoTags');
+    if (!group) return;
+    let button = document.getElementById('previousResultBtn');
+    if (!button) {
+      button = document.createElement('button');
+      button.id = 'previousResultBtn';
+      button.className = 'info-tag previous-result-btn';
+      button.type = 'button';
+      button.hidden = true;
+      button.innerHTML = '<span aria-hidden="true">📋</span><span class="previous-result-label"><span>上次練習結果</span><small>Last result</small></span>';
+      button.addEventListener('click', showPrevious);
+      group.append(button);
+    }
+    updatePreviousButton();
+  }
+  function canUseResult() {
+    return !!(lastCompleted && lastCompleted.studentName && lastCompleted.nameConfirmedAt && !nameEditing);
+  }
+  function canRestart() {
+    return !!(canUseResult() && !viewingPrevious && current && current.completedAt);
+  }
+  function updatePreviousButton() {
+    const button = document.getElementById('previousResultBtn');
+    if (button) button.hidden = !(canUseResult() && current && !current.completedAt);
+  }
+  function renderGate() {
+    const allowed = canUseResult();
+    document.getElementById('nameForm').hidden = allowed;
+    document.getElementById('resultIdentity').hidden = !allowed;
+    document.getElementById('resultActions').hidden = !allowed;
+    document.getElementById('learningHistory').hidden = !allowed;
+    document.getElementById('editStudentName').hidden = !allowed;
+    updatePreviousButton();
+    window.dispatchEvent(new Event('imi:resultchange'));
+  }
+  function renderInfo() {
+    if (!lastCompleted) return;
+    const result = lastCompleted;
+    document.getElementById('resultMaterial').textContent = result.metadata.materialName;
+    document.getElementById('resultStudent').textContent = result.studentName || '學生姓名';
+    const className = document.getElementById('resultClass');
+    className.textContent = result.metadata.className;
+    className.hidden = !result.metadata.className;
+    document.getElementById('resultCount').textContent = `完成 ${result.completedWords} / ${result.totalWords} 個詞彙`;
+    document.getElementById('resultTime').textContent = formatTime(result.completedAt, result.timeZone, true);
+    document.getElementById('resultTime').dateTime = result.completedAt;
+    const input = document.getElementById('studentNameInput');
+    if (document.activeElement !== input) input.value = result.studentName;
+    const list = document.getElementById('learningTimeline');
+    list.replaceChildren();
+    result.events.forEach(event => {
+      const li = document.createElement('li');
+      const time = document.createElement('time');
+      time.dateTime = event.at;
+      time.textContent = formatTime(event.at, result.timeZone);
+      const text = document.createElement('span');
+      if (event.type === 'started') text.textContent = '開始練習';
+      else if (event.type === 'word_completed') text.textContent = `${event.word} · ${event.completedWords} / ${result.totalWords}`;
+      else text.textContent = `完成練習 · ${result.stars} 顆星星`;
+      li.append(time, text);
+      list.append(li);
+    });
+    document.getElementById('resumePracticeBtn').hidden = !viewingPrevious;
+    document.getElementById('restartBtn').hidden = viewingPrevious;
+    renderGate();
+  }
+  function confirmName(value) {
+    if (!lastCompleted) return false;
+    const name = clean(String(value || '').replace(/[\u200B\uFEFF]/g, ''), 80);
+    const input = document.getElementById('studentNameInput');
+    const error = document.getElementById('nameError');
+    if (!name) {
+      error.hidden = false;
+      input.setAttribute('aria-invalid', 'true');
+      input.focus();
+      return false;
+    }
+    studentName = name;
+    nameEditing = false;
+    lastCompleted.studentName = name;
+    lastCompleted.nameConfirmedAt = now();
+    if (current) {
+      current.studentName = name;
+      if (current.id === lastCompleted.id) current.nameConfirmedAt = lastCompleted.nameConfirmedAt;
+    }
+    try { localStorage.setItem(NAME_KEY, name); }
+    catch (_) { /* The confirmed name still works in this tab. */ }
+    error.hidden = true;
+    input.removeAttribute('aria-invalid');
+    input.value = name;
+    renderInfo();
+    return true;
+  }
+  function editName() {
+    if (!lastCompleted) return;
+    nameEditing = true;
+    renderInfo();
+    const input = document.getElementById('studentNameInput');
+    input.focus({ preventScroll: true });
+  }
+  function showPrevious() {
+    if (!canUseResult() || !current || current.completedAt) return;
+    viewingPrevious = true;
+    clearTimeout(idleTimer);
+    hideRescueUI();
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    const list = document.getElementById('finalStarsContainer');
+    list.replaceChildren();
+    for (let i = 0; i < lastCompleted.totalWords; i++) {
+      const star = document.createElement('span');
+      star.className = 'final-star-item';
+      star.textContent = '⭐';
+      star.style.animation = 'none';
+      star.style.transform = 'none';
+      star.style.opacity = i < lastCompleted.stars ? '1' : '.3';
+      if (i >= lastCompleted.stars) star.style.filter = 'grayscale(100%)';
+      list.append(star);
+    }
+    document.getElementById('finalStarText').textContent = `一共有 ${lastCompleted.stars} 顆星星！`;
+    renderInfo();
+    document.getElementById('winModal').style.display = 'flex';
+  }
+  function resume() {
+    if (!viewingPrevious || !canUseResult()) return;
+    viewingPrevious = false;
+    document.getElementById('winModal').style.display = 'none';
+    resetIdleTimer();
+  }
+  function isShowingRound(id) {
+    return !!(current && current.id === id && current.completedAt && !viewingPrevious);
+  }
+  function init() {
+    readName();
+    const input = document.getElementById('studentNameInput');
+    input.value = studentName;
+    input.addEventListener('input', () => {
+      document.getElementById('nameError').hidden = true;
+      input.removeAttribute('aria-invalid');
+    });
+    document.getElementById('nameForm').addEventListener('submit', event => {
+      event.preventDefault();
+      confirmName(input.value);
+    });
+    document.getElementById('editStudentName').addEventListener('click', editName);
+    document.getElementById('resumePracticeBtn').addEventListener('click', resume);
+  }
+  return Object.freeze({
+    init, setMetadata, begin, start, completedWord, finish, confirmName, editName,
+    attachPreviousButton, canUseResult, canRestart, formatTime,
+    showPrevious, resume, isShowingRound,
+    getCurrent: () => copy(current), getLastCompleted: () => copy(lastCompleted),
+    getConfirmedResult: () => canUseResult() ? copy(lastCompleted) : null
+  });
+})();
+LearningRecord.init();
+window.IMILearningRecord = LearningRecord;
+
+
+
+// Client-side PDF export. All layout/rendering is local; no external PDF service or library.
+const StudentPDF = (() => {
+  const W = 1600, H = 2263, M = 100, BOTTOM = H - 130;
+  const COLORS = { ink: '#26332F', text: '#374151', cream: '#FFF1B8', blue: '#E0F1FA', pale: '#F2F9FD', line: '#D7E1E7', peach: '#F3C18E' };
+  const FAMILY = '"PingFang TC","Microsoft JhengHei","Noto Sans TC",sans-serif';
+  const tick = () => new Promise(resolve => setTimeout(resolve, 0));
+  function font(ctx, size, bold = false) { ctx.font = `${bold ? '600' : '400'} ${size}px ${FAMILY}`; }
+  function wrap(ctx, value, width, size, bold = false) {
+    font(ctx, size, bold);
+    const lines = [];
+    String(value == null ? '' : value).split('\n').forEach(paragraph => {
+      let line = '';
+      const tokens = paragraph.split(/(\s+)/).filter(Boolean);
+      tokens.forEach(token => {
+        if (ctx.measureText(line + token).width <= width) { line += token; return; }
+        if (line.trim()) { lines.push(line.trimEnd()); line = ''; }
+        if (ctx.measureText(token).width <= width) { line = token.trimStart(); return; }
+        for (const char of Array.from(token)) {
+          if (line && ctx.measureText(line + char).width > width) { lines.push(line); line = ''; }
+          line += char;
+        }
+      });
+      lines.push(line.trimEnd());
+    });
+    return lines.length ? lines : [''];
+  }
+  function text(ctx, value, x, y, size, bold = false, color = COLORS.ink, align = 'left') {
+    font(ctx, size, bold); ctx.fillStyle = color; ctx.textAlign = align; ctx.textBaseline = 'top'; ctx.fillText(String(value), x, y);
+  }
+  function lines(ctx, values, x, y, size, lineHeight, color = COLORS.text) {
+    values.forEach((value, i) => text(ctx, value, x, y + i * lineHeight, size, false, color));
+  }
+  function roundRect(ctx, x, y, width, height, radius, color) {
+    ctx.beginPath(); ctx.moveTo(x + radius, y); ctx.arcTo(x + width, y, x + width, y + height, radius); ctx.arcTo(x + width, y + height, x, y + height, radius); ctx.arcTo(x, y + height, x, y, radius); ctx.arcTo(x, y, x + width, y, radius); ctx.closePath(); ctx.fillStyle = color; ctx.fill();
+  }
+  function history(record) {
+    const selected = [];
+    const events = record.events || [];
+    const start = events.find(event => event.type === 'started');
+    if (start) selected.push({ at: start.at, label: '開始練習' });
+    const milestones = [...new Set([.25, .5, .75].map(ratio => Math.ceil(record.totalWords * ratio)))];
+    for (const count of milestones) {
+      if (count >= record.totalWords) continue;
+      const event = events.find(event => event.type === 'word_completed' && event.completedWords >= count);
+      if (event) {
+        selected.push({ at: event.at, label: `完成 ${event.completedWords} / ${record.totalWords} 個詞彙` });
+      }
+    }
+    selected.push({ at: record.completedAt, label: `完成全部 ${record.completedWords} 個詞彙；獲得 ${record.stars} 顆星星` });
+    return selected;
+  }
+  function makeColumns(record) {
+    const hasPy = record.vocabulary.some(word => (word.tiles || []).some(tile => String(tile.py || '').trim()));
+    const hasForeign = record.vocabulary.some(word => String(word.translation || '').trim());
+    const hasZy = record.vocabulary.some(word => (word.tiles || []).some(tile => annotation(tile).symbols.length));
+    let wordWidth = W - 2 * M - 65 - (hasPy ? 340 : 0) - (hasForeign ? 405 : 0);
+    const columns = [{ key: 'number', label: '序號', width: 65 }, { key: 'word', label: hasZy ? '詞彙（右側直式注音）' : '詞彙', width: wordWidth }];
+    if (hasPy) columns.push({ key: 'py', label: '漢語拼音', width: 340 });
+    if (hasForeign) columns.push({ key: 'foreign', label: record.metadata.language || '輔助外語', width: 405 });
+    let x = M; columns.forEach(column => { column.x = x; x += column.width; });
+    return columns;
+  }
+  function annotation(tile) {
+    const raw = Array.isArray(tile.zy) ? tile.zy.join('') : String(tile.zy || '');
+    let tone = String(tile.tone || '') || (raw.match(/[ˊˇˋ˙]/) || [''])[0];
+    tone = ({ '1': '', '2': 'ˊ', '3': 'ˇ', '4': 'ˋ', '5': '˙' })[tone] ?? tone;
+    return { symbols: Array.from(raw.replace(/[ˊˇˋ˙]/g, '')), tone };
+  }
+  function wordLines(ctx, word, width) {
+    const tiles = word.tiles && word.tiles.length ? word.tiles : Array.from(word.text || '').map(zh => ({ zh }));
+    const output = []; let row = [], rowWidth = 0;
+    for (const tile of tiles) {
+      const zy = annotation(tile); font(ctx, 46);
+      const hanziWidth = ctx.measureText(tile.zh || '').width;
+      const unitWidth = hanziWidth + (zy.symbols.length ? 18 + 24 + 22 + 16 : 16);
+      if (row.length && rowWidth + unitWidth > width) { output.push(row); row = []; rowWidth = 0; }
+      row.push({ text: tile.zh || '', zy, width: unitWidth, hanziWidth }); rowWidth += unitWidth;
+    }
+    if (row.length) output.push(row);
+    return output.length ? output : [[]];
+  }
+  function firstHeader(ctx, record) {
+    const title = wrap(ctx, record.metadata.materialName, W - 2 * M, 38, true);
+    const name = wrap(ctx, '學生姓名：' + record.studentName, 675, 30);
+    const classroom = wrap(ctx, '班級：' + (record.metadata.className || '-'), 675, 30);
+    const teacher = wrap(ctx, '教師：' + record.metadata.teacherName, 675, 28);
+    const count = wrap(ctx, `完成詞彙：${record.completedWords} / ${record.totalWords}`, 675, 28);
+    const completion = wrap(ctx, '完成時間：' + LearningRecord.formatTime(record.completedAt, record.timeZone, true), W - 2 * M, 28);
+    let y = 185;
+    const titleY = y; y += title.length * 49 + 24;
+    const nameY = y; y += Math.max(name.length, classroom.length) * 41 + 14;
+    const teacherY = y; y += Math.max(teacher.length, count.length) * 39 + 14;
+    const completionY = y; y += completion.length * 39 + 26;
+    const timeline = history(record), historyY = y, historyHeight = 75 + timeline.length * 40;
+    y += historyHeight + 28;
+    if (y + 52 > BOTTOM - 160) {
+      // Very long names / course labels switch to one full-width metadata column.
+      const stack = [
+        ...wrap(ctx, '學生姓名：' + record.studentName, W - 2 * M, 28),
+        ...wrap(ctx, '班級：' + (record.metadata.className || '-'), W - 2 * M, 28),
+        ...wrap(ctx, '教師：' + record.metadata.teacherName, W - 2 * M, 28),
+        ...wrap(ctx, `完成詞彙：${record.completedWords} / ${record.totalWords}`, W - 2 * M, 28)
+      ];
+      const stackedNameY = titleY + title.length * 49 + 24;
+      const stackedCompletionY = stackedNameY + stack.length * 39 + 16;
+      const stackedHistoryY = stackedCompletionY + completion.length * 39 + 26;
+      return { title, titleY, stack, nameY: stackedNameY, completion, completionY: stackedCompletionY,
+        timeline, historyY: stackedHistoryY, historyHeight, tableY: stackedHistoryY + historyHeight + 80 };
+    }
+    return { title, name, classroom, teacher, count, completion, titleY, nameY, teacherY, completionY, timeline, historyY, historyHeight, tableY: y + 52 };
+  }
+  function layout(record, ctx) {
+    const columns = makeColumns(record), wordColumn = columns.find(column => column.key === 'word');
+    const pyColumn = columns.find(column => column.key === 'py'), foreignColumn = columns.find(column => column.key === 'foreign');
+    const header = firstHeader(ctx, record);
+    const pages = [];
+    function page(first) {
+      const item = { first, tableY: first ? header.tableY : 230, rows: [] };
+      pages.push(item); return item;
+    }
+    let currentPage = page(true), y = currentPage.tableY + 68;
+    if (y > BOTTOM - 150) { currentPage = page(false); y = currentPage.tableY + 68; }
+    const freshCapacity = BOTTOM - 230 - 68;
+    record.vocabulary.forEach((word, index) => {
+      const data = {
+        term: wordLines(ctx, word, wordColumn.width - 40),
+        py: pyColumn ? wrap(ctx, (word.tiles || []).map(tile => String(tile.py || '').trim()).filter(Boolean).join(' '), pyColumn.width - 40, 30) : [],
+        foreign: foreignColumn ? wrap(ctx, word.translation || '', foreignColumn.width - 40, 30) : []
+      };
+      const offsets = { term: 0, py: 0, foreign: 0 }; let continuation = false;
+      function remainingHeight() { return Math.max((data.term.length - offsets.term) * 104, (data.py.length - offsets.py) * 43, (data.foreign.length - offsets.foreign) * 43, 74) + 26; }
+      while (offsets.term < data.term.length || offsets.py < data.py.length || offsets.foreign < data.foreign.length) {
+        const fullHeight = remainingHeight(), available = BOTTOM - y;
+        if (available < 110 || (fullHeight > available && fullHeight <= freshCapacity)) { currentPage = page(false); y = currentPage.tableY + 68; continue; }
+        const allowed = BOTTOM - y;
+        const counts = {
+          term: Math.min(data.term.length - offsets.term, Math.max(0, Math.floor((allowed - 26) / 104))),
+          py: Math.min(data.py.length - offsets.py, Math.max(0, Math.floor((allowed - 26) / 43))),
+          foreign: Math.min(data.foreign.length - offsets.foreign, Math.max(0, Math.floor((allowed - 26) / 43)))
+        };
+        if (!counts.term && !counts.py && !counts.foreign) { currentPage = page(false); y = currentPage.tableY + 68; continue; }
+        const height = Math.max(counts.term * 104, counts.py * 43, counts.foreign * 43, 74) + 26;
+        currentPage.rows.push({ index, continuation, y, height,
+          term: data.term.slice(offsets.term, offsets.term + counts.term),
+          py: data.py.slice(offsets.py, offsets.py + counts.py),
+          foreign: data.foreign.slice(offsets.foreign, offsets.foreign + counts.foreign) });
+        offsets.term += counts.term; offsets.py += counts.py; offsets.foreign += counts.foreign;
+        y += height; continuation = true;
+        if (offsets.term < data.term.length || offsets.py < data.py.length || offsets.foreign < data.foreign.length) { currentPage = page(false); y = currentPage.tableY + 68; }
+      }
+    });
+    return { pages, columns, header };
+  }
+  function drawWord(ctx, units, x, centerY) {
+    let cursor = x;
+    for (const unit of units) {
+      font(ctx, 46); ctx.fillStyle = COLORS.ink; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText(unit.text, cursor, centerY);
+      const symbols = unit.zy.symbols;
+      if (symbols.length) {
+        const zx = cursor + unit.hanziWidth + 18 + 12;
+        const top = centerY - (symbols.length - 1) * 26 / 2;
+        font(ctx, 24); ctx.textAlign = 'center';
+        symbols.forEach((symbol, i) => ctx.fillText(symbol, zx, top + i * 26));
+        ctx.strokeStyle = COLORS.ink; ctx.fillStyle = COLORS.ink; ctx.lineWidth = 2.6; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        if (unit.zy.tone === '˙') { ctx.beginPath(); ctx.arc(zx, top - 20, 2.7, 0, Math.PI * 2); ctx.fill(); }
+        else if (unit.zy.tone) {
+          const tx = zx + 23; ctx.beginPath();
+          if (unit.zy.tone === 'ˊ') { ctx.moveTo(tx - 5, centerY + 6); ctx.lineTo(tx + 5, centerY - 6); }
+          else if (unit.zy.tone === 'ˋ') { ctx.moveTo(tx - 5, centerY - 6); ctx.lineTo(tx + 5, centerY + 6); }
+          else if (unit.zy.tone === 'ˇ') { ctx.moveTo(tx - 6, centerY - 4); ctx.lineTo(tx, centerY + 5); ctx.lineTo(tx + 6, centerY - 4); }
+          else { font(ctx, 24); ctx.fillText(unit.zy.tone, tx, centerY); }
+          ctx.stroke();
+        }
+      }
+      cursor += unit.width;
+    }
+  }
+  function drawPage(ctx, plan, page, record, number) {
+    ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, W, H);
+    text(ctx, page.first ? '學習歷程' : '學習歷程（續）', M, 70, page.first ? 52 : 40, true);
+    text(ctx, 'IMI MANDARIN', W - M, 90, 24, false, COLORS.text, 'right');
+    ctx.strokeStyle = COLORS.peach; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(M, 148); ctx.lineTo(W - M, 148); ctx.stroke();
+    if (page.first) {
+      const h = plan.header;
+      h.title.forEach((value, i) => text(ctx, value, M, h.titleY + i * 49, 38, true));
+      if (h.stack) lines(ctx, h.stack, M, h.nameY, 28, 39);
+      else {
+        lines(ctx, h.name, M, h.nameY, 30, 41); lines(ctx, h.classroom, M + 725, h.nameY, 30, 41);
+        lines(ctx, h.teacher, M, h.teacherY, 28, 39); lines(ctx, h.count, M + 725, h.teacherY, 28, 39);
+      }
+      lines(ctx, h.completion, M, h.completionY, 28, 39);
+      roundRect(ctx, M, h.historyY, W - 2 * M, h.historyHeight, 23, COLORS.cream);
+      text(ctx, '本次學習歷程', M + 28, h.historyY + 20, 30, true);
+      h.timeline.forEach((event, i) => {
+        const y = h.historyY + 65 + i * 40;
+        text(ctx, LearningRecord.formatTime(event.at, record.timeZone), M + 28, y, 25, false, COLORS.text);
+        ctx.fillStyle = '#D89B61'; ctx.beginPath(); ctx.arc(M + 180, y + 15, 4, 0, Math.PI * 2); ctx.fill();
+        text(ctx, event.label, M + 204, y, 27);
+      });
+      text(ctx, '本次完成詞彙', M, h.tableY - 44, 31, true);
+    } else {
+      const material = wrap(ctx, record.metadata.materialName, W - 2 * M, 28)[0];
+      text(ctx, material, M, 174, 28, false, COLORS.text);
+    }
+    ctx.fillStyle = COLORS.blue; ctx.fillRect(M, page.tableY, W - 2 * M, 68);
+    plan.columns.forEach(column => {
+      // Headers can wrap while retaining the row's fixed height.
+      const size = column.key === 'number' ? 20 : 25;
+      const label = wrap(ctx, column.label, column.width - 24, size, true);
+      label.slice(0, 2).forEach((line, i) => text(ctx, line, column.x + column.width / 2, page.tableY + (label.length > 1 ? 7 : (68 - size) / 2) + i * 28, size, true, COLORS.ink, 'center'));
+    });
+    page.rows.forEach(row => {
+      ctx.fillStyle = row.index % 2 ? '#FFFFFF' : COLORS.pale; ctx.fillRect(M, row.y, W - 2 * M, row.height);
+      text(ctx, String(row.index + 1) + (row.continuation ? '續' : ''), M + 32.5, row.y + 34, row.continuation ? 19 : 24, false, COLORS.text, 'center');
+      const wc = plan.columns.find(column => column.key === 'word');
+      row.term.forEach((units, i) => drawWord(ctx, units, wc.x + 20, row.y + 13 + 52 + i * 104));
+      const py = plan.columns.find(column => column.key === 'py'), foreign = plan.columns.find(column => column.key === 'foreign');
+      if (py) lines(ctx, row.py, py.x + 20, row.y + 25, 30, 43);
+      if (foreign) lines(ctx, row.foreign, foreign.x + 20, row.y + 25, 30, 43);
+    });
+    const end = page.rows.length ? page.rows[page.rows.length - 1].y + page.rows[page.rows.length - 1].height : page.tableY + 68;
+    ctx.strokeStyle = COLORS.line; ctx.lineWidth = 2;
+    for (const column of plan.columns) { ctx.beginPath(); ctx.moveTo(column.x, page.tableY); ctx.lineTo(column.x, end); ctx.stroke(); }
+    ctx.beginPath(); ctx.moveTo(W - M, page.tableY); ctx.lineTo(W - M, end); ctx.stroke();
+    for (const y of [page.tableY, page.tableY + 68, ...page.rows.map(row => row.y + row.height)]) { ctx.beginPath(); ctx.moveTo(M, y); ctx.lineTo(W - M, y); ctx.stroke(); }
+    ctx.beginPath(); ctx.moveTo(M, H - 100); ctx.lineTo(W - M, H - 100); ctx.stroke();
+    text(ctx, 'Made by IMI Teacher Evelyn', M, H - 74, 25, false, COLORS.text);
+    text(ctx, `${number} / ${plan.pages.length}`, W - M, H - 74, 25, false, COLORS.text, 'right');
+  }
+  function pdfString(value) {
+    const string = String(value); let hex = 'FEFF';
+    for (let i = 0; i < string.length; i++) hex += string.charCodeAt(i).toString(16).padStart(4, '0');
+    return '<' + hex + '>';
+  }
+  function assemblePDF(images, record) {
+    const encoder = new TextEncoder();
+    const bytes = value => encoder.encode(value);
+    const objects = [];
+    objects[1] = [bytes('<< /Type /Catalog /Pages 2 0 R >>')];
+    const kids = images.map((_, index) => `${3 + index * 3} 0 R`).join(' ');
+    objects[2] = [bytes(`<< /Type /Pages /Count ${images.length} /Kids [${kids}] >>`)];
+    images.forEach((image, index) => {
+      const pageId = 3 + index * 3, imageId = pageId + 1, contentId = pageId + 2;
+      objects[pageId] = [bytes(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595.28 841.89] /Resources << /XObject << /Im0 ${imageId} 0 R >> >> /Contents ${contentId} 0 R >>`)];
+      objects[imageId] = [bytes(`<< /Type /XObject /Subtype /Image /Width ${W} /Height ${H} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${image.length} >>\nstream\n`), image, bytes('\nendstream')];
+      const content = bytes('q\n595.28 0 0 841.89 0 0 cm\n/Im0 Do\nQ\n');
+      objects[contentId] = [bytes(`<< /Length ${content.length} >>\nstream\n`), content, bytes('endstream')];
+    });
+    const infoId = 3 + images.length * 3;
+    objects[infoId] = [bytes(`<< /Title ${pdfString(record.metadata.materialName + ' - ' + record.studentName)} /Author (IMI Teacher Evelyn) /Creator (IMI Vocabulary Hub) >>`)];
+    const parts = [], offsets = [0]; let length = 0;
+    function append(part) { parts.push(part); length += part.length; }
+    append(bytes('%PDF-1.4\n%IMI\n'));
+    for (let id = 1; id < objects.length; id++) {
+      offsets[id] = length; append(bytes(`${id} 0 obj\n`)); objects[id].forEach(append); append(bytes('\nendobj\n'));
+    }
+    const xref = length;
+    append(bytes(`xref\n0 ${objects.length}\n0000000000 65535 f \n`));
+    for (let id = 1; id < objects.length; id++) append(bytes(`${String(offsets[id]).padStart(10, '0')} 00000 n \n`));
+    append(bytes(`trailer\n<< /Size ${objects.length} /Root 1 0 R /Info ${infoId} 0 R >>\nstartxref\n${xref}\n%%EOF\n`));
+    return new Blob(parts, { type: 'application/pdf' });
+  }
+  function segment(value) {
+    let result = '';
+    for (const char of Array.from(String(value || '').replace(/[\\/:*?"<>|\u0000-\u001F]/g, '_').trim())) {
+      if (new TextEncoder().encode(result + char).length > 60) break;
+      result += char;
+    }
+    return result.replace(/[. ]+$/g, '') || 'IMI';
+  }
+  function filename(record) {
+    let date = record.completedAt.slice(0, 10);
+    try {
+      const parts = new Intl.DateTimeFormat('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit', timeZone: record.timeZone }).formatToParts(new Date(record.completedAt));
+      const values = Object.fromEntries(parts.map(part => [part.type, part.value])); date = `${values.year}-${values.month}-${values.day}`;
+    } catch (_) {}
+    return [record.metadata.className && segment(record.metadata.className), segment(record.studentName), segment(record.metadata.materialName), date].filter(Boolean).join('_') + '.pdf';
+  }
+  async function create(record, progress) {
+    if (!record || !record.nameConfirmedAt || !record.studentName || !record.completedAt) throw new Error('Name required');
+    if (document.fonts && document.fonts.ready) await document.fonts.ready;
+    const canvas = document.createElement('canvas'); canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext('2d'); if (!ctx) throw new Error('Canvas unavailable');
+    const plan = layout(record, ctx), images = [];
+    for (let i = 0; i < plan.pages.length; i++) {
+      drawPage(ctx, plan, plan.pages[i], record, i + 1);
+      const image = await new Promise((resolve, reject) => canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Image unavailable')), 'image/jpeg', .96));
+      images.push(new Uint8Array(await image.arrayBuffer()));
+      if (progress) progress(i + 1, plan.pages.length);
+      await tick();
+    }
+    canvas.width = 1; canvas.height = 1;
+    return { blob: assemblePDF(images, record), filename: filename(record), pages: plan.pages.length };
+  }
+  return Object.freeze({ create, filename });
+})();
+window.IMIStudentPDF = StudentPDF;
+
+
+
+// Batch 4: real local files, prepared before invoking a native share sheet.
+const StudentExports = (() => {
+  let busy = false, generation = 0;
+  const cache = new Map();
+  const status = document.getElementById('pdfStatus');
+  const ids = ['downloadPdfBtn','sharePdfBtn','downloadImageBtn','shareImageBtn','openReviewBtn','editStudentName','restartBtn','resumePracticeBtn'];
+  const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+  const key = record => [record.id, record.studentName, record.nameConfirmedAt].join('|');
+  function wrap(ctx, value, width, size, weight='400') {
+    ctx.font = `${weight} ${size}px "PingFang TC","Microsoft JhengHei",sans-serif`;
+    const lines=[]; let line='';
+    for(const char of Array.from(String(value || ''))) {
+      if(char==='\n'||(line&&ctx.measureText(line+char).width>width)){lines.push(line);line='';if(char==='\n')continue;}
+      line+=char;
+    }
+    if(line)lines.push(line);return lines.length?lines:[''];
+  }
+  function rounded(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+  function star(ctx,x,y,r,lit){ctx.beginPath();for(let i=0;i<10;i++){const angle=-Math.PI/2+i*Math.PI/5,d=i%2?r*.46:r;const px=x+Math.cos(angle)*d,py=y+Math.sin(angle)*d;i?ctx.lineTo(px,py):ctx.moveTo(px,py);}ctx.closePath();ctx.fillStyle=lit?'#FFD66C':'#E4E6E3';ctx.fill();ctx.strokeStyle=lit?'#D9A943':'#CACDC8';ctx.lineWidth=2;ctx.stroke();}
+  async function image(record) {
+    if(!record?.nameConfirmedAt||!record.studentName||!record.completedAt)throw Error('Name required');
+    if(document.fonts?.ready)await document.fonts.ready;
+    const canvas=document.createElement('canvas');canvas.width=1000;
+    const ctx=canvas.getContext('2d');if(!ctx)throw Error('Canvas unavailable');
+    const material=wrap(ctx,record.metadata.materialName,820,36,'600');
+    const names=wrap(ctx,record.studentName,820,54,'600');
+    const classes=record.metadata.className?wrap(ctx,record.metadata.className,820,30):[];
+    const teacher=wrap(ctx,'教師：'+record.metadata.teacherName,820,27);
+    const cols=12,rows=Math.ceil(record.totalWords/cols),step=64;
+    const height=560+material.length*47+names.length*68+classes.length*42+teacher.length*38+rows*step;
+    if(height>30000)throw Error('Too many stars');
+    canvas.height=height;
+    ctx.fillStyle='#FFFCF5';ctx.fillRect(0,0,1000,height);
+    const gradient=ctx.createLinearGradient(20,20,980,height-20);
+    ['#F6ADBA','#FFD0A3','#FFE797','#C8E6B1','#B2DDF2','#DAC4EF'].forEach((color,i)=>gradient.addColorStop(i/5,color));
+    rounded(ctx,20,20,960,height-40,52);ctx.fillStyle=gradient;ctx.fill();
+    rounded(ctx,32,32,936,height-64,42);ctx.fillStyle='white';ctx.fill();
+    let y=76;ctx.textBaseline='top';ctx.textAlign='center';
+    function line(value,size,color='#26332F',bold=false){ctx.font=`${bold?'600':'400'} ${size}px "PingFang TC","Microsoft JhengHei",sans-serif`;ctx.fillStyle=color;ctx.fillText(value,500,y);}
+    material.forEach(value=>{line(value,36,'#374151',true);y+=47});y+=16;
+    line('太棒了！',68,'#388E3C',true);y+=90;line('你學會了！',37,'#374151');y+=65;
+    for(let i=0;i<record.totalWords;i++){const row=Math.floor(i/cols),rowCount=Math.min(cols,record.totalWords-row*cols);star(ctx,500+(i%cols-(rowCount-1)/2)*step,y+30+row*step,25,i<record.stars)}
+    y+=rows*step+14;line(`一共有 ${record.stars} 顆星星！`,40,'#8B651B',true);y+=72;
+    ctx.strokeStyle='#DDE7DF';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(90,y);ctx.lineTo(910,y);ctx.stroke();y+=32;
+    names.forEach(value=>{line(value,54,'#26332F',true);y+=68});classes.forEach(value=>{line(value,30,'#374151');y+=42});
+    y+=10;line(`完成 ${record.completedWords} / ${record.totalWords} 個詞彙`,33,'#284E2A',true);y+=56;
+    teacher.forEach(value=>{line(value,27,'#374151');y+=38});
+    const date=wrap(ctx,LearningRecord.formatTime(record.completedAt,record.timeZone,true),820,27);date.forEach(value=>{line(value,27,'#374151');y+=38});
+    ctx.font='26px "PingFang TC",sans-serif';ctx.fillStyle='#374151';ctx.fillText('Made by IMI Teacher Evelyn',500,height-82);
+    const blob=await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(Error('PNG unavailable')),'image/png'));
+    canvas.width=canvas.height=1;
+    return {blob,filename:StudentPDF.filename(record).replace(/\.pdf$/,'.png')};
+  }
+  function current(kind){const record=LearningRecord.getConfirmedResult();const item=cache.get(kind);return record&&item&&item.key===key(record)?item:null;}
+  function toggleBusy(value){busy=value;ids.forEach(id=>{const el=document.getElementById(id);if(el)el.disabled=value;});document.querySelectorAll('#resultActions a').forEach(a=>{a.style.pointerEvents=value?'none':'';a.setAttribute('aria-disabled',String(value));});}
+  async function prepare(kind) {
+    if(busy)return null;
+    const record=LearningRecord.getConfirmedResult();if(!record)return null;
+    if(current(kind))return current(kind);
+    toggleBusy(true);const token=generation;
+    status.textContent=kind==='pdf'?'PDF…':'圖卡…';
+    try {
+      if(kind==='image'){
+        while(!LearningRecord.getLastCompleted()?.readyForExport){if(token!==generation)return null;await wait(120);}
+      }
+      const result=kind==='pdf'?await StudentPDF.create(record,(n,total)=>status.textContent=`PDF ${n}/${total}`):await image(record);
+      if(token!==generation||key(LearningRecord.getConfirmedResult()||{})!==key(record))return null;
+      const item={...result,key:key(record),url:URL.createObjectURL(result.blob)};cache.set(kind,item);
+      const link=document.getElementById(kind==='pdf'?'pdfReadyLink':'imageReadyLink');link.href=item.url;link.download=item.filename;link.hidden=false;
+      document.getElementById(kind==='pdf'?'downloadPdfBtn':'downloadImageBtn').hidden=true;
+      return item;
+    }catch(error){console.error('Export failed',error);status.textContent='請重試 Try again';return null;}
+    finally{toggleBusy(false);}
+  }
+  async function download(kind){if(busy)return;const item=current(kind)||await prepare(kind);if(!item)return;document.getElementById(kind==='pdf'?'pdfReadyLink':'imageReadyLink').click();status.textContent=kind==='pdf'?'PDF OK':'圖卡 OK';}
+  async function share(kind){
+    if(busy)return;
+    const item=current(kind);
+    if(!item){const result=await prepare(kind);if(result)status.textContent='檔案已準備好，請再點分享。Tap Share.';return;}
+    const file=new File([item.blob],item.filename,{type:item.blob.type});
+    if(!navigator.share||!navigator.canShare||!navigator.canShare({files:[file]})){
+      status.textContent='請先下載，再附加到 LINE、WhatsApp、Email 或 Google 雲端。Download first.';return;
+    }
+    toggleBusy(true);
+    try{await navigator.share({files:[file]});status.textContent='可返回繼續操作。';}
+    catch(error){status.textContent=error.name==='AbortError'?'已取消，可再分享。':'無法分享，請先下載再附加檔案。Download first.';}
+    finally{toggleBusy(false);}
+  }
+  function invalidate(){generation++;for(const item of cache.values())URL.revokeObjectURL(item.url);cache.clear();['pdf','image'].forEach(kind=>{const link=document.getElementById(kind==='pdf'?'pdfReadyLink':'imageReadyLink');link.hidden=true;link.removeAttribute('href');document.getElementById(kind==='pdf'?'downloadPdfBtn':'downloadImageBtn').hidden=false;});if(!busy)status.textContent='';}
+  document.getElementById('downloadPdfBtn').onclick=()=>download('pdf');document.getElementById('downloadImageBtn').onclick=()=>download('image');
+  document.getElementById('sharePdfBtn').onclick=()=>share('pdf');document.getElementById('shareImageBtn').onclick=()=>share('image');
+  window.addEventListener('imi:resultchange',invalidate);
+  window.addEventListener('pagehide',invalidate);
+  return Object.freeze({image});
+})();
+window.IMIStudentExports=StudentExports;
+
+// Batch 5: original display controls, same speech function and teacher corrections.
+const StudentReview = (() => {
+  const $=id=>document.getElementById(id),overlay=$('reviewOverlay'),card=$('reviewCard');
+  const colors=['#FFF1B8','#E0F1FA','#EDE3F6','#E2F0D6'];
+  let record=null,index=0,has={},serial=0,utterance=null,guard=null,priorOverflow='',start=null,suppressUntil=0;
+  const annotations=tile=>{const raw=Array.isArray(tile.zy)?tile.zy.join(''):String(tile.zy||'');let tone=String(tile.tone||'')||(raw.match(/[ˊˇˋ˙]/)||[''])[0];tone=({'1':'','2':'ˊ','3':'ˇ','4':'ˋ','5':'˙'})[tone]??tone;return{symbols:Array.from(raw.replace(/[ˊˇˋ˙]/g,'')),tone}};
+  function stop(){serial++;clearTimeout(guard);if('speechSynthesis'in window)speechSynthesis.cancel();utterance=null;$('reviewSpeak').classList.remove('playing');$('reviewAudioStatus').textContent='';}
+  function sync(){
+    const settings=[['foreign','reviewTrans',transVisible,record.metadata.language||'外語','hide-review-foreign'],['py','reviewPy',pinyinVisible,'拼音 Pinyin','hide-review-py'],['zy','reviewZy',zhuyinVisible,'注音ㄅㄆㄇ','hide-review-zy']];
+    settings.forEach(([kind,id,on,label,klass])=>{const el=$(id);el.hidden=!has[kind];el.textContent=(on?'👁️ ':'🙈 ')+label;el.classList.toggle('off',!on);el.setAttribute('aria-pressed',String(on));card.classList.toggle(klass,!on);});
+  }
+  function render(){
+    stop();$('reviewError').hidden=true;
+    const word=record.vocabulary[index];$('reviewWord').replaceChildren();
+    const tiles=word.tiles?.length?word.tiles:Array.from(word.text).map(zh=>({zh}));
+    $('reviewWord').dataset.fourAnnotated=String(tiles.length===4&&has.zy);
+    tiles.forEach(tile=>{const unit=document.createElement('span');unit.className='review-unit';const hz=document.createElement('span');hz.className='review-hz';hz.textContent=tile.zh||'';unit.append(hz);
+      if(has.zy){const annotation=document.createElement('span');annotation.className='review-annotation';const zy=annotations(tile);const symbols=document.createElement('span');symbols.className='review-symbols';zy.symbols.forEach(char=>{const part=document.createElement('span');part.textContent=char;symbols.append(part);});annotation.append(symbols);if(zy.symbols.length&&zy.tone){const tone=document.createElement('span');tone.className='review-tone'+(zy.tone==='˙'?' light':'');tone.textContent=zy.tone;annotation.append(tone);}unit.append(annotation);}
+      $('reviewWord').append(unit);
+    });
+    $('reviewPinyin').textContent=tiles.map(tile=>tile.py||'').filter(Boolean).join(' ');$('reviewPinyin').hidden=!has.py;
+    $('reviewForeign').textContent=word.translation||'';$('reviewForeign').hidden=!has.foreign;
+    $('reviewProgress').textContent=`${index+1} / ${record.vocabulary.length}`;$('reviewPrev').disabled=index===0;$('reviewNext').disabled=index===record.vocabulary.length-1;
+    card.style.background=colors[index%colors.length];sync();
+  }
+  function move(delta){if(!record||overlay.hidden)return;const next=Math.max(0,Math.min(record.vocabulary.length-1,index+delta));if(next===index)return;index=next;render();}
+  function play(){
+    if(!record||overlay.hidden)return;stop();$('reviewError').hidden=true;
+    const token=serial;
+    if(!('speechSynthesis'in window)){showError();return;}
+    const done=()=>{if(token!==serial)return;clearTimeout(guard);$('reviewSpeak').classList.remove('playing');$('reviewAudioStatus').textContent='播放結束';};
+    function showError(){if(token!==undefined&&token!==serial)return;clearTimeout(guard);$('reviewSpeak').classList.remove('playing');$('reviewError').textContent='無法播放，請再試一次。Try again.';$('reviewError').hidden=false;}
+    const word=record.vocabulary[index];
+    utterance=playAudio(word.ttsText||word.text,{start(){if(token!==serial)return;clearTimeout(guard);$('reviewSpeak').classList.add('playing');$('reviewAudioStatus').textContent='正在播放';},end:done,error:showError});
+    guard=setTimeout(()=>{if(token===serial&&!speechSynthesis.speaking)showError();},6000);
+  }
+  function open(){
+    const result=LearningRecord.getConfirmedResult();if(!result?.vocabulary?.length)return;
+    record=result;index=0;
+    has={py:record.vocabulary.some(w=>(w.tiles||[]).some(t=>String(t.py||'').trim())),zy:record.vocabulary.some(w=>(w.tiles||[]).some(t=>annotations(t).symbols.length)),foreign:$('btnTrans').style.display!=='none'&&record.vocabulary.some(w=>String(w.translation||'').trim())};
+    $('reviewTitle').textContent=record.metadata.materialName;
+    clearTimeout(idleTimer);hideRescueUI();$('winModal').style.display='none';$('gameViewport').inert=true;
+    priorOverflow=document.body.style.overflow;document.body.style.overflow='hidden';
+    overlay.hidden=false;overlay.scrollTop=0;render();$('reviewSpeak').focus({preventScroll:true});
+  }
+  function close(){if(overlay.hidden)return;stop();overlay.hidden=true;document.body.style.overflow=priorOverflow;$('gameViewport').inert=false;$('winModal').style.display='flex';$('openReviewBtn').focus({preventScroll:true});}
+  $('openReviewBtn').onclick=open;$('reviewReturn').onclick=close;$('reviewSpeak').onclick=play;$('reviewPrev').onclick=()=>move(-1);$('reviewNext').onclick=()=>move(1);
+  $('reviewTrans').onclick=()=>{toggleTranslation();sync();};$('reviewPy').onclick=()=>{togglePinyin();sync();};$('reviewZy').onclick=()=>{toggleZhuyin();sync();};
+  card.addEventListener('click',event=>{if(performance.now()<suppressUntil||event.target.closest('button'))return;play();});
+  card.addEventListener('pointerdown',event=>{if(!event.isPrimary||event.target.closest('button'))return;start={x:event.clientX,y:event.clientY,id:event.pointerId};card.setPointerCapture?.(event.pointerId);});
+  card.addEventListener('pointerup',event=>{if(!start||event.pointerId!==start.id)return;const dx=event.clientX-start.x,dy=event.clientY-start.y;start=null;if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.4){suppressUntil=performance.now()+500;move(dx<0?1:-1);}});
+  card.addEventListener('pointercancel',()=>start=null);
+  overlay.addEventListener('keydown',event=>{if(event.key==='Escape'){event.preventDefault();close();}if(event.key==='ArrowLeft'){event.preventDefault();move(-1);}if(event.key==='ArrowRight'){event.preventDefault();move(1);}if(event.key==='Tab'){const focusable=[...overlay.querySelectorAll('button:not([disabled])')].filter(el=>!el.hidden);const first=focusable[0],last=focusable.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();});window.addEventListener('pagehide',stop);
+  const bg=getComputedStyle(document.body).backgroundImage;if(bg&&bg!=='none')overlay.style.setProperty('--imi-review-background',bg);
+  return Object.freeze({open,close});
+})();
+window.IMIStudentReview=StudentReview;
+
 </script>
 </body>
 </html>
