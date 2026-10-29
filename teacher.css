@@ -1,0 +1,54 @@
+@font-face{font-family:IMIExport;src:url('fonts/IMI-CJK.woff') format('woff');font-display:swap}
+body.imi-teacher{padding:20px;background-color:#fff8ee;color:#30303d;align-items:stretch}
+.imi-teacher #teacherPanel{display:block!important;width:auto;max-width:none;margin:0 20px;padding:0;border-radius:22px;box-sizing:border-box;background:#fffaf5}
+.imi-teacher #teacherPanel *{box-sizing:border-box}
+.imi-teacher .brand-header{margin:0;padding:20px 24px;border-bottom:1px solid #e4dce6}
+.imi-teacher .brand-header h1{font-size:20px}.imi-teacher .brand-header p{font-size:13px}
+.imi-teacher .tu-layout{display:grid;grid-template-columns:330px minmax(0,1fr);gap:20px;padding:20px}
+.imi-teacher .tu-sidebar,.imi-teacher .tu-work{min-width:0}
+.imi-teacher #auditDashboard{padding:0;margin:0;border:0;background:transparent;gap:0}
+.imi-teacher .tu-sidebar{background:#fff;border:1px solid #e3dbe8;border-radius:16px;padding:18px;align-self:start}
+.imi-teacher .settings-grid{display:flex;flex-direction:column;gap:14px;margin:0}
+.imi-teacher .setting-item{margin:0;width:100%}.imi-teacher .setting-item label{font-size:15px}
+.imi-teacher .setting-item input,.imi-teacher .setting-item select{font-size:16px;padding:11px;width:100%;min-width:0}
+.imi-teacher .custom-dropdown{z-index:30}
+.imi-teacher .tu-importhead{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin:22px 0 10px}
+.imi-teacher .tu-importhead h2{font-size:17px;margin:0}.imi-teacher .tu-importhead a{color:#786582;font-size:13px}
+.imi-teacher .tu-sidebar textarea{width:100%;min-height:130px;height:150px;font:13px/1.5 monospace;padding:12px;border:1px solid #d9d0df;border-radius:10px;margin:10px 0}
+.imi-teacher .tu-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.imi-teacher button.tu-button,.imi-teacher a.tu-button{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid #d7ccdf;border-radius:10px;padding:9px 12px;background:#fff;color:#51445e;font:15px/1.4 inherit;min-height:44px;cursor:pointer;text-decoration:none}
+.imi-teacher button.tu-primary{background:#786582;color:#fff;border-color:#786582}
+.imi-teacher button:disabled{opacity:.5;cursor:not-allowed}
+.imi-teacher .tu-tabs{display:flex;gap:8px;margin-bottom:12px}.imi-teacher .tu-tabs button{flex:1;font-size:17px;font-weight:600;padding:12px}
+.imi-teacher .tu-tabs [aria-selected=true]{background:#786582;color:#fff}
+.imi-teacher .tu-zone{border:1px solid #e1d8e5;background:#fff;border-radius:15px;margin-bottom:14px;overflow:hidden}
+.imi-teacher .tu-zonehead{padding:12px 14px;background:#f1edf4;display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}
+.imi-teacher .tu-zonehead h2{margin:0;font-size:17px;font-weight:600}.imi-teacher .tu-red .tu-zonehead{background:#fff0ef;color:#aa353c}.imi-teacher .tu-green .tu-zonehead{background:#eef7f0;color:#276448}
+.imi-teacher .tu-zonehead .tu-button{font-size:13px;padding:7px 9px;min-height:36px}
+.imi-teacher .tu-word{padding:9px 14px;border-top:1px solid #eee8f1;display:flex;align-items:center;gap:12px;min-height:76px}
+.imi-teacher .tu-info{flex:1;min-width:0}.imi-teacher .tu-annotated{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.imi-teacher .tu-unit{display:inline-grid;grid-template-columns:auto auto;grid-template-rows:auto auto;align-items:center;position:relative;gap:0 2px}
+.imi-teacher .tu-char{border:0;background:transparent;color:#30303d;font:26px/1.2 inherit;font-size:26px;padding:4px 2px;cursor:pointer;border-radius:5px}.imi-teacher .tu-char:hover{background:#eee6f3}
+.imi-teacher .tu-py{grid-column:1/-1;text-align:center;font-size:13px;color:#655d70;line-height:1.6;overflow-wrap:anywhere}
+.imi-teacher .tu-annotation{position:relative;display:flex;align-items:center;min-width:18px;min-height:42px;padding-right:10px}
+.imi-teacher .tu-bopo{display:flex;flex-direction:column;font:13px/1.05 IMIExport,sans-serif;align-items:center}
+.imi-teacher .tu-mark{position:absolute;right:0;top:50%;transform:translateY(-50%);font:18px IMIExport,sans-serif}
+.imi-teacher .tu-dot{position:absolute;top:-7px;left:0;width:13px;text-align:center;font-size:18px;line-height:1}
+.imi-teacher .tu-meaning{font-size:12px;color:#6b6171;margin-top:4px;overflow-wrap:anywhere;white-space:pre-wrap}
+.imi-teacher .tu-error{color:#ad303a;font-size:13px;white-space:pre-wrap}.imi-teacher .tu-warning{color:#885e20;font-size:12px}
+.imi-teacher .tu-actions{display:flex;gap:6px;flex-shrink:0}.imi-teacher .tu-icon{width:40px;height:40px;padding:9px;border:none;border-radius:10px;cursor:pointer;position:relative}.imi-teacher .tu-icon svg{width:21px;height:21px;display:block;stroke:currentColor;fill:none}
+.imi-teacher .tu-sound{color:#0878a9;background:#e0f2fd}.imi-teacher .tu-edit{color:#78608d;background:#eee5f6}.imi-teacher .tu-confirm{color:#258449;background:#e2f5e8}.imi-teacher .tu-confirm[aria-pressed=true]{color:white;background:#27834a}.imi-teacher .tu-delete{color:#b94c53;background:#ffe8e8}
+.imi-teacher .tu-icon:after{content:attr(data-tip);position:absolute;right:0;bottom:calc(100% + 4px);background:#34303d;color:#fff;padding:5px 7px;border-radius:5px;font-size:12px;white-space:nowrap;pointer-events:none;opacity:0;z-index:3}.imi-teacher .tu-icon:hover:after,.imi-teacher .tu-icon:focus-visible:after{opacity:1}
+.imi-teacher .tu-status{font-size:13px;line-height:1.6;margin:10px 0;color:#65566e;white-space:pre-wrap}
+.imi-teacher #linkResult{padding:12px;margin-top:12px;border:1px solid #d7ccdf;border-radius:12px;background:#faf7fc}.imi-teacher #linkResult p{font-size:13px!important}
+.imi-teacher #generatedUrl{width:100%;font-size:12px}.imi-teacher .tu-qr{display:block;max-width:100%;height:auto;margin:12px auto}
+.imi-teacher .tu-pdfcontrols{background:#fff;border:1px solid #ded5e4;border-radius:15px;padding:16px;margin-bottom:16px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.imi-teacher .tu-pdfcontrols label{font-size:14px}.imi-teacher .tu-pdfcontrols select{width:100%;margin-top:6px;padding:10px;font-size:16px;border-radius:9px;border:1px solid #d5cadd;background:white;color:#30303d}
+.imi-teacher .tu-full{grid-column:1/-1}.imi-teacher .tu-pdfpage{width:100%;height:auto;display:block;margin-bottom:16px;box-shadow:0 2px 8px #0001;background:white}
+.imi-teacher .tu-pages{max-width:780px;margin:auto}.imi-teacher .tu-dialog{border:1px solid #c4b5cd;border-radius:18px;padding:22px;background:white;color:#30303d;width:min(580px,calc(100% - 24px));max-height:90vh;overflow:auto;box-shadow:0 15px 60px #0003}.imi-teacher .tu-dialog::backdrop{background:#30263766}
+.imi-teacher .tu-dialog label{display:block;font-size:14px;margin:12px 0}.imi-teacher .tu-dialog input,.imi-teacher .tu-dialog textarea,.imi-teacher .tu-dialog select{display:block;width:100%;padding:10px;border:1px solid #d5cadd;border-radius:9px;font:16px/1.5 inherit;box-sizing:border-box;margin-top:5px}
+.imi-teacher .tu-dialog h2{margin-top:0;font-size:21px}.imi-teacher .tu-candidates{display:flex;gap:6px;flex-wrap:wrap}
+.imi-teacher [hidden]{display:none!important}
+@media(pointer:coarse){.imi-teacher .tu-icon{width:44px;height:44px}}
+@media(max-width:960px){.imi-teacher .tu-layout{grid-template-columns:290px minmax(0,1fr);gap:12px;padding:12px}.imi-teacher .tu-word{flex-wrap:wrap}.imi-teacher .tu-actions{margin-left:auto}}
+@media(max-width:700px){body.imi-teacher{padding:8px}.imi-teacher #teacherPanel{margin:0}.imi-teacher .tu-layout{grid-template-columns:1fr}.imi-teacher .brand-header{padding:14px}.imi-teacher .brand-header h1{font-size:17px}.imi-teacher .tu-pdfcontrols{grid-template-columns:1fr}.imi-teacher .tu-word{gap:8px}.imi-teacher .tu-zonehead h2{font-size:16px}}

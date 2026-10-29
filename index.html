@@ -13,7 +13,7 @@ body {
     color: #444; overflow-x: hidden; padding-top: 20px;
     
     /* 👇 這次保證是真正的轉換網址！ */
-    background-image: url('https://lh3.googleusercontent.com/d/1lOcPtHdy8U-V1ZHCtvRtsgJhXSQTFnYW');
+    background-image: url('assets/original-background.jpg');
     background-size: cover;          
     background-position: center;     
     background-attachment: fixed;    
@@ -784,6 +784,7 @@ body {
 .picture-toolbar h2 span,.picture-toolbar h2 small{display:block;white-space:nowrap}.picture-toolbar h2 small{font-size:12px;margin-top:2px;font-weight:500}
 
 </style>
+<link rel="stylesheet" href="teacher.css">
 </head>
 
 <body id="gameBody">
@@ -791,7 +792,7 @@ body {
   <div id="teacherPanel">
     <div class="brand-header">
       <div class="imi-logo-container">
-        <img src="https://lh3.googleusercontent.com/d/1pVzgjMeFRcr6FKrx1DVhElykenr7ta0o" alt="IMI Logo">
+        <img src="assets/original-logo.png" alt="IMI Logo">
       </div>
       <div class="brand-text">
         <h1>IMI - Inkheart Mandarin Immersion Teacher Studio</h1>
@@ -3004,5 +3005,13 @@ const StudentReview = (() => {
 window.IMIStudentReview=StudentReview;
 
 </script>
+<script src="vocab-data.js"></script>
+<script src="student-data-adapter.js"></script>
+<script src="phonetic.js"></script>
+<script src="vendor/pdf-lib.min.js"></script>
+<script src="vendor/qrcode.js"></script>
+<script src="teacher-pdf.js"></script>
+<script src="teacher-icons.js"></script>
+<script src="teacher.js"></script>
 </body>
 </html>
