@@ -52,3 +52,36 @@ body.imi-teacher{padding:20px;background-color:#fff8ee;color:#30303d;align-items
 @media(pointer:coarse){.imi-teacher .tu-icon{width:44px;height:44px}}
 @media(max-width:960px){.imi-teacher .tu-layout{grid-template-columns:290px minmax(0,1fr);gap:12px;padding:12px}.imi-teacher .tu-word{flex-wrap:wrap}.imi-teacher .tu-actions{margin-left:auto}}
 @media(max-width:700px){body.imi-teacher{padding:8px}.imi-teacher #teacherPanel{margin:0}.imi-teacher .tu-layout{grid-template-columns:1fr}.imi-teacher .brand-header{padding:14px}.imi-teacher .brand-header h1{font-size:17px}.imi-teacher .tu-pdfcontrols{grid-template-columns:1fr}.imi-teacher .tu-word{gap:8px}.imi-teacher .tu-zonehead h2{font-size:16px}}
+
+/* v1.1 teacher-only spacing. Original sidebar breakpoints remain intact. */
+body.imi-teacher{padding:24px 48px}
+.imi-teacher #teacherPanel{width:100%;max-width:1200px;margin:0 auto;background:rgba(255,250,245,.85)}
+.imi-teacher .tu-sidebar,.imi-teacher .tu-zone{background:rgba(255,255,255,.94)}
+.imi-teacher .tu-tabs button{flex:0 1 140px;min-width:100px}
+.imi-teacher .tu-word{flex-wrap:wrap;column-gap:16px}
+.imi-teacher .tu-info{flex:0 1 var(--tu-info-width,280px);width:var(--tu-info-width,280px);max-width:100%;overflow-x:auto;padding-top:3px}
+.imi-teacher .tu-annotated{width:max-content;flex-wrap:nowrap;align-items:center;padding:3px 2px}
+.imi-teacher .tu-unit{flex-shrink:0}
+.imi-teacher .tu-actions{margin-left:0}
+.imi-teacher .tu-annotation{min-height:0;align-items:center}
+.imi-teacher .tu-dot{position:static;width:3px;height:3px;flex:none;border-radius:50%;background:currentColor;line-height:0;font-size:0;margin:0 auto 2px}
+.imi-teacher .tu-bopo{padding:2px 0}
+.imi-teacher .tu-meaning{max-width:var(--tu-info-width,280px)}
+.imi-teacher .tu-candidates{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:16px 0}
+.imi-teacher .tu-candidates button:only-child{grid-column:1/-1}
+.imi-teacher .tu-candidates button{min-height:52px}
+.imi-teacher .tu-candidates [aria-pressed=true]{background:#786582;color:white;border-color:#786582;box-shadow:0 0 0 2px #d7ccdf}
+.imi-teacher .tu-manual{margin:14px 0}.imi-teacher .tu-manual summary{cursor:pointer;color:#65566e}
+.imi-teacher .tu-copy-success{background:#27834a!important;color:#fff!important;border-color:#27834a!important}
+.imi-teacher .tu-source{font-size:12px;margin:16px 0;color:#65566e}.imi-teacher .tu-source a{color:inherit}
+@media(max-width:960px){body.imi-teacher{padding:20px 48px}.imi-teacher .tu-actions{margin-left:0}}
+@media(max-width:700px){body.imi-teacher{padding:8px}.imi-teacher #teacherPanel{margin:0 auto}.imi-teacher .tu-tabs button{flex:0 1 140px}.imi-teacher .tu-info{flex-basis:100%;width:100%}.imi-teacher .tu-meaning{max-width:100%}}
+
+/* v1.1.1: new teacher selects follow the original language dropdown. */
+.imi-teacher .tu-select{display:block;position:relative;min-width:0;margin-top:6px}
+.imi-teacher .tu-select-trigger{display:block;text-align:left;font-family:inherit;font-size:16px;line-height:1.5;font-weight:400;padding:10px 45px 10px 14px;min-height:48px;color:#4a5568;white-space:normal;background-size:30px}
+.imi-teacher .tu-select-menu{position:fixed;z-index:1001;margin-top:0;width:auto;overflow-y:auto;overscroll-behavior:contain;text-align:left;font-family:inherit;font-weight:400}
+.imi-teacher .tu-select-menu [role=option]{padding:12px 16px;font-size:16px;line-height:1.5;color:#4a5568;cursor:pointer}
+.imi-teacher .tu-select-menu [role=option]:hover,.imi-teacher .tu-select-menu .tu-option-active{background:#ebf8ff;color:#2b6cb0;font-weight:600}
+.imi-teacher .tu-select-menu [aria-selected=true]{background:#f1edf4;color:#65566e;font-weight:600}
+.imi-teacher .tu-select-menu [aria-selected=true].tu-option-active{background:#ebf8ff;color:#2b6cb0}
