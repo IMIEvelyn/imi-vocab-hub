@@ -85,3 +85,38 @@ body.imi-teacher{padding:24px 48px}
 .imi-teacher .tu-select-menu [role=option]:hover,.imi-teacher .tu-select-menu .tu-option-active{background:#ebf8ff;color:#2b6cb0;font-weight:600}
 .imi-teacher .tu-select-menu [aria-selected=true]{background:#f1edf4;color:#65566e;font-weight:600}
 .imi-teacher .tu-select-menu [aria-selected=true].tu-option-active{background:#ebf8ff;color:#2b6cb0}
+
+/* v1.2: teacher-only compact brand, equal tabs, and readable translation column. */
+.imi-teacher .brand-header{flex-direction:row;justify-content:center;align-items:center;gap:20px;padding:14px 22px}
+.imi-teacher .imi-logo-container{height:90px;width:calc(90px * var(--tu-logo-aspect,1));max-width:210px;position:relative;overflow:hidden;margin:0;flex-shrink:0}
+.imi-teacher .imi-logo-container img{position:static;width:100%;height:100%;object-fit:contain}
+.imi-teacher .imi-logo-container.tu-logo-fitted img{position:absolute;max-width:none;object-fit:fill}
+.imi-teacher .brand-text{display:flex;flex-wrap:wrap;align-items:center;gap:4px 18px;text-align:left;min-width:0;max-width:840px}
+.imi-teacher .brand-text h1{flex-basis:100%;font-size:20px;line-height:1.35;margin:0 0 3px;overflow-wrap:break-word}
+.imi-teacher .brand-text p,.imi-teacher .brand-text p.brand-more-info{font-size:13px;line-height:1.5;margin:0}
+.imi-teacher .tu-tabs button{flex:1 1 0;min-width:0}
+.imi-teacher .tu-word{display:grid;grid-template-columns:minmax(0,var(--tu-info-width,160px)) minmax(120px,1fr) max-content;gap:12px 16px;align-items:center;padding:12px 14px}
+.imi-teacher .tu-info{width:auto;max-width:100%;padding-top:2px}
+.imi-teacher .tu-meaning{font-size:17px;line-height:1.55;margin:0;max-width:none;min-width:0;color:#5d5268;overflow-wrap:anywhere}
+.imi-teacher .tu-actions{margin:0;justify-self:end}
+.imi-teacher .tu-notices{grid-column:1/-1}
+.imi-teacher .tu-word-stacked{grid-template-columns:minmax(0,1fr) max-content}
+.imi-teacher .tu-word-stacked .tu-info{grid-column:1;grid-row:1}
+.imi-teacher .tu-word-stacked .tu-meaning{grid-column:1;grid-row:2}
+.imi-teacher .tu-word-stacked .tu-actions{grid-column:2;grid-row:1/3}
+.imi-teacher .tu-word-stacked .tu-notices{grid-row:3}
+.imi-teacher .tu-editorfields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.imi-teacher .tu-editorcard{display:flex;align-items:center;gap:12px;padding:12px 0;margin:4px 0 12px}
+.imi-teacher .tu-editorchars{display:flex;align-items:center;gap:8px;width:max-content;max-width:calc(100% - 52px);overflow-x:auto;padding:4px 2px}
+.imi-teacher .tu-editorchars .tu-unit{flex:none}
+.imi-teacher .tu-editorchars .tu-char[aria-pressed=true]{background:#eee5f6;box-shadow:0 0 0 1px #786582}
+.imi-teacher #tuEditorListen{flex:none;margin:0}
+.imi-teacher #tuEditorListen.playing{box-shadow:0 0 0 3px #c3e7f7}
+.imi-teacher .tu-reading{background:#faf8fc;border-radius:14px;padding:12px 14px}
+.imi-teacher #tuAtomContext{font-size:16px;margin:0 0 10px}
+.imi-teacher .tu-reading .tu-candidates{margin:8px 0 12px}
+.imi-teacher .tu-auxiliary{margin:12px 0}.imi-teacher .tu-auxiliary summary{color:#65566e;cursor:pointer;font-size:14px}
+.imi-teacher .tu-editorfooter{padding-top:8px}
+.imi-teacher #tuWordDialog .tu-source{margin-bottom:0}
+@media(max-width:700px){.imi-teacher .brand-header{padding:12px 14px;gap:12px}.imi-teacher .imi-logo-container{height:72px;width:calc(72px * var(--tu-logo-aspect,1));max-width:150px}.imi-teacher .brand-text h1{font-size:17px}.imi-teacher .brand-text p,.imi-teacher .brand-text p.brand-more-info{font-size:12px}.imi-teacher .tu-tabs button{flex:1 1 0;min-width:0}}
+@media(max-width:480px){.imi-teacher .brand-header{flex-wrap:wrap;gap:8px}.imi-teacher .brand-text{justify-content:center;text-align:center}.imi-teacher .tu-editorfields{grid-template-columns:1fr;gap:0}.imi-teacher .tu-dialog{padding:16px}.imi-teacher .tu-word,.imi-teacher .tu-word-stacked{grid-template-columns:minmax(0,1fr)}.imi-teacher .tu-word .tu-info{grid-column:1;grid-row:1}.imi-teacher .tu-word .tu-meaning{grid-column:1;grid-row:2}.imi-teacher .tu-word .tu-actions{grid-column:1;grid-row:3;justify-self:start}.imi-teacher .tu-word .tu-notices{grid-column:1;grid-row:4}}
