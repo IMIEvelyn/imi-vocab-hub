@@ -88,7 +88,7 @@ body.imi-teacher{padding:24px 48px}
 
 /* v1.2: teacher-only compact brand, equal tabs, and readable translation column. */
 .imi-teacher .brand-header{flex-direction:row;justify-content:center;align-items:center;gap:20px;padding:14px 22px}
-.imi-teacher .imi-logo-container{height:90px;width:calc(90px * var(--tu-logo-aspect,1));max-width:210px;position:relative;overflow:hidden;margin:0;flex-shrink:0}
+.imi-teacher .imi-logo-container{height:56px;width:calc(56px * var(--tu-logo-aspect,1));max-width:210px;position:relative;overflow:hidden;margin:0;flex-shrink:0}
 .imi-teacher .imi-logo-container img{position:static;width:100%;height:100%;object-fit:contain}
 .imi-teacher .imi-logo-container.tu-logo-fitted img{position:absolute;max-width:none;object-fit:fill}
 .imi-teacher .brand-text{display:flex;flex-wrap:wrap;align-items:center;gap:4px 18px;text-align:left;min-width:0;max-width:840px}
@@ -118,5 +118,5 @@ body.imi-teacher{padding:24px 48px}
 .imi-teacher .tu-auxiliary{margin:12px 0}.imi-teacher .tu-auxiliary summary{color:#65566e;cursor:pointer;font-size:14px}
 .imi-teacher .tu-editorfooter{padding-top:8px}
 .imi-teacher #tuWordDialog .tu-source{margin-bottom:0}
-@media(max-width:700px){.imi-teacher .brand-header{padding:12px 14px;gap:12px}.imi-teacher .imi-logo-container{height:72px;width:calc(72px * var(--tu-logo-aspect,1));max-width:150px}.imi-teacher .brand-text h1{font-size:17px}.imi-teacher .brand-text p,.imi-teacher .brand-text p.brand-more-info{font-size:12px}.imi-teacher .tu-tabs button{flex:1 1 0;min-width:0}}
+@media(max-width:700px){.imi-teacher .brand-header{padding:12px 14px;gap:12px}.imi-teacher .imi-logo-container{height:48px;width:calc(48px * var(--tu-logo-aspect,1));max-width:150px}.imi-teacher .brand-text h1{font-size:17px}.imi-teacher .brand-text p,.imi-teacher .brand-text p.brand-more-info{font-size:12px}.imi-teacher .tu-tabs button{flex:1 1 0;min-width:0}}
 @media(max-width:480px){.imi-teacher .brand-header{flex-wrap:wrap;gap:8px}.imi-teacher .brand-text{justify-content:center;text-align:center}.imi-teacher .tu-editorfields{grid-template-columns:1fr;gap:0}.imi-teacher .tu-dialog{padding:16px}.imi-teacher .tu-word,.imi-teacher .tu-word-stacked{grid-template-columns:minmax(0,1fr)}.imi-teacher .tu-word .tu-info{grid-column:1;grid-row:1}.imi-teacher .tu-word .tu-meaning{grid-column:1;grid-row:2}.imi-teacher .tu-word .tu-actions{grid-column:1;grid-row:3;justify-self:start}.imi-teacher .tu-word .tu-notices{grid-column:1;grid-row:4}}
