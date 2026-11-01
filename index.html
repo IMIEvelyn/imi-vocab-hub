@@ -784,7 +784,7 @@ body {
 .picture-toolbar h2 span,.picture-toolbar h2 small{display:block;white-space:nowrap}.picture-toolbar h2 small{font-size:12px;margin-top:2px;font-weight:500}
 
 </style>
-<link rel="stylesheet" href="teacher.css">
+<link rel="stylesheet" href="teacher.css?v=1.5.0">
 </head>
 
 <body id="gameBody">
@@ -1835,12 +1835,12 @@ function toggleTranslation() {
     starContainer.classList.add('show');
     
    // 2. 首次播放音效 (🎯 優先使用發音攔截字串 ttsStr)
-    playAudio(matchObj.ttsStr || matchObj.str);
+    playAudio(matchObj.speechPlan || matchObj.ttsStr || matchObj.str);
     
     // 3. 綁定「🔊 再聽一次」按鈕事件
     document.getElementById('replayAudioBtn').addEventListener('click', function(event) {
       event.stopPropagation(); 
-      playAudio(matchObj.ttsStr || matchObj.str);
+      playAudio(matchObj.speechPlan || matchObj.ttsStr || matchObj.str);
     });
 
     // 4. 綁定「點擊大星星關閉」事件
@@ -2237,7 +2237,7 @@ const LearningRecord = (() => {
     const vocabulary = words.map((word, index) => {
       const key = `word-${index + 1}`;
       wordKeys.set(word, key);
-      return { key, text: word.str, ttsText: word.ttsStr || word.str, translation: word.native || '', tiles: copy(word.tiles || []) };
+      return { key, text: word.str, ttsText: word.ttsStr || word.str, speechPlan: copy(word.speechPlan || [word.ttsStr || word.str]), translation: word.native || '', tiles: copy(word.tiles || []) };
     });
     current = {
       schemaVersion: 2, id, roundNumber, studentName, nameConfirmedAt: null,
@@ -2978,7 +2978,7 @@ const StudentReview = (() => {
     const done=()=>{if(token!==serial)return;clearTimeout(guard);$('reviewSpeak').classList.remove('playing');$('reviewAudioStatus').textContent='播放結束';};
     function showError(){if(token!==undefined&&token!==serial)return;clearTimeout(guard);$('reviewSpeak').classList.remove('playing');$('reviewError').textContent='無法播放，請再試一次。Try again.';$('reviewError').hidden=false;}
     const word=record.vocabulary[index];
-    utterance=playAudio(word.ttsText||word.text,{start(){if(token!==serial)return;clearTimeout(guard);$('reviewSpeak').classList.add('playing');$('reviewAudioStatus').textContent='正在播放';},end:done,error:showError});
+    utterance=playAudio(word.speechPlan||word.ttsText||word.text,{start(){if(token!==serial)return;clearTimeout(guard);$('reviewSpeak').classList.add('playing');$('reviewAudioStatus').textContent='正在播放';},end:done,error:showError});
     guard=setTimeout(()=>{if(token===serial&&!speechSynthesis.speaking)showError();},6000);
   }
   function open(){
@@ -3005,15 +3005,15 @@ const StudentReview = (() => {
 window.IMIStudentReview=StudentReview;
 
 </script>
-<script src="vocab-data.js"></script>
-<script src="student-data-adapter.js"></script>
+<script src="vocab-data.js?v=1.5.0"></script>
+<script src="student-data-adapter.js?v=1.5.0"></script>
 <script src="phonetic.js"></script>
 <script src="vendor/pdf-lib.min.js"></script>
 <script src="vendor/qrcode.js"></script>
 <script src="teacher-pdf.js"></script>
 <script src="teacher-icons.js"></script>
-<script src="speech-runtime.js"></script>
-<script src="teacher-speech-map.js"></script>
-<script src="teacher.js"></script>
+<script src="speech-runtime.js?v=1.5.0"></script>
+<script src="teacher-speech-map.js?v=1.5.0"></script>
+<script src="teacher.js?v=1.5.0"></script>
 </body>
 </html>

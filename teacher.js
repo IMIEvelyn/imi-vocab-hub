@@ -1,4 +1,4 @@
-/* IMI teacher upgrade 1.4.0. No paid APIs, no server, no student workflow changes. */
+/* IMI teacher upgrade 1.5.0. No paid APIs, no server, no student workflow changes. */
 (()=>{'use strict';const D=IMIVocabData,$=id=>document.getElementById(id),el=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;};
 let words=[],states=new Map,editing=null,pdfSerial=0,previewTimer=null,inputTimer=null,lastPublished='',publishedData='',publicationEpoch=0,lexiconPromise=null,manualEdits=new Map,pdfBusy=false,pdfURL=null;
 const say=t=>{$('tuStatus').textContent=t;},signature=w=>JSON.stringify(D.rows([w])),state=w=>states.get(w.id)?.signature===signature(w)&&states.get(w.id)?.confirmed===true;
@@ -66,7 +66,7 @@ function stale(){if(lastPublished){let same=false;try{same=JSON.stringify(payloa
 function scan(){try{words=D.parse($('vocabInput').value);$('tuImportError')?.remove();}catch(e){words=[];const p=el('p',e.message,'tu-error');p.id='tuImportError';p.setAttribute('role','alert');$('vocabInput').after(p);}render();stale();schedulePDF();}
 function render(){const dash=$('auditDashboard');dash.replaceChildren();let confirmed=0;for(const risk of [true,false]){const group=words.filter(w=>D.isRisk(w)===risk),zone=el('section',undefined,'tu-zone '+(risk?'tu-red':'tu-green'));zone.setAttribute('aria-label',risk?'紅燈區':'綠燈區');const head=el('div',undefined,'tu-zonehead');head.append(el('h2',risk?'● 紅燈區 · 優先校正（輕聲、多音字）':'● 綠燈區 · 無多音義字（待確認）'));const controls=el('div',undefined,'tu-row');controls.append(button((risk?'紅燈':'綠燈')+'一鍵確認',()=>{let blocked=0;group.forEach(w=>{if(w.errors.length)blocked++;else states.set(w.id,{signature:signature(w),confirmed:true});});render();say(blocked?'已確認可用詞彙；'+blocked+'組錯誤須先修正。':'本區已確認。');}),button('全部解鎖',()=>{group.forEach(w=>states.delete(w.id));render();}));head.append(controls);zone.append(head);if(!group.length)zone.append(el('p','目前無詞彙','tu-status'));
 for(const w of group){const row=el('article',undefined,'tu-word'),info=el('div',undefined,'tu-info'),annotation=el('div',undefined,'tu-annotated');row.dataset.wordId=w.id;w.atoms.forEach((a,i)=>annotation.append(unit(a,()=>openAtom(w,i))));info.append(annotation);const meaning=el('div',w.meaning,'tu-meaning');const notices=el('div',undefined,'tu-notices');for(const error of w.errors)notices.append(el('div',error,'tu-error'));for(const warning of w.warnings)notices.append(el('div',warning,'tu-warning'));
-const acts=el('div',undefined,'tu-actions');acts.append(action('volume-2','試聽','sound',()=>playAudio(w.tts)),action('square-pen','編輯','edit',()=>openWord(w)));const ok=action(state(w)?'square-check':'square',state(w)?'取消確認':'確認','confirm',()=>{if(w.errors.length){say('請先修正此詞彙的資料錯誤。');return;}states.set(w.id,{signature:signature(w),confirmed:!state(w)});render();});ok.setAttribute('aria-pressed',String(state(w)));acts.append(ok,action('trash-2','刪除','delete',()=>{if(confirm('刪除「'+w.word+'」？')){words=words.filter(x=>x!==w);write();}}));row.append(info,meaning,acts);if(notices.children.length)row.append(notices);zone.append(row);if(state(w))confirmed++;}dash.append(zone);}
+const acts=el('div',undefined,'tu-actions');acts.append(action('volume-2','試聽','sound',()=>playAudio(D.speechPlan(w))),action('square-pen','編輯','edit',()=>openWord(w)));const ok=action(state(w)?'square-check':'square',state(w)?'取消確認':'確認','confirm',()=>{if(w.errors.length){say('請先修正此詞彙的資料錯誤。');return;}states.set(w.id,{signature:signature(w),confirmed:!state(w)});render();});ok.setAttribute('aria-pressed',String(state(w)));acts.append(ok,action('trash-2','刪除','delete',()=>{if(confirm('刪除「'+w.word+'」？')){words=words.filter(x=>x!==w);write();}}));row.append(info,meaning,acts);if(notices.children.length)row.append(notices);zone.append(row);if(state(w))confirmed++;}dash.append(zone);}
 for(const row of dash.querySelectorAll('.tu-word')){fitWordRow(row);}
 $('tuSummary').textContent='共'+words.length+'組 · 已確認'+confirmed+'組 · 待確認'+(words.length-confirmed)+'組';}
 function unit(a,fn){const u=el('span',undefined,'tu-unit'),b=el('button',a.char,'tu-char');b.type='button';b.setAttribute('aria-label','校正「'+a.char+'」字音');b.onclick=fn;u.append(b);if(a.zhuyin){const box=el('span',undefined,'tu-annotation'),column=el('span',undefined,'tu-bopo');Array.from(a.zhuyin).forEach(z=>column.append(el('span',z)));if(a.mark==='˙'){const dot=el('span',undefined,'tu-dot');dot.setAttribute('aria-label','輕聲');column.prepend(dot);}box.append(column);if(a.mark&&a.mark!=='˙')box.append(el('span',a.mark,'tu-mark'));u.append(box);}if(a.pinyin)u.append(el('span',a.pinyin,'tu-py'));return u;}
@@ -83,21 +83,21 @@ function makeDialogs(){
   const manual=el('details',undefined,'tu-manual');manual.id='tuManual';manual.append(el('summary','自行輸入／檢視標音'));const manualFields=el('div',undefined,'tu-editorfields');field(manualFields,'tuAtomPy','拼音（不帶聲調）');field(manualFields,'tuAtomZy','注音（不含調號）');manual.append(manualFields);reading.append(manual);d.append(reading);
   const speechState=el('p',undefined,'tu-status');speechState.id='tuSpeechStatus';speechState.setAttribute('role','status');d.append(speechState);
   const decision=el('div',undefined,'tu-row');decision.id='tuSpeechDecision';decision.setAttribute('role','group');decision.setAttribute('aria-label','人工朗讀修正處理');decision.hidden=true;const keep=button('保留人工修正',keepManual),regenerate=button('重新產生',regenerateSpeech);keep.id='tuKeepSpeech';regenerate.id='tuRegenerateSpeech';decision.append(keep,regenerate);d.append(decision);
-  const auxiliary=el('details',undefined,'tu-auxiliary');auxiliary.id='tuSpeechDetails';auxiliary.append(el('summary','仍讀不正確？同音字輔助修正'));field(auxiliary,'tuWordSpeech','朗讀修正（選填，僅影響朗讀）');const hint=el('p','可輸入同音異字與必要空格，再點詞彙卡旁的喇叭試聽。','tu-status');auxiliary.append(hint);d.append(auxiliary);
+  const auxiliary=el('details',undefined,'tu-auxiliary');auxiliary.id='tuSpeechDetails';auxiliary.append(el('summary','人工校正朗讀音'));const scopes=el('div',undefined,'tu-speech-scopes');scopes.id='tuSpeechScopes';scopes.setAttribute('role','group');scopes.setAttribute('aria-label','人工校正範圍');auxiliary.append(scopes);field(auxiliary,'tuWordSpeech','朗讀修正（選填，僅影響朗讀）');const isolation=el('label',undefined,'tu-isolation'),check=el('input');check.type='checkbox';check.id='tuSpeechIsolate';check.checked=true;isolation.append(check,document.createTextNode(' 分段朗讀，減少相鄰字影響'));isolation.id='tuIsolationLabel';auxiliary.append(isolation);const hint=el('p','選字後只輸入該字的同音替代內容；喇叭仍試聽完整詞彙。清空可恢復標音自動結果。','tu-status');auxiliary.append(hint);d.append(auxiliary);const effective=el('p',undefined,'tu-status tu-speech-effective');effective.id='tuSpeechEffective';d.append(effective);
   const err=el('p',undefined,'tu-error');err.id='tuWordError';err.setAttribute('role','alert');const feedback=el('p',undefined,'tu-status');feedback.id='tuAtomFeedback';feedback.setAttribute('role','status');d.append(err,feedback);
   const actions=el('div',undefined,'tu-row tu-editorfooter');actions.append(button('確認儲存',saveWord,true),button('取消',()=>d.close()));d.append(actions);
   const source=el('details',undefined,'tu-source');source.append(el('summary','讀音來源'));source.append(el('p','候選參考：教育部《國語辭典簡編本》2014_20260929，CC BY-ND 3.0 TW。教師指定標音另存，不改動辭典原文。中國口音與簡體教材請教師依教材標準核對。'));const link=el('a','來源與授權');link.href='vendor/MOE-usage.pdf';link.target='_blank';link.rel='noopener';source.append(link);d.append(source);
   $('tuWordZh').addEventListener('change',()=>{try{syncDraftText();renderEditor();}catch(e){editorError(e.message);}});
   for(const id of ['tuAtomPy','tuAtomZy'])$(id).addEventListener('input',()=>{if(!editing)return;if(!editing.requested.includes(editing.index))editing.requested.push(editing.index);try{flushAtom();renderEditorCard();highlightCandidates();updateSpeechStatus();$('tuWordError').textContent='';}catch(e){editorError(e.message);}});
   $('tuAtomTone').addEventListener('change',()=>{if(!editing)return;if(!editing.requested.includes(editing.index))editing.requested.push(editing.index);try{flushAtom();renderEditorCard();highlightCandidates();updateSpeechStatus();$('tuWordError').textContent='';}catch(e){editorError(e.message);}});
-  $('tuWordSpeech').addEventListener('input',()=>{if(editing){editing.manualTyped=true;editing.forceAuto=false;updateSpeechStatus();}});
+  $('tuWordSpeech').addEventListener('input',()=>{if(!editing)return;stopEditorAudio();try{const text=$('tuWordSpeech').value;if(editing.speechScope==='whole'){if(text.trim())D.setSpeech(editing.draft,text);else {if(editing.draft.speechWhole){editing.draft.speechWhole.text='';editing.draft.speechWhole.active=false;}requestSpeech(editing.index);}}else {const a=editing.draft.atoms[editing.index];if(!a)return;if(text.trim())D.setAtomSpeech(editing.draft,editing.index,text,$('tuSpeechIsolate').checked);else {a.tts=null;delete a.speech;delete a.speechMetaRaw;requestSpeech(editing.index);}}updateSpeechStatus(false);$('tuWordError').textContent='';}catch(e){editorError(e.message);}});
+  $('tuSpeechIsolate').addEventListener('change',()=>{if(!editing)return;stopEditorAudio();const a=editing.draft.atoms[editing.index];if(a?.speech){a.speech.isolate=$('tuSpeechIsolate').checked;delete a.speechMetaRaw;}updateSpeechStatus();});
   d.addEventListener('close',()=>{if(!d.open){const focus=editing?.returnFocus;stopEditorAudio();editing=null;focus?.isConnected&&focus.focus({preventScroll:true});}});
   d.addEventListener('cancel',stopEditorAudio);
 }
 function editorError(text){$('tuWordError').textContent=text;}
 function stopEditorAudio(){if(editing)editing.speechSerial=(editing.speechSerial||0)+1;if(window.IMISpeech)IMISpeech.stop();else if('speechSynthesis'in window)window.speechSynthesis.cancel();$('tuEditorListen')?.classList.remove('playing');}
 function annotationKey(a){return JSON.stringify([a.char,a.pinyin,a.zhuyin,a.tone,a.mark]);}
-function speechText(w){return w.atoms.map(a=>a.tts===null?a.char:a.tts).join('');}
 function flushAtom(){
   if(!editing||editing.index<0)return;const a=editing.draft.atoms[editing.index],py=$('tuAtomPy').value.trim().toLowerCase(),zy=$('tuAtomZy').value.trim(),tone=Number($('tuAtomTone').value),snapshot=editing.fields;
   if(snapshot&&snapshot.py===py&&snapshot.zy===zy&&snapshot.tone===tone)return;
@@ -127,46 +127,44 @@ function renderEditorCard(){
   editing.draft.atoms.forEach((a,i)=>{const u=unit(a,()=>selectEditorAtom(i));u.querySelector('button').setAttribute('aria-pressed',String(i===editing.index));host.append(u);});
   $('tuEditorListen').disabled=!editing.draft.atoms.length;
 }
-function selectEditorAtom(i){try{syncDraftText();editing.index=i;renderEditor();$('tuWordError').textContent='';}catch(e){editorError(e.message);}}
+function selectEditorAtom(i){try{stopEditorAudio();syncDraftText();editing.index=i;requestSpeech(i);renderEditor();$('tuWordError').textContent='';}catch(e){editorError(e.message);}}
 function renderEditor(){
   if(!editing)return;renderEditorCard();const a=editing.draft.atoms[editing.index];const reading=$('tuWordDialog').querySelector('.tu-reading');reading.hidden=!a;
   if(!a){$('tuCandidates').replaceChildren();$('tuAtomPy').value='';$('tuAtomZy').value='';$('tuAtomTone').value='';$('tuAtomTone')._tuSync?.();updateSpeechStatus();return;}
   $('tuAtomContext').textContent='「'+a.char+'」的標音';$('tuAtomPy').value=D.bare(a.pinyin);$('tuAtomZy').value=a.zhuyin;$('tuAtomTone').value=a.tone||'';editing.fields={py:D.bare(a.pinyin),zy:a.zhuyin,tone:Number(a.tone)||0};$('tuAtomTone')._tuSync?.();
   $('tuManual').open=!a.pinyin&&!a.zhuyin;renderCandidates(editing.draft,editing.index);updateSpeechStatus();
 }
-function annotationEdited(){return editing.draft.atoms.some((a,i)=>D.speechKey(a)!==D.speechKey(editing.word?.atoms[i]||{}))||editing.textChanged||editing.requested.length>0||editing.draft.atoms.some(a=>a.speech&&a.speech.key!==D.speechKey(a));}
-function typedSpeech(){return editing.manualTyped||$('tuWordSpeech').value!==editing.fieldBaseline;}
-function keepManual(){if(!editing)return;stopEditorAudio();editing.forceAuto=false;if(editing.manualBackup!==undefined){$('tuWordSpeech').value=editing.manualBackup;editing.manualTyped=editing.manualBackup!==editing.initialSpeech;}editing.fieldBaseline=editing.initialSpeech;updateSpeechStatus();}
-async function regenerateSpeech(){if(!editing)return;const session=editing;stopEditorAudio();try{await loadLexicon();if(editing!==session||!$('tuWordDialog').open)return;syncDraftText();if(!editing.forceAuto)editing.manualBackup=$('tuWordSpeech').value;editing.forceAuto=true;editing.manualTyped=false;editing.fieldBaseline=$('tuWordSpeech').value;updateSpeechStatus();}catch(e){editorError(e.message+'；原人工修正保留。');}}
-function restoreDraftSpeech(){editing.draft.atoms.forEach((a,i)=>{const previous=editing.word?.atoms[i];a.tts=previous?.tts??null;delete a.speech;delete a.speechMetaRaw;if(previous?.speech){a.speech=structuredClone(previous.speech);a.speechMetaRaw=previous.speechMetaRaw;}});}
-function updateSpeechStatus(){
- if(!editing)return;const edited=annotationEdited(),typed=typedSpeech(),oldManual=!!editing.word&&IMISpeechMap.manual(editing.word),protectedManual=oldManual&&!editing.forceAuto&&!typed;
- $('tuSpeechDecision').hidden=!(oldManual||editing.manualBackup!==undefined);$('tuKeepSpeech').setAttribute('aria-pressed',String(!editing.forceAuto));$('tuRegenerateSpeech').setAttribute('aria-pressed',String(!!editing.forceAuto));
- if(typed){$('tuSpeechStatus').textContent=$('tuWordSpeech').value.trim()?'使用人工修正；請試聽完整詞彙。':'已清除人工修正；試聽使用原詞。';return;}
- restoreDraftSpeech();
- if(protectedManual){$('tuSpeechStatus').textContent=edited?'標音已修改；人工朗讀修正已保留，可選擇重新產生。':'使用人工修正；請試聽完整詞彙。';return;}
- if(!edited&&!editing.forceAuto){$('tuWordSpeech').value=editing.initialSpeech;editing.fieldBaseline=editing.initialSpeech;$('tuSpeechStatus').textContent=editing.draft.atoms.some(a=>a.speech?.unresolved)?'部分需手動修正；請試聽完整詞彙。':editing.draft.atoms.some(a=>a.speech)?'使用已儲存的自動轉換；請試聽完整詞彙。':'修改標音後會自動查找對應字；仍可使用人工修正。';return;}
- if(!window.IMIToneLexicon){$('tuSpeechStatus').textContent=editing.lookupFailed?'讀音資料未載入；保留原朗讀，可手動修正。':'正在載入讀音資料，可先手動修正。';return;}
- const result=IMISpeechMap.apply(editing.draft,editing.word,IMIToneLexicon,!!editing.forceAuto||editing.textChanged||editing.draft.atoms.some(a=>a.speech&&a.speech.key!==D.speechKey(a)),editing.requested);editing.autoReport=result;
- $('tuWordSpeech').value=result.text;editing.fieldBaseline=result.text;
- $('tuSpeechStatus').textContent=(result.missing.length?'部分需手動修正（'+result.missing.map(x=>x.char).join('、')+'）；':'已自動轉換；')+'請試聽完整詞彙。';
+function requestSpeech(i){if(i>=0&&!editing.requested.includes(i))editing.requested.push(i);}
+function annotationEdited(){return editing.draft.atoms.some((a,i)=>D.speechKey(a)!==D.speechKey(editing.word?.atoms[i]||{}))||editing.textChanged||editing.requested.length>0;}
+function setSpeechScope(scope,i=editing.index){stopEditorAudio();syncDraftText();editing.speechScope=scope;if(scope==='atom'){editing.index=i;if(editing.draft.speechWhole)editing.draft.speechWhole.active=false;requestSpeech(i);}else if(editing.draft.speechWhole?.text.trim())editing.draft.speechWhole.active=true;renderEditor();}
+function keepManual(){if(!editing)return;stopEditorAudio();updateSpeechStatus();}
+async function regenerateSpeech(){if(!editing)return;const session=editing;stopEditorAudio();try{await loadLexicon();if(editing!==session||!$('tuWordDialog').open)return;syncDraftText();const a=editing.draft.atoms[editing.index];if(a){a.tts=null;delete a.speech;delete a.speechMetaRaw;}if(editing.draft.speechWhole)editing.draft.speechWhole.active=false;editing.speechScope='atom';requestSpeech(editing.index);updateSpeechStatus();}catch(e){editorError(e.message+'；原修正保留。');}}
+function updateSpeechStatus(syncField=true){
+ if(!editing)return;const w=editing.draft,a=w.atoms[editing.index],whole=!!w.speechWhole?.active;
+ const requested=[...new Set([...editing.requested,...w.atoms.flatMap((x,i)=>x.speech?.mode==='auto'&&x.speech.key!==D.speechKey(x)?[i]:[])])];
+ if(!whole&&window.IMIToneLexicon){editing.autoReport=IMISpeechMap.apply(w,editing.word,IMIToneLexicon,false,requested);editing.requested=[];}
+ D.refreshSpeech(w);const manual=whole||!!a&&D.manualAtom(a);
+ $('tuSpeechDecision').hidden=!manual;$('tuKeepSpeech').setAttribute('aria-pressed','true');$('tuRegenerateSpeech').textContent=whole?'改用所選字的標音':'此字依標音重新產生';
+ let message=whole?'使用整詞人工修正；請試聽完整詞彙。':manual?'所選字使用人工修正；其他字設定保留。':!window.IMIToneLexicon?(editing.lookupFailed?'讀音資料未載入；可使用人工修正。':'正在載入讀音資料…'):w.atoms.some(x=>x.speech?.unresolved)?'部分讀音查無對應字，請使用人工修正。':'已依目前標音準備朗讀；請試聽完整詞彙。';
+ if(a&&D.manualAtom(a)&&a.speech?.key!==D.speechKey(a))message='此字標音已變；人工修正保留，可依新標音重新產生。';
+ $('tuSpeechStatus').textContent=message;
+ const scopes=$('tuSpeechScopes');scopes.replaceChildren();w.atoms.forEach((x,i)=>{const b=button(x.char,()=>setSpeechScope('atom',i));b.setAttribute('aria-label','人工校正第'+(i+1)+'字「'+x.char+'」');b.setAttribute('aria-pressed',String(editing.speechScope==='atom'&&editing.index===i));scopes.append(b);});const all=button('整個詞彙',()=>setSpeechScope('whole'));all.setAttribute('aria-pressed',String(editing.speechScope==='whole'));scopes.append(all);
+ const field=$('tuWordSpeech');field.parentElement.firstChild.textContent=editing.speechScope==='whole'?'整個詞彙的朗讀修正（選填）':'「'+(a?.char||'')+'」的朗讀修正（選填）';
+ if(syncField)field.value=editing.speechScope==='whole'?(w.speechWhole?.text||''):(a&&D.manualAtom(a)?a.tts:'');
+ $('tuIsolationLabel').hidden=editing.speechScope==='whole';$('tuSpeechIsolate').checked=a?.speech?.isolate??true;
+ const plan=D.speechPlan(w);$('tuSpeechEffective').textContent='本次試聽用字：'+plan.map(t=>t.replaceAll(' ','␠')).join(' ｜ ');
 }
 function openAtom(w,i){openWord(w,i);}
 function openWord(w,index=0){
-  const d=$('tuWordDialog');if(d.open)return;const draft=w?structuredClone(w):{id:'w_'+Date.now(),word:'',meaning:'',atoms:[],errors:[],warnings:[]};
-  editing={word:w,draft,index:draft.atoms.length?Math.min(index,draft.atoms.length-1):-1,returnFocus:document.activeElement,speechSerial:0,requested:[],textChanged:false,fields:null,source:D.encode(w?[w]:[]),sourceInput:$('vocabInput').value,initialSpeech:w&&w.atoms.some(a=>a.tts!==null)?w.tts:'',manualTyped:false,forceAuto:false,lookupFailed:false};
-  editing.fieldBaseline=editing.initialSpeech;const session=editing;d.querySelector('h2').textContent=w?'編輯詞彙':'新增詞彙';$('tuWordZh').value=draft.word;$('tuWordMeaning').value=draft.meaning;$('tuWordSpeech').value=editing.initialSpeech;$('tuSpeechDetails').open=false;$('tuWordError').textContent='';$('tuAtomFeedback').textContent='';renderEditor();d.showModal();
+  const d=$('tuWordDialog');if(d.open)return;const draft=w?D.editSpeech(structuredClone(w)):{id:'w_'+Date.now(),word:'',meaning:'',atoms:[],errors:[],warnings:[]};
+  editing={word:w,draft,index:draft.atoms.length?Math.min(index,draft.atoms.length-1):-1,returnFocus:document.activeElement,speechSerial:0,requested:[],textChanged:false,fields:null,source:D.encode(w?[w]:[]),sourceInput:$('vocabInput').value,lookupFailed:false,speechScope:draft.speechWhole?.active?'whole':'atom'};requestSpeech(editing.index);
+  const session=editing;d.querySelector('h2').textContent=w?'編輯詞彙':'新增詞彙';$('tuWordZh').value=draft.word;$('tuWordMeaning').value=draft.meaning;$('tuWordSpeech').value='';$('tuSpeechDetails').open=false;$('tuWordError').textContent='';$('tuAtomFeedback').textContent='';renderEditor();d.showModal();
   if(draft.atoms.length)$('tuEditorChars').querySelectorAll('.tu-char')[editing.index]?.focus({preventScroll:true});
   loadLexicon().then(()=>{if(editing===session&&d.open&&editing.index>=0){renderCandidates(editing.draft,editing.index);updateSpeechStatus();}}).catch(e=>{if(editing===session&&d.open){editing.lookupFailed=true;$('tuAtomFeedback').textContent=e.message;updateSpeechStatus();}});
 }
 function prepareDraft(){
-  syncDraftText();updateSpeechStatus();if(annotationEdited()&&!typedSpeech()&&!editing.lookupFailed&&!window.IMIToneLexicon&&!(editing.word&&IMISpeechMap.manual(editing.word)&&!editing.forceAuto))throw Error('讀音資料載入中，請稍候或使用人工修正。');const draft=structuredClone(editing.draft);if(draft.atoms.some(a=>!Number.isInteger(a.tone)||a.tone<1||a.tone>5))throw Error('請為每個新字選擇1～5聲。');
+  syncDraftText();updateSpeechStatus();if(annotationEdited()&&!window.IMIToneLexicon&&!editing.draft.speechWhole?.active&&!D.manualAtom(editing.draft.atoms[editing.index]||{}))throw Error('讀音資料載入中，請稍候或使用人工修正。');const draft=structuredClone(editing.draft);if(draft.atoms.some(a=>!Number.isInteger(a.tone)||a.tone<1||a.tone>5))throw Error('請為每個新字選擇1～5聲。');
   const meaning=$('tuWordMeaning').value;draft.meaning=meaning;if(!editing.word||meaning!==editing.word.meaning)draft.atoms.forEach(a=>a.meaning=meaning);
-  const auxiliary=$('tuWordSpeech').value;if(typedSpeech()){if(auxiliary.trim())D.setSpeech(draft,auxiliary);else draft.atoms.forEach(a=>{a.tts=null;delete a.speech;delete a.speechMetaRaw;});}
-  else if(editing.textChanged&&!editing.forceAuto&&editing.word&&IMISpeechMap.manual(editing.word)){
-    // Preserve the existing whole spoken content after a word edit; save requires review.
-    D.setSpeech(draft,editing.word.tts);
-  }
   const verified=D.parse(D.encode([draft]))[0];if(verified.errors.length)throw Error(verified.errors.join('；'));return verified;
 }
 function previewDraft(){
@@ -174,7 +172,7 @@ function previewDraft(){
     $('tuWordError').textContent='';$('tuAtomFeedback').textContent='正在試聽完整詞彙。';
     const current=()=>editing===session&&session.speechSerial===serial&&$('tuWordDialog').open;
     const done=()=>{if(!current())return;$('tuEditorListen').classList.remove('playing');$('tuAtomFeedback').textContent='試聽結束，請核對完整詞彙讀音。';};
-    const utterance=playAudio(draft.tts,{start(){if(current())$('tuEditorListen').classList.add('playing');},end:done,waiting(){if(current())$('tuAtomFeedback').textContent='正在載入聲音…';},info(info){if(current()&&info.defaultUnverified)$('tuAtomFeedback').textContent='未取得指定口音聲音，正嘗試預設朗讀。';},error(event){if(current()){$('tuEditorListen').classList.remove('playing');$('tuAtomFeedback').textContent=window.IMISpeech?IMISpeech.errorMessage(event?.error):'無法播放，請再試一次。';}}});
+    const utterance=playAudio(D.speechPlan(draft),{start(){if(current())$('tuEditorListen').classList.add('playing');},end:done,waiting(){if(current())$('tuAtomFeedback').textContent='正在載入聲音…';},info(info){if(current()&&info.defaultUnverified)$('tuAtomFeedback').textContent='未取得指定口音聲音，正嘗試預設朗讀。';},error(event){if(current()){$('tuEditorListen').classList.remove('playing');$('tuAtomFeedback').textContent=window.IMISpeech?IMISpeech.errorMessage(event?.error):'無法播放，請再試一次。';}}});
     if(!utterance)$('tuAtomFeedback').textContent='此環境無法播放語音。';
   }catch(e){editorError(e.message);}
 }
@@ -182,7 +180,7 @@ function saveWord(){
   if(!editing)return;try{
     if($('vocabInput').value!==editing.sourceInput)throw Error('匯入資料已變動，請取消並重新開啟編輯，避免覆寫其他修改。');
     const draft=prepareDraft(),old=editing.word,same=old&&D.encode([draft])===editing.source;
-    if(editing.textChanged&&old&&!confirm('詞彙文字已變動。請確認新字標音；被移除字位的原資料將在儲存後移除。'+(old.atoms.some(a=>a.tts!==null)&&$('tuWordSpeech').value===editing.initialSpeech?' 原朗讀修正「'+old.tts+'」會保留，是否已核對？':'')+' 確認儲存？'))return;
+    if(editing.textChanged&&old&&!confirm('詞彙文字已變動。請確認新字標音；被移除字位的原資料將在儲存後移除。'+(draft.speechWhole?.text?' 整詞人工草稿仍保留，請核對是否適用於新詞彙。':'')+' 確認儲存？'))return;
     if(same){$('tuWordDialog').close();return;}
     if(old){const at=words.findIndex(w=>w.id===old.id);if(at<0)throw Error('此詞已不存在，請取消後重新核對。');words[at]=draft;}else words.unshift(draft);
     const edits=new Map;draft.atoms.forEach((a,i)=>{if(annotationKey(a)!==annotationKey(old?.atoms[i]||{}))edits.set(i,annotationKey(a));});manualEdits.set(draft.id,edits);states.delete(draft.id);$('tuWordDialog').close();write();say('詞彙已儲存，請重新確認此詞。');
