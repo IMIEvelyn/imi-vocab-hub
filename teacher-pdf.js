@@ -34,6 +34,14 @@ async function loadFonts(config={}){
   await loaded.get(name);
  }
 }
+function detectChineseFont(records){
+ const data=global.IMIPDFFontCoverage?.scriptMarkers;if(!data)throw Error('PDF中文字體判讀資料未載入，請重新整理。');
+ const sc=new Set(Array.from(data.simplified)),tc=new Set(Array.from(data.traditional));let simplified=0,traditional=0;
+ // Use vocabulary characters only. Foreign meanings, headings and phonetic annotations cannot change the result.
+ for(const record of records)for(const char of Array.from(record.word||(record.atoms||[]).map(a=>a.char).join(''))){if(sc.has(char))simplified++;if(tc.has(char))traditional++;}
+ // Shared characters contain no script evidence; retain the existing traditional-font default without asking the teacher.
+ return simplified>traditional?'simplified':'traditional';
+}
 function fontNotice(){return latinFallback?'外語使用 Times New Roman 備援':'';}
 function validateGlyphs(records,config={}){
  const coverage=global.IMIPDFFontCoverage;if(!coverage)throw Error('PDF字體檢查資料未載入，請重新整理。');
@@ -154,5 +162,5 @@ function render(spec,canvas,index,total){canvas.width=W;canvas.height=H;const ct
 if(config.showMeaning&&r.meaning){for(const candidate of [34,30,26,22,18,16]){meaningSize=candidate;font(ctx,candidate);meaningLines=wrapTableText(ctx,r.meaning,cw-54);mh=meaningLines.length*candidate*1.3;if(mh<=maxMeaning)break;}if(mh>maxMeaning)throw Error('第'+(r.ordinal||i+1)+'詞彙的外語過長，請改用詞彙表或縮短內容。');}
 const wordTop=y+92,wordHeight=ch-126-mh;drawWord(ctx,r,{x:x+25,y:wordTop,w:cw-50,h:wordHeight},config);if(config.showMeaning&&r.meaning){font(ctx,meaningSize);ctx.textAlign='center';ctx.textBaseline='top';ctx.fillStyle='#66756c';meaningLines.forEach((line,j)=>ctx.fillText(line,x+cw/2,y+ch-25-mh+j*meaningSize*1.3))}})}else{drawTable(ctx,spec,config)}ctx.fillStyle='#66756c';font(ctx,26);ctx.textBaseline='bottom';ctx.textAlign='left';ctx.fillText('© Teacher Evelyn · IMI Mandarin',M,H-60);ctx.textAlign='right';ctx.fillText((index+1)+' / '+total,W-M,H-60);return canvas}
 async function build(records,env={}){if(!records.length)throw Error('請先貼上有效的詞彙資料。');validateGlyphs(records,env.presentation||presentation());const make=env.createCanvas||(()=>document.createElement('canvas'));await loadFonts(env.presentation);const canvas=make(),ctx=canvas.getContext('2d'),pages=plan(records,ctx,env.presentation||presentation()).filter(p=>!env.type||p.type===env.type);const lib=env.PDFLib||global.PDFLib;if(!lib)throw Error('PDF 功能尚未載入，請重新整理後再試。');const pdf=await lib.PDFDocument.create();pdf.setTitle('IMI Vocabulary Cards and Table');pdf.setAuthor('Teacher Evelyn · IMI Mandarin');for(let i=0;i<pages.length;i++){render(pages[i],canvas,i,pages.length);const data=canvas.toDataURL('image/jpeg',.98),img=await pdf.embedJpg(data);const page=pdf.addPage([595.276,841.89]);page.drawImage(img,{x:0,y:0,width:595.276,height:841.89});if(env.onProgress)env.onProgress(i+1,pages.length);if(env.yieldPage)await env.yieldPage()}canvas.width=1;canvas.height=1;return {bytes:await pdf.save(),pages:pages.length}}
-global.IMIVocabExport={loadFonts,fontNotice,validateGlyphs,family,presentation,headerLines,checkHeader,tableColumns,plan,render,build,width:W,height:H};
+global.IMIVocabExport={loadFonts,detectChineseFont,fontNotice,validateGlyphs,family,presentation,headerLines,checkHeader,tableColumns,plan,render,build,width:W,height:H};
 })(typeof window!=='undefined'?window:globalThis);
