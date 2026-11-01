@@ -1,4 +1,4 @@
-/* IMI teacher upgrade 1.5.5. No paid APIs, no server, no student workflow changes. */
+/* IMI teacher upgrade 1.5.6. No paid APIs, no server, no student workflow changes. */
 (()=>{'use strict';const D=IMIVocabData,$=id=>document.getElementById(id),el=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;};
 let words=[],states=new Map,editing=null,pdfSerial=0,previewTimer=null,inputTimer=null,lastPublished='',publishedData='',publicationEpoch=0,lexiconPromise=null,manualEdits=new Map,pdfBusy=false,pdfURL=null;
 const say=t=>{$('tuStatus').textContent=t;},signature=w=>JSON.stringify(D.rows([w])),state=w=>states.get(w.id)?.signature===signature(w)&&states.get(w.id)?.confirmed===true;
@@ -66,6 +66,7 @@ const status=el('p',undefined,'tu-status');status.id='tuStatus';status.setAttrib
 compactBrand(header);makeDialogs();window.addEventListener('resize',scheduleRows);if(window.ResizeObserver)new ResizeObserver(scheduleRows).observe(work);document.fonts?.ready.then(scheduleRows);document.fonts?.addEventListener('loadingdone',scheduleRows);for(const id of ['tuPDFKind','tuPDFStyle','tuAtomTone'])enhanceSelect($(id));input.addEventListener('input',()=>{invalidatePublication();clearTimeout(inputTimer);inputTimer=setTimeout(scan,100);});input.addEventListener('paste',()=>setTimeout(()=>{input.style.display='block';$('addVocabBar')?.remove();},120));
 for(const id of ['inputMaterialName','inputClassName','inputTeacherName','inputDate','inputLanguage','inputAccent','inputDisableTrans'])$(id).addEventListener('change',()=>{if(id==='inputAccent'){states.clear();render();}stale();schedulePDF();});
 for(const id of ['inputMaterialName','inputClassName','inputTeacherName','inputDate','inputLanguage'])$(id).addEventListener('input',()=>{stale();schedulePDF();});
+window.IMICommonNames.mount($('inputClassName'));
 // Original paste/input listeners remain installed; route their delayed calls to the new scanner.
 window.scanVocabForAudit=scan;window.clearVocab=()=>{input.value='';scan();};window.generateLink=generate;window.copyUrl=copyLink;window.openAddModal=()=>openWord(null);window.openEditorModal=id=>openWord(words.find(w=>w.id===id));window.toggleVocabInput=()=>{input.style.display='block';};
 scan();}

@@ -131,3 +131,17 @@ body.imi-teacher{padding:24px 48px}
 .imi-teacher .tu-word{grid-template-columns:minmax(0,var(--tu-info-width,max-content)) minmax(120px,1fr) max-content}
 .imi-teacher .tu-word-stacked{grid-template-columns:minmax(0,1fr) max-content}
 @media(max-width:480px){.imi-teacher .tu-word,.imi-teacher .tu-word-stacked{grid-template-columns:minmax(0,1fr)}}
+/* Local common student/class names; preserve the original settings input width. */
+.imi-teacher .tu-common-names{margin-top:8px;min-width:0}
+.imi-teacher .tu-common-names .tu-button{font-size:14px;max-width:100%;white-space:normal;overflow-wrap:anywhere}
+.imi-teacher .tu-common-panel{margin-top:8px;padding:10px;border:1px solid #ded4e5;border-radius:10px;background:#fcf9fd;min-width:0}
+.imi-teacher .tu-common-panel[hidden]{display:none!important}
+.imi-teacher .tu-common-tools{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.imi-teacher .tu-common-tools input{flex:1 1 130px;width:0;min-width:0;font-size:14px}
+.imi-teacher .tu-common-list{max-height:240px;overflow-y:auto;overflow-x:hidden;margin-top:8px}
+.imi-teacher .tu-common-item{display:flex;align-items:center;gap:6px;min-width:0;margin-top:6px}
+.imi-teacher .tu-common-item>.tu-button:first-child{flex:1;min-width:0;text-align:left;justify-content:flex-start}
+.imi-teacher .tu-common-item>.tu-common-remove{flex:0 0 auto;color:#8c3549}
+.imi-teacher .tu-common-empty,.imi-teacher .tu-common-status{font-size:13px;line-height:1.5;color:#685772;overflow-wrap:anywhere;margin:8px 0 0}
+.imi-teacher .tu-common-status:empty{display:none}
+.imi-teacher .tu-common-names .tu-button:focus-visible{outline:3px solid #786582;outline-offset:2px}
