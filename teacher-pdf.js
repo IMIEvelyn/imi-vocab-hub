@@ -63,6 +63,13 @@ function headerLines(config={}){
  const first=[date,clean(h.className)].filter(Boolean).join('  ');
  return [[first,clean(h.language)].filter(Boolean).join(' / '),[clean(config.title),clean(h.teacherName)].filter(Boolean).join(' / ')];
 }
+// Use the same captured settings as the PDF pages; teacher names stay inside the PDF only.
+function downloadFilename(config={},kind='both'){
+ const clean=value=>String(value??'').normalize('NFC').replace(/[\\/:*?"<>|\u0000-\u001f\u007f]/gu,' ').replace(/\s+/gu,' ').replace(/^[ .]+|[ .]+$/gu,'');
+ const h=config.header||{},date=String(h.date??'').trim().replace(/^(\d{4})[/-](\d{2})[/-](\d{2})$/u,'$1-$2-$3');
+ const label={both:'字卡＋詞彙',cards:'字卡',table:'詞彙'}[kind]||'字卡＋詞彙';
+ return [clean(date),clean(h.className),clean(h.language),clean(config.title)||'IMI詞序配對',label].filter(Boolean).join('_')+'.pdf';
+}
 function checkHeader(ctx,config){
  useFonts(ctx,config);const previous=ctx.font,lines=headerLines(config);
  try{for(let i=0;i<lines.length;i++){font(ctx,i===0?44:30,i===0);if(ctx.measureText(lines[i]).width>W-2*M)throw Error('PDF頁首第'+(i===0?'一':'二')+'行超出整頁寬度，請縮短'+(i===0?'日期／班級（學生）／輔助外語種。':'教材名稱／老師姓名。'));}}
@@ -162,5 +169,5 @@ function render(spec,canvas,index,total){canvas.width=W;canvas.height=H;const ct
 if(config.showMeaning&&r.meaning){for(const candidate of [34,30,26,22,18,16]){meaningSize=candidate;font(ctx,candidate);meaningLines=wrapTableText(ctx,r.meaning,cw-54);mh=meaningLines.length*candidate*1.3;if(mh<=maxMeaning)break;}if(mh>maxMeaning)throw Error('第'+(r.ordinal||i+1)+'詞彙的外語過長，請改用詞彙表或縮短內容。');}
 const wordTop=y+92,wordHeight=ch-126-mh;drawWord(ctx,r,{x:x+25,y:wordTop,w:cw-50,h:wordHeight},config);if(config.showMeaning&&r.meaning){font(ctx,meaningSize);ctx.textAlign='center';ctx.textBaseline='top';ctx.fillStyle='#66756c';meaningLines.forEach((line,j)=>ctx.fillText(line,x+cw/2,y+ch-25-mh+j*meaningSize*1.3))}})}else{drawTable(ctx,spec,config)}ctx.fillStyle='#66756c';font(ctx,26);ctx.textBaseline='bottom';ctx.textAlign='left';ctx.fillText('© Teacher Evelyn · IMI Mandarin',M,H-60);ctx.textAlign='right';ctx.fillText((index+1)+' / '+total,W-M,H-60);return canvas}
 async function build(records,env={}){if(!records.length)throw Error('請先貼上有效的詞彙資料。');validateGlyphs(records,env.presentation||presentation());const make=env.createCanvas||(()=>document.createElement('canvas'));await loadFonts(env.presentation);const canvas=make(),ctx=canvas.getContext('2d'),pages=plan(records,ctx,env.presentation||presentation()).filter(p=>!env.type||p.type===env.type);const lib=env.PDFLib||global.PDFLib;if(!lib)throw Error('PDF 功能尚未載入，請重新整理後再試。');const pdf=await lib.PDFDocument.create();pdf.setTitle('IMI Vocabulary Cards and Table');pdf.setAuthor('Teacher Evelyn · IMI Mandarin');for(let i=0;i<pages.length;i++){render(pages[i],canvas,i,pages.length);const data=canvas.toDataURL('image/jpeg',.98),img=await pdf.embedJpg(data);const page=pdf.addPage([595.276,841.89]);page.drawImage(img,{x:0,y:0,width:595.276,height:841.89});if(env.onProgress)env.onProgress(i+1,pages.length);if(env.yieldPage)await env.yieldPage()}canvas.width=1;canvas.height=1;return {bytes:await pdf.save(),pages:pages.length}}
-global.IMIVocabExport={loadFonts,detectChineseFont,fontNotice,validateGlyphs,family,presentation,headerLines,checkHeader,tableColumns,plan,render,build,width:W,height:H};
+global.IMIVocabExport={loadFonts,detectChineseFont,fontNotice,validateGlyphs,family,presentation,headerLines,downloadFilename,checkHeader,tableColumns,plan,render,build,width:W,height:H};
 })(typeof window!=='undefined'?window:globalThis);
