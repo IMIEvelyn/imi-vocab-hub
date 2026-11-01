@@ -123,3 +123,11 @@ body.imi-teacher{padding:24px 48px}
 
 /* v1.5 per-position speech editor */
 .imi-teacher .tu-speech-scopes{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.imi-teacher .tu-speech-scopes button[aria-pressed=true]{background:#786582;color:white;border-color:#786582}.imi-teacher .tu-isolation{display:flex;align-items:center;gap:6px;margin:12px 0;font-size:14px}.imi-teacher .tu-isolation input{width:auto}.imi-teacher .tu-speech-effective{overflow-wrap:anywhere}.imi-teacher [hidden]{display:none!important}
+
+/* PDF fonts are independent of the on-screen annotations and existing zhuyin. */
+@font-face{font-family:IMIPDFTraditional;src:url('fonts/Iansui-Regular.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:IMIPDFSimplified;src:url('fonts/LXGWWenKaiGB-Regular.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:IMIPDFLatin;src:url('fonts/LiberationSerif-Regular.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
+.imi-teacher .tu-word{grid-template-columns:minmax(0,var(--tu-info-width,max-content)) minmax(120px,1fr) max-content}
+.imi-teacher .tu-word-stacked{grid-template-columns:minmax(0,1fr) max-content}
+@media(max-width:480px){.imi-teacher .tu-word,.imi-teacher .tu-word-stacked{grid-template-columns:minmax(0,1fr)}}
