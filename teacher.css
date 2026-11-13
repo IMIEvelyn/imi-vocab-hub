@@ -145,3 +145,5 @@ body.imi-teacher{padding:24px 48px}
 .imi-teacher .tu-common-empty,.imi-teacher .tu-common-status{font-size:13px;line-height:1.5;color:#685772;overflow-wrap:anywhere;margin:8px 0 0}
 .imi-teacher .tu-common-status:empty{display:none}
 .imi-teacher .tu-common-names .tu-button:focus-visible{outline:3px solid #786582;outline-offset:2px}
+
+@font-face{font-family:IMIPDFThai;src:url('fonts/NotoSerifThai-Regular.woff') format('woff');font-weight:400;font-style:normal;font-display:swap}

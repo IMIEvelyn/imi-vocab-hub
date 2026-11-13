@@ -6,7 +6,7 @@ const FAMILY='"IMIExport", "Noto Sans CJK TC", "PingFang TC", "Microsoft JhengHe
 function presentation(style='combined',showMeaning=true){const names={combined:['word','pinyin','zhuyin'],chinese:['word'],pinyin:['pinyin'],zhuyin:['zhuyin'],hanpy:['word','pinyin'],hanzh:['word','zhuyin'],pyzh:['pinyin','zhuyin']},labels={word:'中文',pinyin:'拼音',zhuyin:'注音',meaning:'意思'},keys=(names[style]||names.combined).slice();if(showMeaning)keys.push('meaning');return {style,showMeaning:!!showMeaning,han:keys.includes('word'),py:keys.includes('pinyin'),zh:keys.includes('zhuyin'),columns:keys.map(key=>({key,label:labels[key]})),label:(names[style]||names.combined).map(k=>labels[k]).join('＋')}}
 
 const loaded=new Map();let latinFallback=false;
-function family(config={}){return (latinFallback?'"IMIPDFLatinFallback", ':'"IMIPDFLatin", ')+(config.chineseFont==='simplified'?'"IMIPDFSimplified"':'"IMIPDFTraditional"');}
+function family(config={}){return (latinFallback?'"IMIPDFLatinFallback", ':'"IMIPDFLatin", ')+'"IMIPDFThai", '+(config.chineseFont==='simplified'?'"IMIPDFSimplified"':'"IMIPDFTraditional"');}
 function font(ctx,size,bold=false){ctx.font='400 '+size+'px '+(ctx.imiPDFFamily||family());}
 function zhuyinFont(ctx,size,bold=false){ctx.font=(bold?'700 ':'400 ')+size+'px '+FAMILY;}
 function useFonts(ctx,config){ctx.imiPDFFamily=family(config);}
@@ -18,8 +18,8 @@ function limited(promise,label){
 async function loadFonts(config={}){
  if(!global.document?.fonts)return;
  const primary=config.chineseFont==='simplified'?'IMIPDFSimplified':'IMIPDFTraditional';
- const labels={IMIPDFTraditional:'芫荽',IMIPDFSimplified:'霞鶩文楷 GB',IMIPDFLatin:'Liberation Serif',IMIExport:'注音字體'};
- for(const name of [primary,'IMIPDFLatin',...(config.zh?[ 'IMIExport' ]:[])]){
+ const labels={IMIPDFTraditional:'芫荽',IMIPDFSimplified:'霞鶩文楷 GB',IMIPDFLatin:'Liberation Serif',IMIPDFThai:'Noto Serif Thai',IMIExport:'注音字體'};
+ for(const name of [primary,'IMIPDFLatin','IMIPDFThai',...(config.zh?[ 'IMIExport' ]:[])]){
   if(name==='IMIPDFLatin'&&latinFallback)continue;
   if(!loaded.has(name)){
    const promise=limited(global.document.fonts.load('400 16px '+name).then(faces=>{if(!faces.length)throw Error(labels[name]+'未註冊');}),labels[name]).catch(async error=>{
@@ -46,9 +46,9 @@ function fontNotice(){return latinFallback?'外語使用 Times New Roman 備援'
 function validateGlyphs(records,config={}){
  const coverage=global.IMIPDFFontCoverage;if(!coverage)throw Error('PDF字體檢查資料未載入，請重新整理。');
  const chinese=config.chineseFont==='simplified'?'simplified':'traditional';
- const has=(key,cp)=>{const ranges=coverage[key];let lo=0,hi=ranges.length-1;while(lo<=hi){const m=(lo+hi)>>1,[a,b]=ranges[m];if(cp<a)hi=m-1;else if(cp>b)lo=m+1;else return true;}return false;};
+ const has=(key,cp)=>{const ranges=coverage[key]||[];let lo=0,hi=ranges.length-1;while(lo<=hi){const m=(lo+hi)>>1,[a,b]=ranges[m];if(cp<a)hi=m-1;else if(cp>b)lo=m+1;else return true;}return false;};
  function check(text,kind='mixed'){
-  for(const ch of String(text||'')){if(/\s/u.test(ch))continue;const cp=ch.codePointAt(0),ok=kind==='zhuyin'?has('zhuyin',cp):/\p{Script=Han}/u.test(ch)?has(chinese,cp):has('latin',cp)||has(chinese,cp);
+  for(const ch of String(text||'')){if(/\s/u.test(ch))continue;const cp=ch.codePointAt(0),ok=kind==='zhuyin'?has('zhuyin',cp):/\p{Script=Thai}/u.test(ch)?has('thai',cp):/\p{Script=Han}/u.test(ch)?has(chinese,cp):has('latin',cp)||has(chinese,cp);
    if(!ok)throw Error('PDF指定字體缺少「'+ch+'」（U+'+cp.toString(16).toUpperCase()+'），請先確認教材或字體；尚未產生PDF。');
   }
  }
