@@ -9,7 +9,7 @@ function setup(loader=async()=>[{}]){
  return {c,calls,classes,nodes,get starts(){return starts},get scans(){return scans}};
 }
 (async()=>{
- const normal=setup();await normal.c.initGame();assert.equal(normal.starts,1);assert.equal(normal.c.document.documentElement.dataset.imiScript,'traditional');assert.equal(normal.classes.size,0);await normal.c.initGame();assert.equal(normal.calls.filter(x=>String(x[0]).includes('IMIPDFTraditional')).length,1);
+ const normal=setup();assert.equal(normal.calls[0][1],1.05);await normal.c.initGame();assert.equal(normal.starts,1);assert.equal(normal.c.document.documentElement.dataset.imiScript,'traditional');assert.equal(normal.classes.size,0);await normal.c.initGame();assert.equal(normal.calls.filter(x=>String(x[0]).includes('IMIPDFTraditional')).length,1);
  normal.c.validWords=[{str:'课本学习'}];await normal.c.initGame();assert.equal(normal.c.document.documentElement.dataset.imiScript,'simplified');assert.equal(normal.calls.filter(x=>String(x[0]).includes('IMIPDFSimplified')).length,1);
  normal.c.updateMarquee();assert.equal(normal.scans,1);
  const fail=setup(async()=>{throw Error('network')});await fail.c.initGame();assert.equal(fail.starts,0);assert.ok(fail.classes.has('imi-font-waiting'));assert.equal(fail.nodes.get('imiFontStatus').hidden,false);assert.ok(fail.nodes.get('imiFontStatus').children.some(n=>n.textContent==='重試 Retry'));

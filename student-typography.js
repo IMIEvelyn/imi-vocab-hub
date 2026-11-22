@@ -5,7 +5,7 @@ const ignored='.imi-han-cell,.marquee-translation,.greet-py,.greet-zhuyin-box,.r
 let enabled=false,pending=false,epoch=0;
 const cache=new Map();
 // A visual scale never changes the original character's advance width or line height.
-const scale=new URLSearchParams(location.search).get('fontSample')==='105'?1.05:1;
+const scale=new URLSearchParams(location.search).get('fontSample')==='100'?1:1.05;
 root.style.setProperty('--imi-han-scale',scale);
 function decorate(){
  if(!enabled)return;
