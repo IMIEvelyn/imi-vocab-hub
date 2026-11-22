@@ -79,7 +79,7 @@ body {
   .marquee-inner { display: inline-flex; white-space: nowrap; width: max-content; transform: translateZ(0); will-change: transform; }
   @keyframes marquee-anim { 0% { transform: translateX(0) translateZ(0); } 100% { transform: translateX(-50%) translateZ(0); } }
   .marquee-item { margin: 0 30px; font-weight: bold; color: #666; font-size: 26px; letter-spacing: 2px; }
-  .marquee-item span { color: #4CAF50; font-size: 20px; margin-left: 8px; }
+  .marquee-item > .marquee-translation { color: #4CAF50; font-size: 20px; margin-left: 8px; }
 
  /* 🌟 電腦版大星星回饋層 (全面放大 1.5 倍) */
   #bigStarFeedback { 
@@ -228,7 +228,7 @@ body {
 
   .hide-pinyin .greet-py { opacity: 0 !important; } 
   .hide-zhuyin .greet-zhuyin-box { opacity: 0 !important; }
-  body.hide-translation .marquee-item span { display: none !important; } /* 💡 讓跑馬燈裡的翻譯消失並縮緊空間 */
+  body.hide-translation .marquee-item > .marquee-translation { display: none !important; } /* 💡 讓跑馬燈裡的翻譯消失並縮緊空間 */
     
 /* 🌐 高質感自訂語種下拉選單 */
   .custom-dropdown {
@@ -784,7 +784,8 @@ body {
 .picture-toolbar h2 span,.picture-toolbar h2 small{display:block;white-space:nowrap}.picture-toolbar h2 small{font-size:12px;margin-top:2px;font-weight:500}
 
 </style>
-<link rel="stylesheet" href="teacher.css?v=1.5.7">
+<link rel="stylesheet" href="teacher.css?v=1.5.8-dev">
+<link rel="stylesheet" href="student-typography.css?v=1.5.8-dev">
 </head>
 
 <body id="gameBody">
@@ -1797,7 +1798,7 @@ function toggleTranslation() {
     const box = document.getElementById('marqueeInner');
     if (remainingWords.length === 0) { box.innerHTML = ""; return; }
     
-    let htmlStr = remainingWords.map(w => `<span class="marquee-item">${w.str}<span>(${w.native})</span></span>`).join('✨');
+    let htmlStr = remainingWords.map(w => `<span class="marquee-item">${w.str}<span class="marquee-translation">(${w.native})</span></span>`).join('✨');
     let repeatCount = Math.max(1, Math.ceil(12 / remainingWords.length));
     let blockStr = new Array(repeatCount).fill(htmlStr).join('✨');
     box.innerHTML = blockStr + '✨' + blockStr;
@@ -3017,5 +3018,6 @@ window.IMIStudentReview=StudentReview;
 <script src="teacher-speech-map.js?v=1.5.7"></script>
 <script src="teacher-common-names.js?v=1.5.7"></script>
 <script src="teacher.js?v=1.5.7"></script>
+<script src="student-typography.js?v=1.5.8-dev"></script>
 </body>
 </html>
