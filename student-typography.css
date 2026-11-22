@@ -6,3 +6,20 @@ html[data-imi-script=simplified] .imi-han-ink{font-family:IMIPDFSimplified}
 #imiFontStatus{position:fixed;inset:0;z-index:2000;display:flex;align-items:center;justify-content:center;gap:16px;background:#fffaf5;color:#51445e;font:18px/1.5 sans-serif;padding:24px;text-align:center}
 #imiFontStatus[hidden]{display:none}#imiFontStatus button{font:inherit;padding:10px 18px;border:1px solid #786582;border-radius:12px;background:white;color:#51445e;cursor:pointer}
 html.imi-font-waiting #gameViewport{visibility:hidden}
+
+/* Pure Chinese is an explicit BOTH-off state. Any visible annotation restores B unchanged. */
+body.hide-pinyin.hide-zhuyin .tile .greet-py,
+body.hide-pinyin.hide-zhuyin .tile .greet-zhuyin-box,
+body.hide-pinyin.hide-zhuyin .greeting-zh-container .greet-py,
+body.hide-pinyin.hide-zhuyin .greeting-zh-container .greet-zhuyin-box{display:none}
+body.hide-pinyin.hide-zhuyin .tile .greet-char-block{margin:0}
+body.hide-pinyin.hide-zhuyin .tile .greet-hz{font-size:96px;margin-right:0;line-height:1}
+body.hide-pinyin.hide-zhuyin .greeting-zh-container{flex-wrap:wrap!important;gap:12px;align-items:center;justify-content:center}
+body.hide-pinyin.hide-zhuyin .greeting-zh-container .greet-char-block{margin:0 6px}
+body.hide-pinyin.hide-zhuyin .greeting-zh-container .greet-hz{font-size:72px;margin-right:0;line-height:1.1}
+#reviewCard.hide-review-py.hide-review-zy #reviewPinyin,
+#reviewCard.hide-review-py.hide-review-zy .review-annotation{display:none}
+#reviewCard.hide-review-py.hide-review-zy .review-unit{gap:0;min-height:0;padding-top:0;flex:0 0 auto}
+#reviewCard.hide-review-py.hide-review-zy .review-hz{font-size:clamp(54px,12vw,84px)}
+#reviewCard.hide-review-py.hide-review-zy #reviewWord{column-gap:8px;row-gap:14px;justify-content:center;align-items:center}
+@media(max-width:600px){body.hide-pinyin.hide-zhuyin .greeting-zh-container .greet-hz{font-size:60px}}
