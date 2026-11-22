@@ -785,7 +785,7 @@ body {
 
 </style>
 <link rel="stylesheet" href="teacher.css?v=1.5.8">
-<link rel="stylesheet" href="student-typography.css?v=1.5.9">
+<link rel="stylesheet" href="student-typography.css?v=1.5.10">
 </head>
 
 <body id="gameBody">
@@ -1652,6 +1652,11 @@ function generateLink() {
   let hintUsedThisTurn = false; // 🎯 防弊機制：這回合是否用過提示
   const HEX_W = 170; const HEX_H = 196; const GAP = 5;
   let pinyinVisible = true; let zhuyinVisible = true;
+  let annotationAvailable = { py: true, zy: true };
+  function syncAnnotationVisibility() {
+    document.body.classList.toggle("hide-pinyin", !annotationAvailable.py || !pinyinVisible);
+    document.body.classList.toggle("hide-zhuyin", !annotationAvailable.zy || !zhuyinVisible);
+  }
  let transVisible = true; let currentLang = '外語'; 
 function toggleCustomDropdown() {
   document.getElementById('customLangDropdown').classList.toggle('show');
@@ -1684,8 +1689,8 @@ function toggleTranslation() {
   // 💡 修復跑馬燈 Bug：給瀏覽器 50 毫秒緩衝更新畫面寬度，然後強迫跑馬燈重新測量並起跑！
   setTimeout(updateMarquee, 50);
 }
-  function togglePinyin() { pinyinVisible = !pinyinVisible; const btn = document.getElementById('btnPy'); if(pinyinVisible) { document.body.classList.remove('hide-pinyin'); btn.classList.remove('off'); btn.innerText = "👁️ 拼音 Pinyin"; } else { document.body.classList.add('hide-pinyin'); btn.classList.add('off'); btn.innerText = "🙈 拼音 Pinyin"; } }
-  function toggleZhuyin() { zhuyinVisible = !zhuyinVisible; const btn = document.getElementById('btnZy'); if(zhuyinVisible) { document.body.classList.remove('hide-zhuyin'); btn.classList.remove('off'); btn.innerText = "👁️ 注音ㄅㄆㄇ"; } else { document.body.classList.add('hide-zhuyin'); btn.classList.add('off'); btn.innerText = "🙈 注音ㄅㄆㄇ"; } }
+  function togglePinyin() { pinyinVisible = !pinyinVisible; const btn = document.getElementById('btnPy'); if(pinyinVisible) { document.body.classList.remove('hide-pinyin'); btn.classList.remove('off'); btn.innerText = "👁️ 拼音 Pinyin"; } else { document.body.classList.add('hide-pinyin'); btn.classList.add('off'); btn.innerText = "🙈 拼音 Pinyin"; } syncAnnotationVisibility(); }
+  function toggleZhuyin() { zhuyinVisible = !zhuyinVisible; const btn = document.getElementById('btnZy'); if(zhuyinVisible) { document.body.classList.remove('hide-zhuyin'); btn.classList.remove('off'); btn.innerText = "👁️ 注音ㄅㄆㄇ"; } else { document.body.classList.add('hide-zhuyin'); btn.classList.add('off'); btn.innerText = "🙈 注音ㄅㄆㄇ"; } syncAnnotationVisibility(); }
   function initSlots() { SLOTS = []; const layout = [3, 4, 3]; for (let row = 0; row < layout.length; row++) { let cols = layout[row]; let offsetX = (cols === 3) ? ((HEX_W + GAP) / 2) : 0; for (let col = 0; col < cols; col++) { const x = col * (HEX_W + GAP) + offsetX + 20; const y = row * (HEX_H * 0.75 + GAP) + 20; SLOTS.push({ id: `R${row}C${col}`, x, y, tileData: null, el: null }); } } }
   
   function parseAndStart(rawString) {
@@ -1709,6 +1714,8 @@ function toggleTranslation() {
       tileQueue.push(tData);
     }
     document.getElementById('btnPy').style.display = hasPy ? 'flex' : 'none'; document.getElementById('btnZy').style.display = hasZy ? 'flex' : 'none';
+    annotationAvailable = { py: hasPy, zy: hasZy };
+    syncAnnotationVisibility();
     // 🎯 將組合好的 ttsStr 一併打包進最終詞庫
     validWords = Object.values(tempMap).map(w => ({ str: w.fullStr, ttsStr: w.ttsStr, native: w.native, tiles: w.tiles }));
     
@@ -2955,7 +2962,7 @@ const StudentReview = (() => {
   function stop(){serial++;clearTimeout(guard);if('speechSynthesis'in window)speechSynthesis.cancel();utterance=null;$('reviewSpeak').classList.remove('playing');$('reviewAudioStatus').textContent='';}
   function sync(){
     const settings=[['foreign','reviewTrans',transVisible,record.metadata.language||'外語','hide-review-foreign'],['py','reviewPy',pinyinVisible,'拼音 Pinyin','hide-review-py'],['zy','reviewZy',zhuyinVisible,'注音ㄅㄆㄇ','hide-review-zy']];
-    settings.forEach(([kind,id,on,label,klass])=>{const el=$(id);el.hidden=!has[kind];el.textContent=(on?'👁️ ':'🙈 ')+label;el.classList.toggle('off',!on);el.setAttribute('aria-pressed',String(on));card.classList.toggle(klass,!on);});
+    settings.forEach(([kind,id,on,label,klass])=>{const el=$(id);el.hidden=!has[kind];el.textContent=(on?'👁️ ':'🙈 ')+label;el.classList.toggle('off',!on);el.setAttribute('aria-pressed',String(on));card.classList.toggle(klass,!on || !has[kind]);});
   }
   function render(){
     stop();$('reviewError').hidden=true;
@@ -3007,7 +3014,7 @@ window.IMIStudentReview=StudentReview;
 
 </script>
 <script src="vocab-data.js?v=1.5.7"></script>
-<script src="student-data-adapter.js?v=1.5.7"></script>
+<script src="student-data-adapter.js?v=1.5.10"></script>
 <script src="phonetic.js"></script>
 <script src="vendor/pdf-lib.min.js"></script>
 <script src="vendor/qrcode.js"></script>
